@@ -3,7 +3,7 @@ import os
 
 
 class Mutation:
-    __id = ""
+    # __id = ""
     __chr = ""
     __pos = 0
     __ref = ""
@@ -19,12 +19,13 @@ class Mutation:
     __totalDepth = 0
     __refDepth = 0
     __altDepth = 0
-    __strandBias = 0.0
+    __strandBias = "" # 0.0
+
 
     # constructor
-    def __init__(self, chr, id, pos, ref, alt, type, context, consequence, dbSNP, cosmix, clinVar, qual, altFreq,
+    def __init__(self, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmix, clinVar, qual, altFreq,
                  totalDepth, refDepth, altDepth, strandBias):
-        self.__id = id
+        # self.__id = id
         self.__chr = chr
         self.__pos = pos
         self.__ref = ref
@@ -147,11 +148,35 @@ class Mutation:
     def get_strandBias(self):
         return self.__strandBias
 
+    # class functions
+
+    def toString(self):
+        return "{} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}".format(self.__chr,
+                                                                        self.__pos,
+                                                                        self.__ref,
+                                                                        self.__alt,
+                                                                        self.__type,
+                                                                        self.__context,
+                                                                        self.__consequence,
+                                                                        self.__dbSNP,
+                                                                        self.__cosmix,
+                                                                        self.__clinVar,
+                                                                        self.__qual,
+                                                                        self.__altFreq,
+                                                                        self.__totalDepth,
+                                                                        self.__refDepth,
+                                                                        self.__altDepth,
+                                                                        self.__strandBias)
 
     
 
 f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
 for line in f:
     print line
-
 print "fin\n"
+f.close()
+
+mutation1 = Mutation("chr1", 36932474, "C", "T", "SNV", "Coding,Intergenic", "synonymous_variant,upstream_gene_variant",
+                     "rs146209034", "", "", 100, 0.533, 5346, 2489, 2848, "-1.000")
+
+print(mutation1.toString())
