@@ -102,6 +102,11 @@ class Mutation:
     def get_chr(self):
         return self.__chr
 
+    def get_pos(self):
+        return self.__pos
+
+    
+
 
 f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
 for line in f:
