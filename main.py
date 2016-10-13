@@ -105,8 +105,50 @@ class Mutation:
     def get_pos(self):
         return self.__pos
 
-    
+    def get_ref(self):
+        return self.__ref
 
+    def get_alt(self):
+        return self.__alt
+
+    def get_type(self):
+        return self.__type
+
+    def get_context(self):
+        return self.__context
+
+    def get_consequences(self):
+        return self.__consequence
+
+    def get_dbSNP(self):
+        return self.__dbSNP
+
+    def get_cosmix(self):
+        return self.__cosmix
+
+    def get_clinVar(self):
+        return self.__clinVar
+
+    def get_qual(self):
+        return self.__qual
+
+    def get_altFreq(self):
+        return self.__altFreq
+
+    def get_totalDepth(self):
+        return self.__totalDepth
+
+    def get_refDepth(self):
+        return self.__refDepth
+
+    def get_altDepth(self):
+        return self.__altDepth
+
+    def get_strandBias(self):
+        return self.__strandBias
+
+
+    
 
 f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
 for line in f:
