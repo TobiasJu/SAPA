@@ -73,7 +73,7 @@ def run(species, symbol):
     variants = client.get_variants(species, symbol)
     if variants:
         for v in variants:
-            print '{seq_region_name}:{start}-{end}:{strand} ==> {id} ({consequence_type})'.format(**v);
+            print '{seq_region_name}:{start}-{end}:{strand} ==> {id} ({consequence_type})'.format(**v)
 
 if __name__ == '__main__':
     if len(sys.argv) == 3:
