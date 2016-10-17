@@ -7,6 +7,7 @@ import json
 import time
 
 class EnsemblRestClient(object):
+    # initialize class, set server address
     def __init__(self, server='http://rest.ensembl.org', reqs_per_sec=15):
         self.server = server
         self.reqs_per_sec = reqs_per_sec
@@ -81,4 +82,4 @@ if __name__ == '__main__':
     else:
         species, symbol = 'human', 'BRAF'
 
-    run(species, symbol)
+#    run(species, symbol)
