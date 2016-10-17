@@ -1,6 +1,20 @@
 import sys
 import os
+import ensembl_rest
+import argparse
 
+# argparse for information
+parser = argparse.ArgumentParser()
+group = parser.add_mutually_exclusive_group()
+group.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
+group.add_argument("-q", "--quiet", action="store_true", help="prevent output")
+parser.add_argument("-o", "--output", action="store_true", help="store the output in a file")
+parser.add_argument("-n","--number", type=int, help="number X")
+
+args = parser.parse_args()
+
+#if args.verbose:
+    # do something
 
 class Mutation:
     __id = ""
@@ -64,16 +78,32 @@ class Mutation:
         self.__type = type
 
     def set_context(self, context):
-        self.__context = context
+        if len(context.split(',')) == 1:
+            self.__context = context
+        else:
+            multiple_context = context.split(',')
+            self.__context = multiple_context
 
     def set_consequence(self, consequence):
-        self.__consequence = consequence
+        if len(consequence.split(',')) == 1:
+            self.__context = consequence
+        else:
+            multiple_context = consequence.split(',')
+            self.__context = multiple_context
 
     def set_dbSNP(self, dbSNP):
-        self.__dbSNP = dbSNP
+        if len(dbSNP.split(',')) == 1:
+            self.__context = dbSNP
+        else:
+            multiple_context = dbSNP.split(',')
+            self.__context = multiple_context
 
     def set_cosmic(self, cosmic):
-        self.__cosmic = cosmic
+        if len(cosmic.split(',')) == 1:
+            self.__context = cosmic
+        else:
+            multiple_context = cosmic.split(',')
+            self.__context = multiple_context
 
     def set_clinVar(self, clinVar):
         self.__clinVar = clinVar
@@ -195,7 +225,7 @@ for line in f:
 print "fin\n"
 f.close()
 
-print(mutations[80].toString())
+print(mutations[0].toString())
 print ("Mutation count: ", line_count)
 
 # filter all entries
@@ -212,16 +242,22 @@ for mutation in mutations:
     i += 1
 print("past filter: ", len(mutations))
 
+# search after unknown mutations
 for mutation in mutations:
-    if mutation.get_clinVar() != "":
-        print mutation.get_clinVar()
+    if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" and mutation.get_context() == "Coding":
+        print "unknown mutation"
+        print mutation.get_id()
 
-    if mutation.get_dbSNP() != "":
-        print mutation.get_dbSNP()
+        # split error!
 
-    if mutation.get_cosmic() != "":
-        print mutation.get_cosmic()
+    #if mutation.get_dbSNP() != "":
+        #print mutation.get_dbSNP()
+
+    #if mutation.get_cosmic() != "":
+        #print mutation.get_cosmic()
 
 
-# ensebmle API
+# ensemble API
+ensembl_rest.run(species="human", symbol="BRAF")
 
+# get whole gene, chromosome 
