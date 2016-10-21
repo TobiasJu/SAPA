@@ -5,18 +5,20 @@ class AllProt:
     __ensemble = ""
     __geneDesc = ""
     __chromosome = ""
-    __position = ""
+    __start = 0
+    __end = 0
     __proteinClass = ""
     __REST = ""
 
     # constructor
-    def __init__(self, gene, geneSyn, ensembl, geneDesc, chromosome, position, proteinClass, REST):
+    def __init__(self, gene, geneSyn, ensembl, geneDesc, chromosome, start, end, proteinClass, REST):
         self.__gene = gene,
         self.__geneSyn = geneSyn,
         self.__ensembl = ensembl,
         self.__geneDesc = geneDesc,
         self.__chromosome = chromosome,
-        self.__position = position,
+        self.__start = start,
+        self.__end = end,
         self.__proteinClass = proteinClass,
         self.__REST = REST
 
@@ -42,19 +44,23 @@ class AllProt:
     def get_chromosome(self):
         return self.__chromosome
 
-    def get_position(self):
-        return self.__position
+    def get_start(self):
+        return self.__start
+
+    def get_end(self):
+        return self.__end
 
     def get_proteinClass(self):
         return self.__proteinClass
 
     def toString(self):
-        return "Gene: {}, Gene synonym: {}, Ensembl: {}, Gene description: {}, Chromosome: {}, Position: {}, " \
-               "Protein class: {}".format(self.__gene,
+        return "Gene: {}, Gene synonym: {}, Ensembl: {}, Gene description: {}, Chromosome: {}, Start: {}, " \
+               "End: {},Protein class: {}".format(self.__gene,
                                           self.__geneSyn,
                                           self.__ensembl,
                                           self.__geneDesc,
                                           self.__chromosome,
-                                          self.__position,
+                                          self.__start,
+                                          self.__end,
                                           self.__proteinClass)
                                          #selt.__REST
