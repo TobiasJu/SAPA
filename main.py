@@ -1,7 +1,9 @@
 import sys
 import os
 import ensembl_rest
+from mutation import Mutation
 import argparse
+
 
 # argparse for information
 parser = argparse.ArgumentParser()
@@ -13,205 +15,78 @@ parser.add_argument("-n", "--number", type=int, help="number X")
 
 args = parser.parse_args()
 
-
 # if args.verbose:
 # do something
 
-class Mutation:
-    __id = ""
-    __chr = ""
-    __pos = 0  # int
-    __ref = ""
-    __alt = ""  # mutated Base(es)
-    __type = ""
-    __context = ""
-    __consequence = ""
-    __dbSNP = ""
-    __cosmic = ""
-    __clinVar = ""
-    __qual = 0  # int
-    __altFreq = 0.0  # float
-    __totalDepth = 0  # int
-    __refDepth = 0  # int
-    __altDepth = 0  # int
-    __strandBias = 0.0  # float
-    __conclusion = ""
+class AllProt:
+    __gene = ""
+    __geneSyn = ""
+    __ensemble = ""
+    __geneDesc = ""
+    __chromosome = ""
+    __position = ""
+    __proteinClass = ""
+    __REST = ""
 
     # constructor
-    def __init__(self, id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,
-                 totalDepth, refDepth, altDepth, strandBias, conclusion):
-        self.__id = id
-        self.__chr = chr
-        self.__pos = pos
-        self.__ref = ref
-        self.__alt = alt
-        self.__type = type
-        self.__context = context
-        self.__consequence = consequence
-        self.__dbSNP = dbSNP
-        self.__cosmic = cosmic
-        self.__clinVar = clinVar
-        self.__qual = qual
-        self.__altFreq = altFreq
-        self.__totalDepth = totalDepth
-        self.__refDepth = refDepth
-        self.__altDepth = altDepth
-        self.__strandBias = strandBias
-        self.__conclusion = conclusion
+    def __init__(self, gene, geneSyn, ensembl, geneDesc, chromosome, position, proteinClass, REST):
+        self.__gene = gene,
+        self.__geneSyn = geneSyn,
+        self.__ensembl = ensembl,
+        self.__geneDesc = geneDesc,
+        self.__chromosome = chromosome,
+        self.__position = position,
+        self.__proteinClass = proteinClass,
+        self.__REST = REST
 
     # setter
-    def set_id(self, id):
-        self.__id = id
+    def set_gene(self, gene):
+        self.__gene = gene
 
-    def set_chr(self, chr):
-        self.__chr = chr
-
-    def set_pos(self, pos):
-        self.__pos = pos
-
-    def set_ref(self, ref):
-        self.__ref = ref
-
-    def set_alt(self, alt):
-        self.__alt = alt
-
-    def set_type(self, type):
-        self.__type = type
-
-    def set_context(self, context):
-        if len(context.split(',')) == 1:
-            self.__context = context
-        else:
-            multiple_context = context.split(',')
-            self.__context = multiple_context
-
-    def set_consequence(self, consequence):
-        if len(consequence.split(',')) == 1:
-            self.__context = consequence
-        else:
-            multiple_context = consequence.split(',')
-            self.__context = multiple_context
-
-    def set_dbSNP(self, dbSNP):
-        if len(dbSNP.split(',')) == 1:
-            self.__context = dbSNP
-        else:
-            multiple_context = dbSNP.split(',')
-            self.__context = multiple_context
-
-    def set_cosmic(self, cosmic):
-        if len(cosmic.split(',')) == 1:
-            self.__context = cosmic
-        else:
-            multiple_context = cosmic.split(',')
-            self.__context = multiple_context
-
-    def set_clinVar(self, clinVar):
-        self.__clinVar = clinVar
-
-    def set_qual(selfs, qual):
-        selfs.__qual = qual
-
-    def set_altFreq(self, altFreq):
-        self.__altFreq = altFreq
-
-    def set_totalDepth(self, totalDepth):
-        self.__totalDepth = totalDepth
-
-    def set_refDepth(self, refDepth):
-        self.__refDepth = refDepth
-
-    def set_altDepth(self, altDepth):
-        self.__altDepth = altDepth
-
-    def set_strandBias(self, strandBias):
-        self.__strandBias = strandBias
+    # more setters needed?
 
     # getter
-    def get_id(self):
-        return self.__id
+    def get_gene(self):
+        return self.__gene
 
-    def get_chr(self):
-        return self.__chr
+    def get_geneSyn(self):
+        return self.__geneSyn
 
-    def get_pos(self):
-        return self.__pos
+    def get_ensembl(self):
+        return self.__ensemble
 
-    def get_ref(self):
-        return self.__ref
+    def get_geneDesc(self):
+        return self.__geneDesc
 
-    def get_alt(self):
-        return self.__alt
+    def get_chromosome(self):
+        return self.__chromosome
 
-    def get_type(self):
-        return self.__type
+    def get_position(self):
+        return self.__position
 
-    def get_context(self):
-        return self.__context
+    def get_proteinClass(self):
+        return self.__proteinClass
 
-    def get_consequences(self):
-        return self.__consequence
-
-    def get_dbSNP(self):
-        return self.__dbSNP
-
-    def get_cosmic(self):
-        return self.__cosmic
-
-    def get_clinVar(self):
-        return self.__clinVar
-
-    def get_qual(self):
-        return self.__qual
-
-    def get_altFreq(self):
-        return self.__altFreq
-
-    def get_totalDepth(self):
-        return self.__totalDepth
-
-    def get_refDepth(self):
-        return self.__refDepth
-
-    def get_altDepth(self):
-        return self.__altDepth
-
-    def get_strandBias(self):
-        return self.__strandBias
-
-    # class functions
-
-    @property
     def toString(self):
-        return "ID: {}, Chr: {}, Pos: {}, Ref: {}, Alt: {}, Type: {}, Context: {}, Consequence: {}, dbSNP: {}, " \
-               "COSMIC: {}, ClinVar: {}, Qual: {}, Alt Freq: {}, Total Depth: {},Ref Depth: {}, Alt Depth: {}, " \
-               "Strand Bias: {}, Conclusion: {} ".format(self.__id,
-                                                         self.__chr,
-                                                         self.__pos,
-                                                         self.__ref,
-                                                         self.__alt,
-                                                         self.__type,
-                                                         self.__context,
-                                                         self.__consequence,
-                                                         self.__dbSNP,
-                                                         self.__cosmic,
-                                                         self.__clinVar,
-                                                         self.__qual,
-                                                         self.__altFreq,
-                                                         self.__totalDepth,
-                                                         self.__refDepth,
-                                                         self.__altDepth,
-                                                         self.__strandBias,
-                                                         self.__conclusion)
+        return "Gene: {}, Gene synonym: {}, Ensembl: {}, Gene description: {}, Chromosome: {}, Position: {}, " \
+               "Protein class: {}".format(self.__gene,
+                                          self.__geneSyn,
+                                                         self.__ensembl,
+                                                         self.__geneDesc,
+                                                         self.__chromosome,
+                                                         self.__position,
+                                                         self.__proteinClass)
+                                                        #selt.__REST
 
 
 f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
 line_count = 0
 
+# create mutation Objects from the given Data of a patient
 mutations = []
 for line in f:
     # remove /n form end of line
-    lien = line.strip()
+    line = line.strip()
     split_line = line.split('","')
     split_line[0] = split_line[0].translate(None, '"')
     split_line[-1] = split_line[-1].translate(None, '"')
@@ -227,11 +102,34 @@ for line in f:
 
 print "fin\n"
 f.close()
+line_count = 0
 
-print(mutations[0].toString)
+# create Objects containing all human proteins
+allHumanProteins = []
+file = open('data/allprots.csv', 'r')
+
+for line in file:
+    # remove /n form end of line
+    line = line.strip()
+    split_line = line.split('\t')
+    line_count += 1
+    if len(split_line) >= 20:
+        allHumanProteins.append(AllProt(split_line[0], split_line[1], split_line[2], split_line[3], split_line[4],
+                                        split_line[5], split_line[6], split_line[7]))
+    else:
+        #print len(split_line)
+        #print split_line
+        allHumanProteins.append(AllProt(split_line[0], "unknown", "unknown", "unknown", "unknown", "unknown", "unknown",
+                                        "unknown"))
+
+file.close()
+
+print (allHumanProteins[1].get_gene)
+
+#print(mutations[0].toString)
 print ("Mutation count: ", line_count)
 
-# filter all entries
+# filter all entries in the patient mutation data set
 i = 0
 for mutation in mutations:
     # only clinically relevant quality
@@ -239,7 +137,7 @@ for mutation in mutations:
         del mutations[i]
 
     # if mutation does not change the amino acid, it does not affect the cell (in nearly all cases)
-    if mutation.get_consequences() == "synonymous_variant":
+    if "synonymous_variant" in mutation.get_consequences():
         del mutations[i]
     # more filters to come
     i += 1
