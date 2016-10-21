@@ -9,17 +9,18 @@ group = parser.add_mutually_exclusive_group()
 group.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
 group.add_argument("-q", "--quiet", action="store_true", help="prevent output")
 parser.add_argument("-o", "--output", action="store_true", help="store the output in a file")
-parser.add_argument("-n","--number", type=int, help="number X")
+parser.add_argument("-n", "--number", type=int, help="number X")
 
 args = parser.parse_args()
 
-#if args.verbose:
-    # do something
+
+# if args.verbose:
+# do something
 
 class Mutation:
     __id = ""
     __chr = ""
-    __pos = 0   # int
+    __pos = 0  # int
     __ref = ""
     __alt = ""  # mutated Base(es)
     __type = ""
@@ -29,11 +30,11 @@ class Mutation:
     __cosmic = ""
     __clinVar = ""
     __qual = 0  # int
-    __altFreq = 0.0 # float
-    __totalDepth = 0 # int
+    __altFreq = 0.0  # float
+    __totalDepth = 0  # int
     __refDepth = 0  # int
     __altDepth = 0  # int
-    __strandBias = ""  # 0.0
+    __strandBias = 0.0  # float
     __conclusion = ""
 
     # constructor
@@ -180,27 +181,28 @@ class Mutation:
 
     # class functions
 
+    @property
     def toString(self):
         return "ID: {}, Chr: {}, Pos: {}, Ref: {}, Alt: {}, Type: {}, Context: {}, Consequence: {}, dbSNP: {}, " \
                "COSMIC: {}, ClinVar: {}, Qual: {}, Alt Freq: {}, Total Depth: {},Ref Depth: {}, Alt Depth: {}, " \
                "Strand Bias: {}, Conclusion: {} ".format(self.__id,
-                                         self.__chr,
-                                         self.__pos,
-                                         self.__ref,
-                                         self.__alt,
-                                         self.__type,
-                                         self.__context,
-                                         self.__consequence,
-                                         self.__dbSNP,
-                                         self.__cosmic,
-                                         self.__clinVar,
-                                         self.__qual,
-                                         self.__altFreq,
-                                         self.__totalDepth,
-                                         self.__refDepth,
-                                         self.__altDepth,
-                                         self.__strandBias,
-                                         self.__conclusion)
+                                                         self.__chr,
+                                                         self.__pos,
+                                                         self.__ref,
+                                                         self.__alt,
+                                                         self.__type,
+                                                         self.__context,
+                                                         self.__consequence,
+                                                         self.__dbSNP,
+                                                         self.__cosmic,
+                                                         self.__clinVar,
+                                                         self.__qual,
+                                                         self.__altFreq,
+                                                         self.__totalDepth,
+                                                         self.__refDepth,
+                                                         self.__altDepth,
+                                                         self.__strandBias,
+                                                         self.__conclusion)
 
 
 f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
@@ -209,23 +211,24 @@ line_count = 0
 mutations = []
 for line in f:
     # remove /n form end of line
-    lien = line.rstrip('/n')
+    lien = line.strip()
     split_line = line.split('","')
     split_line[0] = split_line[0].translate(None, '"')
+    split_line[-1] = split_line[-1].translate(None, '"')
 
     if len(split_line) == 16:
-        # wieso geht das nicht?
-        # mutation1 = Mutation(split_line)
+        context = split_line[5].split(",")
+        consequences = split_line[6].split(",")
         line_count += 1
         mutations.append(Mutation(line_count, split_line[0], split_line[1], split_line[2], split_line[3], split_line[4],
-                                  split_line[5], split_line[6], split_line[7], split_line[8], split_line[9],
+                                  context, consequences, split_line[7], split_line[8], split_line[9],
                                   int(split_line[10]), split_line[11], split_line[12], split_line[13], split_line[14],
                                   split_line[15], "unknown"))
 
 print "fin\n"
 f.close()
 
-print(mutations[0].toString())
+print(mutations[0].toString)
 print ("Mutation count: ", line_count)
 
 # filter all entries
@@ -244,20 +247,21 @@ print("past filter: ", len(mutations))
 
 # search after unknown mutations
 for mutation in mutations:
-    if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" and mutation.get_context() == "Coding":
+    if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" \
+            and "Coding" in mutation.get_context():
+
         print "unknown mutation"
         print mutation.get_id()
 
-        # split error!
+        # if mutation.get_dbSNP() != "":
+        # print mutation.get_dbSNP()
 
-    #if mutation.get_dbSNP() != "":
-        #print mutation.get_dbSNP()
-
-    #if mutation.get_cosmic() != "":
-        #print mutation.get_cosmic()
+        # if mutation.get_cosmic() != "":
+        # print mutation.get_cosmic()
 
 
 # ensemble API
-ensembl_rest.run(species="human", symbol="BRAF")
+# ensembl_rest.run(species="human", symbol="BRAF")
 
 # get whole gene, chromosome 
+# Suchvorgang...
