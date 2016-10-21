@@ -3,6 +3,7 @@ import os
 import ensembl_rest
 from mutation import Mutation
 from allProt import AllProt
+from probedMutation import ProbedMutation
 import argparse
 
 
@@ -18,9 +19,6 @@ args = parser.parse_args()
 
 # if args.verbose:
 # do something
-
-
-
 
 f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
 l_count = 0
@@ -41,7 +39,7 @@ for line in f:
         mutations.append(Mutation(l_count, split_line[0], split_line[1], split_line[2], split_line[3], split_line[4],
                                   context, consequences, split_line[7], split_line[8], split_line[9],
                                   int(split_line[10]), split_line[11], split_line[12], split_line[13], split_line[14],
-                                  split_line[15], "unknown"))
+                                  split_line[15]))
 
 print "created User Mutation Objects\n"
 f.close()
@@ -79,7 +77,7 @@ for line in lines:
         #                               "unknown", "unknown"))
 # print "{} -> {}".format(start, end)
 file.close()
-print "created All Prot Objects"
+print "created All Protein Objects"
 # print(mutations[0].toString)
 print ("Mutation count: ", l_count)
 
@@ -97,6 +95,7 @@ for mutation in mutations:
     i += 1
 print("past filter: ", len(mutations))
 
+export_list = []
 # search after unknown mutations and find corresponding genes
 for mutation in mutations:
     if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" \
@@ -115,9 +114,13 @@ for mutation in mutations:
                 # print gene.get_gene()
                 # print gene.get_geneSyn()
                 print gene.get_geneDesc()
-
+                # export_list.append(ProbedMutation()
 
                 # FAM83A	BJ-TSA-9, MGC14128	ENSG00000147689	Family with sequence similarity 83, member A	8	123178960-123210079 POS 123195662
+
+    export_list.append(ProbedMutation(mutation[0],mutation[1],mutation[1],mutation[1],mutation[1],mutation[1],
+                                      mutation[1],mutation[1],mutation[1],mutation[1],mutation[1],mutation[1],
+                                      mutation[1],mutation[1],mutation[1],mutation[1],mutation[1],mutation[1],))
 
 # ensemble API
 # ensembl_rest.run(species="human", symbol="BRAF")
@@ -129,29 +132,9 @@ export_cnt = 0
 for mutation in mutations:
     # write Header first:
     if export_cnt == 0:
-        target.write(mutation.header())
+        target.write(ProbedMutation[0].print_header())
         export_cnt += 1
 
     target.write(mutation.export())
 
 target.close()
-
-
-class ProbedMutation(Mutation):
-    __gene = ""
-    __geneSyn = ""
-    __conclusion = ""
-
-    def __init__(self, id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,
-                 totalDepth, refDepth, altDepth, strandBias, gene, geneSyn, conclusion):
-        self.__gene = gene,
-        self.__geneSyn = geneSyn,
-        self.__conclusion = conclusion
-        super(Mutation, self).__init__(id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,
-                 totalDepth, refDepth, altDepth, strandBias)
-
-        
-
-
-
-
