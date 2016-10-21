@@ -26,6 +26,9 @@ class AllProt:
     def set_gene(self, gene):
         self.__gene = gene
 
+    def set_start(self, start):
+        self.__start = start
+
     # more setters needed?
 
     # getter
@@ -45,10 +48,15 @@ class AllProt:
         return self.__chromosome
 
     def get_start(self):
-        return self.__start
+        # wieso ist das ein TUPEL???
+
+        # print type(self.__start)
+        return int(self.__start[0])
 
     def get_end(self):
-        return self.__end
+        # ist auch ein Tupel
+        # print int(self.__end[0])
+        return int(self.__end[0])
 
     def get_proteinClass(self):
         return self.__proteinClass
