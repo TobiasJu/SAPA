@@ -67,21 +67,19 @@ for line in lines:
         position = split_line[5].split("-")
         start = position[0]
         end = position[1]
-        print "{} {}".format("ENDE", end)
-        print int(end)
         geneDesc = split_line[3].split(",")
         #print split_line
-        allHumanProteins.append(AllProt(split_line[0], geneSyn, split_line[2], split_line[3], geneDesc, int(start),
+        allHumanProteins.append(AllProt(split_line[0], geneSyn, split_line[2], split_line[3], geneDesc, start,
                                         int(end), split_line[4], split_line[5]))
-    else:
-        #print len(split_line)
-        #print split_line
-        allHumanProteins.append(AllProt(split_line[0], "unknown", "unknown", "unknown", "unknown", "unknown", "unknown",
-                                        "unknown", "unknown"))
 
+    # else:
+        # print len(split_line)
+        # print split_line
+        # allHumanProteins.append(AllProt(split_line[0], "unknown", "unknown", "unknown", "unknown", "unknown", "unknown",
+        #                               "unknown", "unknown"))
+print "{} -> {}".format(start, end)
 file.close()
 print "created All Prot Objects"
-print allHumanProteins[2].toString()
 #print(mutations[0].toString)
 print ("Mutation count: ", l_count)
 
@@ -104,18 +102,23 @@ for mutation in mutations:
     if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" \
             and "Coding" in mutation.get_context():
 
-        print "{} ID: {}".format("unknown mutation", mutation.get_id())
+        print "{} ID: {}, Position: {}".format("unknown mutation", mutation.get_id(), mutation.get_pos())
 
         for gene in allHumanProteins:
-            # can be simplified, BUT HOW?
-            #print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(), gene.get_start(), gene.get_end())
-            if gene.get_start() < mutation.get_pos() and gene.get_end() > mutation.get_pos():
-                print gene.get_gene()
-                print gene.get_geneSyn()
+            print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
+                                                                                   gene.get_start(), gene.get_end())
+            #print type(gene.get_start())
+            #print type(gene.get_end())
+            #print type(mutation.get_pos())
+            if gene.get_start() < mutation.get_pos() < gene.get_end():
+
+                print "found Gene: "
+                # print gene.get_gene()
+                # print gene.get_geneSyn()
                 print gene.get_geneDesc()
 
-                print "found!"
-                # FAM83A	BJ-TSA-9, MGC14128	ENSG00000147689	Family with sequence similarity 83, member A	8	123178960-123210079
+
+                # FAM83A	BJ-TSA-9, MGC14128	ENSG00000147689	Family with sequence similarity 83, member A	8	123178960-123210079 POS 123195662
 
 
 
