@@ -61,6 +61,8 @@ class AllProt:
     def get_proteinClass(self):
         return self.__proteinClass
 
+    # class functions
+
     def toString(self):
         return "Gene: {}, Gene synonym: {}, Ensembl: {}, Gene description: {}, Chromosome: {}, Start: {}, " \
                "End: {},Protein class: {}".format(self.__gene,
@@ -72,3 +74,4 @@ class AllProt:
                                           self.__end,
                                           self.__proteinClass)
                                          #selt.__REST
+
