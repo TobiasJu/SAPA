@@ -18,11 +18,11 @@ class Mutation:
     __refDepth = 0  # int
     __altDepth = 0  # int
     __strandBias = 0.0  # float
-    __conclusion = ""
+    #__conclusion = ""
 
     # constructor
     def __init__(self, id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,
-                 totalDepth, refDepth, altDepth, strandBias, conclusion):
+                 totalDepth, refDepth, altDepth, strandBias):
         self.__id = id
         self.__chr = chr
         self.__pos = pos
@@ -40,7 +40,7 @@ class Mutation:
         self.__refDepth = refDepth
         self.__altDepth = altDepth
         self.__strandBias = strandBias
-        self.__conclusion = conclusion
+        # self.__conclusion = conclusion
 
     # setter
     def set_id(self, id):
@@ -162,8 +162,8 @@ class Mutation:
     def get_strandBias(self):
         return float(self.__strandBias)
 
-    def get_conclusion(self):
-        return self.__conclusion
+    # def get_conclusion(self):
+    #     return self.__conclusion
 
     # class functions
 
@@ -171,21 +171,21 @@ class Mutation:
     def toString(self):
         return "ID: {}, Chr: {}, Pos: {}, Ref: {}, Alt: {}, Type: {}, Context: {}, Consequence: {}, dbSNP: {}, " \
                "COSMIC: {}, ClinVar: {}, Qual: {}, Alt Freq: {}, Total Depth: {},Ref Depth: {}, Alt Depth: {}, " \
-               "Strand Bias: {}, Conclusion: {} ".format(self.__id,
-                                                         self.__chr,
-                                                         self.__pos,
-                                                         self.__ref,
-                                                         self.__alt,
-                                                         self.__type,
-                                                         self.__context,
-                                                         self.__consequence,
-                                                         self.__dbSNP,
-                                                         self.__cosmic,
-                                                         self.__clinVar,
-                                                         self.__qual,
-                                                         self.__altFreq,
-                                                         self.__totalDepth,
-                                                         self.__refDepth,
-                                                         self.__altDepth,
-                                                         self.__strandBias,
-                                                         self.__conclusion)
+               "Strand Bias: {} ".format(self.__id,
+                                         self.__chr,
+                                         self.__pos,
+                                         self.__ref,
+                                         self.__alt,
+                                         self.__type,
+                                         self.__context,
+                                         self.__consequence,
+                                         self.__dbSNP,
+                                         self.__cosmic,
+                                         self.__clinVar,
+                                         self.__qual,
+                                         self.__altFreq,
+                                         self.__totalDepth,
+                                         self.__refDepth,
+                                         self.__altDepth,
+                                         self.__strandBias)
+                                         #self.__conclusion)
