@@ -1,7 +1,7 @@
 
 
 class Mutation:
-    __id = ""
+    __id = 0
     __chr = ""
     __pos = 0  # int
     __ref = ""
@@ -112,13 +112,13 @@ class Mutation:
 
     # getter
     def get_id(self):
-        return self.__id
+        return int(self.__id)
 
     def get_chr(self):
         return self.__chr
 
     def get_pos(self):
-        return self.__pos
+        return int(self.__pos)
 
     def get_ref(self):
         return self.__ref
@@ -145,22 +145,25 @@ class Mutation:
         return self.__clinVar
 
     def get_qual(self):
-        return self.__qual
+        return int(self.__qual)
 
     def get_altFreq(self):
-        return self.__altFreq
+        return float(self.__altFreq)
 
     def get_totalDepth(self):
-        return self.__totalDepth
+        return int(self.__totalDepth)
 
     def get_refDepth(self):
-        return self.__refDepth
+        return int(self.__refDepth)
 
     def get_altDepth(self):
-        return self.__altDepth
+        return int(self.__altDepth)
 
     def get_strandBias(self):
-        return self.__strandBias
+        return float(self.__strandBias)
+
+    def get_conclusion(self):
+        return self.__conclusion
 
     # class functions
 
