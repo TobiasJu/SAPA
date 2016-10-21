@@ -77,10 +77,10 @@ for line in lines:
         # print split_line
         # allHumanProteins.append(AllProt(split_line[0], "unknown", "unknown", "unknown", "unknown", "unknown", "unknown",
         #                               "unknown", "unknown"))
-print "{} -> {}".format(start, end)
+# print "{} -> {}".format(start, end)
 file.close()
 print "created All Prot Objects"
-#print(mutations[0].toString)
+# print(mutations[0].toString)
 print ("Mutation count: ", l_count)
 
 # filter all entries in the patient mutation data set
@@ -97,7 +97,7 @@ for mutation in mutations:
     i += 1
 print("past filter: ", len(mutations))
 
-# search after unknown mutations
+# search after unknown mutations and find corresponding genes
 for mutation in mutations:
     if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" \
             and "Coding" in mutation.get_context():
@@ -105,13 +105,12 @@ for mutation in mutations:
         print "{} ID: {}, Position: {}".format("unknown mutation", mutation.get_id(), mutation.get_pos())
 
         for gene in allHumanProteins:
-            print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
-                                                                                   gene.get_start(), gene.get_end())
             #print type(gene.get_start())
             #print type(gene.get_end())
             #print type(mutation.get_pos())
             if gene.get_start() < mutation.get_pos() < gene.get_end():
-
+                print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
+                                                                                       gene.get_start(), gene.get_end())
                 print "found Gene: "
                 # print gene.get_gene()
                 # print gene.get_geneSyn()
@@ -120,9 +119,39 @@ for mutation in mutations:
 
                 # FAM83A	BJ-TSA-9, MGC14128	ENSG00000147689	Family with sequence similarity 83, member A	8	123178960-123210079 POS 123195662
 
-
-
 # ensemble API
 # ensembl_rest.run(species="human", symbol="BRAF")
 
-# get whole gene, chrom
+
+# write in export table
+target = open("output.csv", 'w')
+export_cnt = 0
+for mutation in mutations:
+    # write Header first:
+    if export_cnt == 0:
+        target.write(mutation.header())
+        export_cnt += 1
+
+    target.write(mutation.export())
+
+target.close()
+
+
+class ProbedMutation(Mutation):
+    __gene = ""
+    __geneSyn = ""
+    __conclusion = ""
+
+    def __init__(self, id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,
+                 totalDepth, refDepth, altDepth, strandBias, gene, geneSyn, conclusion):
+        self.__gene = gene,
+        self.__geneSyn = geneSyn,
+        self.__conclusion = conclusion
+        super(Mutation, self).__init__(id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,
+                 totalDepth, refDepth, altDepth, strandBias)
+
+        
+
+
+
+
