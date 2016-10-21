@@ -67,12 +67,12 @@ for line in lines:
         position = split_line[5].split("-")
         start = position[0]
         end = position[1]
-        print end
+        print "{} {}".format("ENDE", end)
         print int(end)
         geneDesc = split_line[3].split(",")
         #print split_line
-        allHumanProteins.append(AllProt(split_line[0], geneSyn, split_line[2], geneDesc, int(start), int(end), split_line[4],
-                                        split_line[5], split_line[6]))
+        allHumanProteins.append(AllProt(split_line[0], geneSyn, split_line[2], split_line[3], geneDesc, int(start),
+                                        int(end), split_line[4], split_line[5]))
     else:
         #print len(split_line)
         #print split_line
@@ -81,7 +81,7 @@ for line in lines:
 
 file.close()
 print "created All Prot Objects"
-
+print allHumanProteins[2].toString()
 #print(mutations[0].toString)
 print ("Mutation count: ", l_count)
 
@@ -108,7 +108,7 @@ for mutation in mutations:
 
         for gene in allHumanProteins:
             # can be simplified, BUT HOW?
-            print "Mutation Pos{}, Ref Gene Start: {},  Ref Gene End{}".format(mutation.get_pos(), gene.get_start(), gene.get_end())
+            #print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(), gene.get_start(), gene.get_end())
             if gene.get_start() < mutation.get_pos() and gene.get_end() > mutation.get_pos():
                 print gene.get_gene()
                 print gene.get_geneSyn()

@@ -2,7 +2,7 @@
 class AllProt:
     __gene = ""
     __geneSyn = ""
-    __ensembl = ""
+    __ensemble = ""
     __geneDesc = ""
     __chromosome = ""
     __start = 0
@@ -36,7 +36,7 @@ class AllProt:
         return self.__geneSyn
 
     def get_ensembl(self):
-        return self.__ensembl
+        return self.__ensemble
 
     def get_geneDesc(self):
         return self.__geneDesc
