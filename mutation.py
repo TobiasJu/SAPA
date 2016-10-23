@@ -1,6 +1,6 @@
+# mutation class for storing the patient data
 
-
-class Mutation:
+class Mutation(object): # warum muss hier object hin??
     __id = 0
     __chr = ""
     __pos = 0  # int
@@ -166,8 +166,6 @@ class Mutation:
     #     return self.__conclusion
 
     # class functions
-
-    @property
     def toString(self):
         return "ID: {}, Chr: {}, Pos: {}, Ref: {}, Alt: {}, Type: {}, Context: {}, Consequence: {}, dbSNP: {}, " \
                "COSMIC: {}, ClinVar: {}, Qual: {}, Alt Freq: {}, Total Depth: {},Ref Depth: {}, Alt Depth: {}, " \
