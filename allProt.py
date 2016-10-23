@@ -1,3 +1,4 @@
+# class for all human proteins
 
 class AllProt:
     __gene = ""
@@ -66,12 +67,11 @@ class AllProt:
     def toString(self):
         return "Gene: {}, Gene synonym: {}, Ensembl: {}, Gene description: {}, Chromosome: {}, Start: {}, " \
                "End: {},Protein class: {}".format(self.__gene,
-                                          self.__geneSyn,
-                                          self.__ensembl,
-                                          self.__geneDesc,
-                                          self.__chromosome,
-                                          self.__start,
-                                          self.__end,
-                                          self.__proteinClass)
-                                         #selt.__REST
-
+                                                  self.__geneSyn,
+                                                  self.__ensembl,
+                                                  self.__geneDesc,
+                                                  self.__chromosome,
+                                                  self.__start,
+                                                  self.__end,
+                                                  self.__proteinClass)
+                                                # self.__REST
