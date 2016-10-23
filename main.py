@@ -6,7 +6,6 @@ from allProt import AllProt
 from probedMutation import ProbedMutation
 import argparse
 
-
 # argparse for information
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group()
@@ -21,11 +20,12 @@ args = parser.parse_args()
 # do something
 
 f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
+variant_lines = f.readlines()[1:]
 l_count = 0
 
 # create mutation Objects from the given Data of a patient
 mutations = []
-for line in f:
+for line in variant_lines:
     # remove /n form end of line
     line = line.strip()
     split_line = line.split('","')
@@ -40,6 +40,10 @@ for line in f:
                                   context, consequences, split_line[7], split_line[8], split_line[9],
                                   int(split_line[10]), split_line[11], split_line[12], split_line[13], split_line[14],
                                   split_line[15]))
+    else:
+        print "INVALID DATA LENGHT in Line {}".format(l_count)
+        print line
+        l_count += 1
 
 print "created User Mutation Objects\n"
 f.close()
@@ -47,9 +51,8 @@ line_count = 0
 
 # create Objects containing all human proteins
 allHumanProteins = []
-file = open('data/allprots.csv', 'r')
-lines = file.readlines()[1:]
-
+allProtFile = open('data/allprots.csv', 'r')
+lines = allProtFile.readlines()[1:]
 for line in lines:
     # remove /n form end of line
     line = line.strip()
@@ -61,22 +64,24 @@ for line in lines:
             split_line[i] = split_line[i].translate(None, "\'")
             i += 1
 
+        gene = split_line[0]
         geneSyn = split_line[1].split(",")
+        ensembl = split_line[2]
         position = split_line[5].split("-")
         start = position[0]
         end = position[1]
         geneDesc = split_line[3].split(",")
-        #print split_line
-        allHumanProteins.append(AllProt(split_line[0], geneSyn, split_line[2], split_line[3], geneDesc, start,
-                                        int(end), split_line[4], split_line[5]))
+        # print split_line
+        allHumanProteins.append(AllProt(gene, geneSyn, ensembl, geneDesc, split_line[3], start,
+                                        int(end), split_line[6], split_line[7:-1]))
 
-    # else:
+        # else:
         # print len(split_line)
         # print split_line
-        # allHumanProteins.append(AllProt(split_line[0], "unknown", "unknown", "unknown", "unknown", "unknown", "unknown",
-        #                               "unknown", "unknown"))
+        # allHumanProteins.append(AllProt(split_line[0], "unknown", "unknown",
+        # "unknown", "unknown", "unknown", "unknown", "unknown", "unknown"))
 # print "{} -> {}".format(start, end)
-file.close()
+allProtFile.close()
 print "created All Protein Objects"
 # print(mutations[0].toString)
 print ("Mutation count: ", l_count)
@@ -98,15 +103,16 @@ print("past filter: ", len(mutations))
 export_list = []
 # search after unknown mutations and find corresponding genes
 for mutation in mutations:
+    print mutation.get_id()
     if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" \
             and "Coding" in mutation.get_context():
 
         print "{} ID: {}, Position: {}".format("unknown mutation", mutation.get_id(), mutation.get_pos())
 
         for gene in allHumanProteins:
-            #print type(gene.get_start())
-            #print type(gene.get_end())
-            #print type(mutation.get_pos())
+            # print type(gene.get_start())
+            # print type(gene.get_end())
+            # print type(mutation.get_pos())
             if gene.get_start() < mutation.get_pos() < gene.get_end():
                 print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
                                                                                        gene.get_start(), gene.get_end())
@@ -116,11 +122,19 @@ for mutation in mutations:
                 print gene.get_geneDesc()
                 # export_list.append(ProbedMutation()
 
-                # FAM83A	BJ-TSA-9, MGC14128	ENSG00000147689	Family with sequence similarity 83, member A	8	123178960-123210079 POS 123195662
+                # FAM83A	BJ-TSA-9, MGC14128	ENSG00000147689	Family with sequence similarity 83, member A	8
+                # 123178960-123210079 POS 123195662
 
-    export_list.append(ProbedMutation(mutation[0],mutation[1],mutation[1],mutation[1],mutation[1],mutation[1],
-                                      mutation[1],mutation[1],mutation[1],mutation[1],mutation[1],mutation[1],
-                                      mutation[1],mutation[1],mutation[1],mutation[1],mutation[1],mutation[1],))
+                export_list.append(ProbedMutation(mutation.get_id(), mutation.get_chr(), mutation.get_pos(),
+                                                  mutation.get_ref(), mutation.get_alt(), mutation.get_type(),
+                                                  mutation.get_context(), mutation.get_consequences(),
+                                                  mutation.get_dbSNP(), mutation.get_cosmic(), mutation.get_clinVar(),
+                                                  mutation.get_qual(), mutation.get_altFreq(),
+                                                  mutation.get_totalDepth(), mutation.get_refDepth(),
+                                                  mutation.get_altDepth(), mutation.get_strandBias(),
+                                                  gene.get_gene(), gene.get_geneSyn(), gene.get_geneDesc(),
+                                                  gene.get_proteinClass(), gene.get_start(), gene.get_end(),
+                                                  "unknown"))
 
 # ensemble API
 # ensembl_rest.run(species="human", symbol="BRAF")
@@ -129,12 +143,33 @@ for mutation in mutations:
 # write in export table
 target = open("output.csv", 'w')
 export_cnt = 0
-for mutation in mutations:
+for probed in export_list:
     # write Header first:
     if export_cnt == 0:
-        target.write(ProbedMutation[0].print_header())
+        header = str(probed.print_header())
+        # print type(probed.print_header) # <type 'instancemethod'>
+        target.write(header)
+        target.write("\n")
         export_cnt += 1
 
-    target.write(mutation.export())
+    #print probed.get_id()
+    export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
+                        "".format(probed.get_id(), probed.get_chr(), probed.get_pos(),
+                                  probed.get_ref(), probed.get_alt(), probed.get_type(),
+                                  probed.get_context(), probed.get_consequences(),
+                                  probed.get_dbSNP(), probed.get_cosmic(), probed.get_clinVar(),
+                                  probed.get_qual(), probed.get_altFreq(),
+                                  probed.get_totalDepth(), probed.get_refDepth(),
+                                  probed.get_altDepth(), probed.get_strandBias(),
+                                  probed.get_gene(), probed.get_geneSyn(), probed.get_geneDesc(),
+                                  probed.get_proteinClass(), probed.get_geneStart(), probed.get_geneEnd(),
+                                  probed.get_conclusion()))
+    # print type(probed.generate_export())
+    # target.write(probed.generate_export())
+
+    target.write(export_string)
+    target.write("\n")
 
 target.close()
+
+print "FIN"
