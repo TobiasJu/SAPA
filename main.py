@@ -70,6 +70,7 @@ for line in lines:
         position = split_line[5].split("-")
         start = position[0]
         end = position[1]
+        print start
         geneDesc = split_line[3].split(",")
         # print split_line
         allHumanProteins.append(AllProt(gene, geneSyn, ensembl, geneDesc, split_line[3], start,
@@ -82,9 +83,9 @@ for line in lines:
         # "unknown", "unknown", "unknown", "unknown", "unknown", "unknown"))
 # print "{} -> {}".format(start, end)
 allProtFile.close()
-print "created All Protein Objects"
+print "created all protein objects"
 # print(mutations[0].toString)
-print ("Mutation count: ", l_count)
+print "Mutation count: ", l_count
 
 # filter all entries in the patient mutation data set
 i = 0
@@ -103,7 +104,8 @@ print("past filter: ", len(mutations))
 export_list = []
 # search after unknown mutations and find corresponding genes
 for mutation in mutations:
-    print mutation.get_id()
+    # print mutation.get_id()
+    # print type(mutation.get_context()) = list
     if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" \
             and "Coding" in mutation.get_context():
 
@@ -117,9 +119,9 @@ for mutation in mutations:
                 print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
                                                                                        gene.get_start(), gene.get_end())
                 print "found Gene: "
-                # print gene.get_gene()
+                print gene.get_gene()
                 # print gene.get_geneSyn()
-                print gene.get_geneDesc()
+                # rint gene.get_geneDesc()
                 # export_list.append(ProbedMutation()
 
                 # FAM83A	BJ-TSA-9, MGC14128	ENSG00000147689	Family with sequence similarity 83, member A	8
@@ -134,7 +136,7 @@ for mutation in mutations:
                                                   mutation.get_altDepth(), mutation.get_strandBias(),
                                                   gene.get_gene(), gene.get_geneSyn(), gene.get_geneDesc(),
                                                   gene.get_proteinClass(), gene.get_start(), gene.get_end(),
-                                                  "unknown"))
+                                                  "non pathogenic"))
 
 # ensemble API
 # ensembl_rest.run(species="human", symbol="BRAF")
@@ -147,13 +149,14 @@ for probed in export_list:
     # write Header first:
     if export_cnt == 0:
         header = str(probed.print_header())
-        # print type(probed.print_header) # <type 'instancemethod'>
+        print type(probed.print_header())
         target.write(header)
         target.write("\n")
         export_cnt += 1
 
     #print probed.get_id()
-    export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
+    export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
+                        "{}\t"
                         "".format(probed.get_id(), probed.get_chr(), probed.get_pos(),
                                   probed.get_ref(), probed.get_alt(), probed.get_type(),
                                   probed.get_context(), probed.get_consequences(),
@@ -164,6 +167,9 @@ for probed in export_list:
                                   probed.get_gene(), probed.get_geneSyn(), probed.get_geneDesc(),
                                   probed.get_proteinClass(), probed.get_geneStart(), probed.get_geneEnd(),
                                   probed.get_conclusion()))
+
+    print export_string
+    # print probed.get_geneStart()
     # print type(probed.generate_export())
     # target.write(probed.generate_export())
 
