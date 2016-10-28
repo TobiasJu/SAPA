@@ -5,6 +5,7 @@ import itertools
 from mutation import Mutation
 from allProt import AllProt
 from probedMutation import ProbedMutation
+from dna_to_aa_translator import Translator
 import argparse
 
 # argparse for information
@@ -160,7 +161,7 @@ for cmuta in coding_mutations:
     gene50end_rest = int(gene_end % 50)
     print "END: " + str(gene50end)
     print gene50end_rest
-    expected_length = gene_start - gene_end
+    expected_length = (gene_end - gene_start)
     print "Expected gene length: " + str(expected_length)
     openString = "C:\\hg19\\chromFa\\" + cmuta.get_geneChromosome() + ".fa"
     hg19_chromosome = open(openString, "r")
@@ -196,8 +197,13 @@ for cmuta in coding_mutations:
     # print dna
     # flatten dna list
     dna = list(itertools.chain(*dna))
+
     # print "".join(dna)
-    print "length in BP: " + str(len(dna))
+    dna = "".join(dna)
+    print "final gene length: " + str(len(dna))
+    trans = Translator()
+    trans.translate_dna_sequence(str(dna))
+
         # chromosome_list.append(line.split("\w"))
         # ZU VIEL SPEICHER!
         # print l_count
