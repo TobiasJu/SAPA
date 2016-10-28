@@ -30,6 +30,9 @@ class AllProt:
     def set_start(self, start):
         self.__start = start
 
+    def set_end(self, end):
+        self.__end = end
+
     # more setters needed?
 
     # getter
