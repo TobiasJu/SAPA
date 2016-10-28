@@ -25,10 +25,10 @@ l_count = 0
 
 # create mutation Objects from the given Data of a patient
 mutations = []
-for line in variant_lines:
+for dna_line in variant_lines:
     # remove /n form end of line
-    line = line.strip()
-    split_line = line.split('","')
+    dna_line = dna_line.strip()
+    split_line = dna_line.split('","')
     split_line[0] = split_line[0].translate(None, '"')
     split_line[-1] = split_line[-1].translate(None, '"')
 
@@ -42,7 +42,7 @@ for line in variant_lines:
                                   split_line[15]))
     else:
         print "INVALID DATA LENGHT in Line {}".format(l_count)
-        print line
+        print dna_line
         l_count += 1
 
 print "created User Mutation Objects\n"
@@ -53,10 +53,10 @@ line_count = 0
 allHumanProteins = []
 allProtFile = open('data/allprots.csv', 'r')
 lines = allProtFile.readlines()[1:]
-for line in lines:
+for dna_line in lines:
     # remove /n form end of line
-    line = line.strip()
-    split_line = line.split('\t')
+    dna_line = dna_line.strip()
+    split_line = dna_line.split('\t')
     line_count += 1
     if len(split_line) >= 20:
         i = 0
@@ -146,18 +146,59 @@ for mutation in mutations:
 for cmuta in coding_mutations:
     # print cmuta.toString() # geht nicht????
     print cmuta.get_gene()
-    print cmuta.get_geneChromosome()
-    print cmuta.get_geneStart()
-    print cmuta.get_geneEnd()
+    # print cmuta.get_geneChromosome()
+    gene_start = float(cmuta.get_geneStart())
+    gene50start_rest = int(gene_start % 50)
+    gene50start = int(gene_start) / 50
+    gene50float = gene_start / 50
+    print gene50float
+    print "START: " + str(gene50start)
+    print gene50start_rest
+    gene_end = cmuta.get_geneEnd()
+    gene50end = int(gene_end) / 50
+    gene50end_rest = int(gene_end % 50)
+    print "END: " + str(gene50end)
+    print gene50end_rest
+    print "Expected gene length: " + str(gene_end - gene_start)
     openString = "C:\\hg19\\chromFa\\" + cmuta.get_geneChromosome() + ".fa"
     hg19_chromosome = open(openString, "r")
+    print "open: " + cmuta.get_geneChromosome()
 
-    selected_chromosome = []
-    for line in hg19_chromosome:
-       selected_chromosome.append(line.split())
+    dna = []
+    l_count = 0
+    first_run = True
+    for dna_line in hg19_chromosome:
+        if gene50end >= l_count >= gene50start:
+            dna_line = dna_line.strip()
+            hit_dna = list(dna_line)
 
-    print len(selected_chromosome)
-    # sehr schlecht!
+            # ignore first X bases
+            if first_run:
+                base_counter = 0
+                for base in hit_dna:
+                    if gene50start_rest <= base_counter:
+                        dna.append(base)
+                    # else:
+                        # print "SKIP"
+                    base_counter += 1
+                first_run = False
+            else:
+                dna.append(hit_dna)
+            # print l_count
+            l_count += 1
+        #else:
+            #break
+        l_count += 1
+
+    print "END OF FOOOR LOOP"
+    print dna
+    print "length in BP: " + str(len(dna))
+        # chromosome_list.append(line.split("\w"))
+        # ZU VIEL SPEICHER!
+        # print l_count
+
+
+    # eher schlecht!
 
 
 # ensemble API
