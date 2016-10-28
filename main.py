@@ -159,7 +159,7 @@ for probed in export_list:
 
     #print probed.get_id()
     export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
-                        "{}\t{}\t"
+                        "{}\t{}\t{}\t"
                         "".format(probed.get_id(), probed.get_chr(), probed.get_pos(),
                                   probed.get_ref(), probed.get_alt(), probed.get_type(),
                                   probed.get_context(), probed.get_consequences(),
@@ -169,7 +169,7 @@ for probed in export_list:
                                   probed.get_altDepth(), probed.get_strandBias(), probed.get_geneChromosome(),
                                   probed.get_gene(), probed.get_geneSyn(), probed.get_geneDesc(),
                                   probed.get_proteinClass(), probed.get_geneStart(), probed.get_geneEnd(),
-                                  probed.get_conclusion(), probed.get_score()))
+                                  probed.get_score(), probed.get_conclusion()))
 
     print export_string
     # print probed.get_geneStart()

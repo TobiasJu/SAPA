@@ -88,7 +88,7 @@ class ProbedMutation(Mutation):
     def print_header(self):
         return "ID\tChr\tPos\tRef\tAlt\tType\tContext\tConsequence\tdbSNP\tCOSMIC\tClinVar\tQual\tAlt Freq\t" \
                "Total Depth\tRef Depth\tAlt Depth\tStrand Bias\tGene Chromosome\tGene\tGene synonym\tGene description\t" \
-               "Protein class\tGene Start\tGene End\tConclusion\tScore"
+               "Protein class\tGene Start\tGene End\tpathogenic Score\tConclusion"
 
     # okay warum gehet das nicht?
     def generate_export(self):
