@@ -1,6 +1,7 @@
 import sys
 import os
 import ensembl_rest
+import itertools
 from mutation import Mutation
 from allProt import AllProt
 from probedMutation import ProbedMutation
@@ -142,16 +143,16 @@ for mutation in mutations:
                                                        "non pathogenic", 0.50))
 
 
-
+# find DNA sequence for gene each region
 for cmuta in coding_mutations:
     # print cmuta.toString() # geht nicht????
     print cmuta.get_gene()
     # print cmuta.get_geneChromosome()
-    gene_start = float(cmuta.get_geneStart())
+    gene_start = cmuta.get_geneStart()
     gene50start_rest = int(gene_start % 50)
     gene50start = int(gene_start) / 50
     gene50float = gene_start / 50
-    print gene50float
+    # print gene50float
     print "START: " + str(gene50start)
     print gene50start_rest
     gene_end = cmuta.get_geneEnd()
@@ -159,7 +160,8 @@ for cmuta in coding_mutations:
     gene50end_rest = int(gene_end % 50)
     print "END: " + str(gene50end)
     print gene50end_rest
-    print "Expected gene length: " + str(gene_end - gene_start)
+    expected_length = gene_start - gene_end
+    print "Expected gene length: " + str(expected_length)
     openString = "C:\\hg19\\chromFa\\" + cmuta.get_geneChromosome() + ".fa"
     hg19_chromosome = open(openString, "r")
     print "open: " + cmuta.get_geneChromosome()
@@ -191,7 +193,10 @@ for cmuta in coding_mutations:
         l_count += 1
 
     print "END OF FOOOR LOOP"
-    print dna
+    # print dna
+    # flatten dna list
+    dna = list(itertools.chain(*dna))
+    # print "".join(dna)
     print "length in BP: " + str(len(dna))
         # chromosome_list.append(line.split("\w"))
         # ZU VIEL SPEICHER!
