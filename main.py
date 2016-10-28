@@ -70,10 +70,10 @@ for line in lines:
         position = split_line[5].split("-")
         start = position[0]
         end = position[1]
-        print start
         geneDesc = split_line[3].split(",")
-        # print split_line
-        allHumanProteins.append(AllProt(gene, geneSyn, ensembl, geneDesc, split_line[3], start,
+        chromosome = "chr" + str(split_line[4])
+        # print chromosome
+        allHumanProteins.append(AllProt(gene, geneSyn, ensembl, geneDesc, chromosome, int(start),
                                         int(end), split_line[6], split_line[7:-1]))
 
         # else:
@@ -112,10 +112,12 @@ for mutation in mutations:
         print "{} ID: {}, Position: {}".format("unknown mutation", mutation.get_id(), mutation.get_pos())
 
         for gene in allHumanProteins:
-            # print type(gene.get_start())
+            # print type(gene.get_gene())
+            # print gene.get_gene()
             # print type(gene.get_end())
             # print type(mutation.get_pos())
-            if gene.get_start() < mutation.get_pos() < gene.get_end():
+            if gene.get_start() < mutation.get_pos() < gene.get_end() and mutation.get_chr() == \
+                    gene.get_chromosome():
                 print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
                                                                                        gene.get_start(), gene.get_end())
                 print "found Gene: "
@@ -134,9 +136,10 @@ for mutation in mutations:
                                                   mutation.get_qual(), mutation.get_altFreq(),
                                                   mutation.get_totalDepth(), mutation.get_refDepth(),
                                                   mutation.get_altDepth(), mutation.get_strandBias(),
+                                                  str(gene.get_chromosome()),
                                                   gene.get_gene(), gene.get_geneSyn(), gene.get_geneDesc(),
                                                   gene.get_proteinClass(), gene.get_start(), gene.get_end(),
-                                                  "non pathogenic"))
+                                                  "non pathogenic", 0.50))
 
 # ensemble API
 # ensembl_rest.run(species="human", symbol="BRAF")
@@ -156,17 +159,17 @@ for probed in export_list:
 
     #print probed.get_id()
     export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
-                        "{}\t"
+                        "{}\t{}\t"
                         "".format(probed.get_id(), probed.get_chr(), probed.get_pos(),
                                   probed.get_ref(), probed.get_alt(), probed.get_type(),
                                   probed.get_context(), probed.get_consequences(),
                                   probed.get_dbSNP(), probed.get_cosmic(), probed.get_clinVar(),
                                   probed.get_qual(), probed.get_altFreq(),
                                   probed.get_totalDepth(), probed.get_refDepth(),
-                                  probed.get_altDepth(), probed.get_strandBias(),
+                                  probed.get_altDepth(), probed.get_strandBias(), probed.get_geneChromosome(),
                                   probed.get_gene(), probed.get_geneSyn(), probed.get_geneDesc(),
                                   probed.get_proteinClass(), probed.get_geneStart(), probed.get_geneEnd(),
-                                  probed.get_conclusion()))
+                                  probed.get_conclusion(), probed.get_score()))
 
     print export_string
     # print probed.get_geneStart()

@@ -3,6 +3,7 @@ from mutation import Mutation
 
 # initialize super class
 class ProbedMutation(Mutation):
+    __geneChromosome = ""
     __gene = ""
     __geneSyn = ""
     __geneDesc = ""
@@ -10,21 +11,27 @@ class ProbedMutation(Mutation):
     __geneStart = 0
     __geneEnd = 0
     __conclusion = ""
+    __score = 0.0
 
     def __init__(self, id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,
-                 totalDepth, refDepth, altDepth, strandBias, gene, geneSyn, geneDesc, proteinClass, geneStart,
-                 geneEnd, conclusion):
+                 totalDepth, refDepth, altDepth, strandBias, geneChromosome, gene, geneSyn, geneDesc, proteinClass,
+                 geneStart, geneEnd, conclusion, score):
+        self.__geneChromosome = geneChromosome,
         self.__gene = gene,
         self.__geneSyn = geneSyn,
         self.__geneDesc = geneDesc,
         self.__proteinClass = proteinClass,
         self.__geneStart = geneStart,
         self.__geneEnd = geneEnd,
-        self.__conclusion = conclusion
+        self.__conclusion = conclusion,
+        self.__score = score,
         super(ProbedMutation, self).__init__(id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar,
                                              qual, altFreq, totalDepth, refDepth, altDepth, strandBias)
 
     # setters for super class parameters
+    def set_geneChromosome(self, geneChromosome):
+        self.__geneChromosome = geneChromosome
+
     def set_gene(self, gene):
         self.__gene = gene
 
@@ -46,7 +53,14 @@ class ProbedMutation(Mutation):
     def set_conclusion(self, conclusion):
         self.__conclusion = conclusion
 
+    def set_score(self, score):
+        self.__score = score
+
     # getters for the super class parameters
+
+    def get_geneChromosome(self):
+        return str(self.__geneChromosome[0])
+
     def get_gene(self):
         return self.__gene
 
@@ -68,14 +82,17 @@ class ProbedMutation(Mutation):
     def get_conclusion(self):
         return self.__conclusion
 
+    def get_score(self):
+        return self.__score
+
     def print_header(self):
         return "ID\tChr\tPos\tRef\tAlt\tType\tContext\tConsequence\tdbSNP\tCOSMIC\tClinVar\tQual\tAlt Freq\t" \
-               "Total Depth\tRef Depth\tAlt Depth\tStrand Bias\tGene\tGene synonym\tGene description\tProtein class\t" \
-               "Gene Start\tGene End\tConclusion"
+               "Total Depth\tRef Depth\tAlt Depth\tStrand Bias\tGene Chromosome\tGene\tGene synonym\tGene description\t" \
+               "Protein class\tGene Start\tGene End\tConclusion\tScore"
 
     # okay warum gehet das nicht?
     def generate_export(self):
-        return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
+        return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
                "".format(id,
                          chr,
                          self.__pos,
@@ -99,4 +116,5 @@ class ProbedMutation(Mutation):
                          self.__proteinClass,
                          self.__geneStart,
                          self.__geneEnd,
-                         self.__conclusion)
+                         self.__conclusion,
+                         self.__score)

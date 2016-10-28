@@ -46,7 +46,7 @@ class AllProt:
         return self.__geneDesc
 
     def get_chromosome(self):
-        return self.__chromosome
+        return str(self.__chromosome[0])
 
     def get_start(self):
         # wieso ist das ein TUPEL???
@@ -55,7 +55,7 @@ class AllProt:
         return int(self.__start[0])
 
     def get_end(self):
-        # ist auch ein Tupel
+        # ist auch ein Tupel...
         # print int(self.__end[0])
         return int(self.__end[0])
 
