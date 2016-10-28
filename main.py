@@ -64,7 +64,7 @@ for line in lines:
             split_line[i] = split_line[i].translate(None, "\'")
             i += 1
 
-        gene = split_line[0]
+        protein = split_line[0]
         geneSyn = split_line[1].split(",")
         ensembl = split_line[2]
         position = split_line[5].split("-")
@@ -73,7 +73,7 @@ for line in lines:
         geneDesc = split_line[3].split(",")
         chromosome = "chr" + str(split_line[4])
         # print chromosome
-        allHumanProteins.append(AllProt(gene, geneSyn, ensembl, geneDesc, chromosome, int(start),
+        allHumanProteins.append(AllProt(protein, geneSyn, ensembl, geneDesc, chromosome, int(start),
                                         int(end), split_line[6], split_line[7:-1]))
 
         # else:
@@ -101,7 +101,7 @@ for mutation in mutations:
     i += 1
 print("past filter: ", len(mutations))
 
-export_list = []
+coding_mutations = []
 # search after unknown mutations and find corresponding genes
 for mutation in mutations:
     # print mutation.get_id()
@@ -111,17 +111,17 @@ for mutation in mutations:
 
         print "{} ID: {}, Position: {}".format("unknown mutation", mutation.get_id(), mutation.get_pos())
 
-        for gene in allHumanProteins:
+        for protein in allHumanProteins:
             # print type(gene.get_gene())
             # print gene.get_gene()
             # print type(gene.get_end())
             # print type(mutation.get_pos())
-            if gene.get_start() < mutation.get_pos() < gene.get_end() and mutation.get_chr() == \
-                    gene.get_chromosome():
+            if protein.get_start() < mutation.get_pos() < protein.get_end() and mutation.get_chr() == \
+                    protein.get_chromosome():
                 print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
-                                                                                       gene.get_start(), gene.get_end())
+                                                                                       protein.get_start(), protein.get_end())
                 print "found Gene: "
-                print gene.get_gene()
+                print protein.get_gene()
                 # print gene.get_geneSyn()
                 # rint gene.get_geneDesc()
                 # export_list.append(ProbedMutation()
@@ -129,17 +129,22 @@ for mutation in mutations:
                 # FAM83A	BJ-TSA-9, MGC14128	ENSG00000147689	Family with sequence similarity 83, member A	8
                 # 123178960-123210079 POS 123195662
 
-                export_list.append(ProbedMutation(mutation.get_id(), mutation.get_chr(), mutation.get_pos(),
-                                                  mutation.get_ref(), mutation.get_alt(), mutation.get_type(),
-                                                  mutation.get_context(), mutation.get_consequences(),
-                                                  mutation.get_dbSNP(), mutation.get_cosmic(), mutation.get_clinVar(),
-                                                  mutation.get_qual(), mutation.get_altFreq(),
-                                                  mutation.get_totalDepth(), mutation.get_refDepth(),
-                                                  mutation.get_altDepth(), mutation.get_strandBias(),
-                                                  str(gene.get_chromosome()),
-                                                  gene.get_gene(), gene.get_geneSyn(), gene.get_geneDesc(),
-                                                  gene.get_proteinClass(), gene.get_start(), gene.get_end(),
+                coding_mutations.append(ProbedMutation(mutation.get_id(), mutation.get_chr(), mutation.get_pos(),
+                                                       mutation.get_ref(), mutation.get_alt(), mutation.get_type(),
+                                                       mutation.get_context(), mutation.get_consequences(),
+                                                       mutation.get_dbSNP(), mutation.get_cosmic(), mutation.get_clinVar(),
+                                                       mutation.get_qual(), mutation.get_altFreq(),
+                                                       mutation.get_totalDepth(), mutation.get_refDepth(),
+                                                       mutation.get_altDepth(), mutation.get_strandBias(),
+                                                       str(protein.get_chromosome()),
+                                                       protein.get_gene(), protein.get_geneSyn(), protein.get_geneDesc(),
+                                                       protein.get_proteinClass(), protein.get_start(), protein.get_end(),
                                                   "non pathogenic", 0.50))
+
+
+
+
+
 
 # ensemble API
 # ensembl_rest.run(species="human", symbol="BRAF")
@@ -148,7 +153,7 @@ for mutation in mutations:
 # write in export table
 target = open("output.csv", 'w')
 export_cnt = 0
-for probed in export_list:
+for probed in coding_mutations:
     # write Header first:
     if export_cnt == 0:
         header = str(probed.print_header())
@@ -157,7 +162,7 @@ for probed in export_list:
         target.write("\n")
         export_cnt += 1
 
-    #print probed.get_id()
+    # print probed.get_id()
     export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
                         "{}\t{}\t{}\t"
                         "".format(probed.get_id(), probed.get_chr(), probed.get_pos(),
