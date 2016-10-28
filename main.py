@@ -64,7 +64,7 @@ for line in lines:
             split_line[i] = split_line[i].translate(None, "\'")
             i += 1
 
-        protein = split_line[0]
+        prot = split_line[0]
         geneSyn = split_line[1].split(",")
         ensembl = split_line[2]
         position = split_line[5].split("-")
@@ -73,7 +73,7 @@ for line in lines:
         geneDesc = split_line[3].split(",")
         chromosome = "chr" + str(split_line[4])
         # print chromosome
-        allHumanProteins.append(AllProt(protein, geneSyn, ensembl, geneDesc, chromosome, int(start),
+        allHumanProteins.append(AllProt(prot, geneSyn, ensembl, geneDesc, chromosome, int(start),
                                         int(end), split_line[6], split_line[7:-1]))
 
         # else:
@@ -111,17 +111,17 @@ for mutation in mutations:
 
         print "{} ID: {}, Position: {}".format("unknown mutation", mutation.get_id(), mutation.get_pos())
 
-        for protein in allHumanProteins:
+        for prot in allHumanProteins:
             # print type(gene.get_gene())
             # print gene.get_gene()
             # print type(gene.get_end())
             # print type(mutation.get_pos())
-            if protein.get_start() < mutation.get_pos() < protein.get_end() and mutation.get_chr() == \
-                    protein.get_chromosome():
+            if prot.get_start() < mutation.get_pos() < prot.get_end() and mutation.get_chr() == \
+                    prot.get_chromosome():
                 print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
-                                                                                       protein.get_start(), protein.get_end())
+                                                                                       prot.get_start(), prot.get_end())
                 print "found Gene: "
-                print protein.get_gene()
+                print prot.get_gene()
                 # print gene.get_geneSyn()
                 # rint gene.get_geneDesc()
                 # export_list.append(ProbedMutation()
@@ -132,14 +132,14 @@ for mutation in mutations:
                 coding_mutations.append(ProbedMutation(mutation.get_id(), mutation.get_chr(), mutation.get_pos(),
                                                        mutation.get_ref(), mutation.get_alt(), mutation.get_type(),
                                                        mutation.get_context(), mutation.get_consequences(),
-                                                       mutation.get_dbSNP(), mutation.get_cosmic(), mutation.get_clinVar(),
-                                                       mutation.get_qual(), mutation.get_altFreq(),
-                                                       mutation.get_totalDepth(), mutation.get_refDepth(),
-                                                       mutation.get_altDepth(), mutation.get_strandBias(),
-                                                       str(protein.get_chromosome()),
-                                                       protein.get_gene(), protein.get_geneSyn(), protein.get_geneDesc(),
-                                                       protein.get_proteinClass(), protein.get_start(), protein.get_end(),
-                                                  "non pathogenic", 0.50))
+                                                       mutation.get_dbSNP(), mutation.get_cosmic(),
+                                                       mutation.get_clinVar(), mutation.get_qual(),
+                                                       mutation.get_altFreq(), mutation.get_totalDepth(),
+                                                       mutation.get_refDepth(), mutation.get_altDepth(),
+                                                       mutation.get_strandBias(), str(prot.get_chromosome()),
+                                                       prot.get_gene(), prot.get_geneSyn(), prot.get_geneDesc(),
+                                                       prot.get_proteinClass(), prot.get_start(), prot.get_end(),
+                                                       "non pathogenic", 0.50))
 
 
 
