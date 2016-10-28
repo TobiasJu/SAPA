@@ -118,8 +118,8 @@ for mutation in mutations:
             # print type(mutation.get_pos())
             if prot.get_start() < mutation.get_pos() < prot.get_end() and mutation.get_chr() == \
                     prot.get_chromosome():
-                print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
-                                                                                       prot.get_start(), prot.get_end())
+                # print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
+                #                                                                        prot.get_start(), prot.get_end())
                 print "found Gene: "
                 print prot.get_gene()
                 # print gene.get_geneSyn()
@@ -144,9 +144,20 @@ for mutation in mutations:
 
 
 for cmuta in coding_mutations:
-    print cmuta.print_header()
-    print cmuta.toString()
+    # print cmuta.toString() # geht nicht????
+    print cmuta.get_gene()
+    print cmuta.get_geneChromosome()
+    print cmuta.get_geneStart()
+    print cmuta.get_geneEnd()
+    openString = "C:\\hg19\\chromFa\\" + cmuta.get_geneChromosome() + ".fa"
+    hg19_chromosome = open(openString, "r")
 
+    selected_chromosome = []
+    for line in hg19_chromosome:
+       selected_chromosome.append(line.split())
+
+    print len(selected_chromosome)
+    # sehr schlecht!
 
 
 # ensemble API
@@ -160,7 +171,7 @@ for probed in coding_mutations:
     # write Header first:
     if export_cnt == 0:
         header = str(probed.print_header())
-        print type(probed.print_header())
+        # print type(probed.print_header())
         target.write(header)
         target.write("\n")
         export_cnt += 1

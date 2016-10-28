@@ -62,7 +62,7 @@ class ProbedMutation(Mutation):
         return str(self.__geneChromosome[0])
 
     def get_gene(self):
-        return self.__gene
+        return str(self.__gene[0])
 
     def get_geneSyn(self):
         return self.__geneSyn
@@ -74,10 +74,10 @@ class ProbedMutation(Mutation):
         return self.__proteinClass
 
     def get_geneStart(self):
-        return self.__geneStart
+        return int(self.__geneStart[0])
 
     def get_geneEnd(self):
-        return self.__geneEnd
+        return int(self.__geneEnd[0])
 
     def get_conclusion(self):
         return self.__conclusion

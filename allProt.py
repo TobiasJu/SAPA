@@ -34,7 +34,7 @@ class AllProt:
 
     # getter
     def get_gene(self):
-        return self.__gene
+        return str(self.__gene[0])
 
     def get_geneSyn(self):
         return self.__geneSyn
