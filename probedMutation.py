@@ -85,16 +85,51 @@ class ProbedMutation(Mutation):
     def get_score(self):
         return self.__score
 
+    # class functions
+
     def print_header(self):
         return "ID\tChr\tPos\tRef\tAlt\tType\tContext\tConsequence\tdbSNP\tCOSMIC\tClinVar\tQual\tAlt Freq\t" \
                "Total Depth\tRef Depth\tAlt Depth\tStrand Bias\tGene Chromosome\tGene\tGene synonym\tGene description\t" \
                "Protein class\tGene Start\tGene End\tpathogenic Score\tConclusion"
 
-    # okay warum gehet das nicht?
+    # warum gehet das nicht?
+    def toString(self):
+        return "ID: {}\tChr: {}\tPos: {}\tRef: {}\tAlt: {}\tType: {}\tContext: {}\tConsequence: {}\tdbSNP: {}\t" \
+               "COSMIC: {}\tClinVar: {}\tQual: {}\tAlt Freq: {}\tTotal Depth: {}\tRef Depth: {}\tAlt Depth: {}\t" \
+               "Strand Bias: {}\tGene Chromosome: {}\tGene: {}\tGene synonym: {}\tGene description: {}\t" \
+               "Protein class: {}\tGene Start: {}\tGene End: {}\tpathogenic Score: {}\t" \
+               "conclusion: {}".format(self.__id,
+                                       self.__chr,
+                                       self.__pos,
+                                       self.__ref,
+                                       self.__alt,
+                                       self.__type,
+                                       self.__context,
+                                       self.__consequence,
+                                       self.__dbSNP,
+                                       self.__cosmic,
+                                       self.__clinVar,
+                                       self.__qual,
+                                       self.__altFreq,
+                                       self.__totalDepth,
+                                       self.__refDepth,
+                                       self.__altDepth,
+                                       self.__strandBias,
+                                       self.__geneChromosome,
+                                       self.__gene,
+                                       self.__geneSyn,
+                                       self.__geneDesc,
+                                       self.__proteinClass,
+                                       self.__geneStart,
+                                       self.__geneEnd,
+                                       self.__score,
+                                       self.__conclusion)
+
+    # warum gehet das auch nicht?
     def generate_export(self):
         return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
-               "".format(id,
-                         chr,
+               "".format(self.__id,
+                         self.__chr,
                          self.__pos,
                          self.__ref,
                          self.__alt,

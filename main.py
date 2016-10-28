@@ -143,6 +143,9 @@ for mutation in mutations:
 
 
 
+for cmuta in coding_mutations:
+    print cmuta.print_header()
+    print cmuta.toString()
 
 
 
@@ -176,7 +179,7 @@ for probed in coding_mutations:
                                   probed.get_proteinClass(), probed.get_geneStart(), probed.get_geneEnd(),
                                   probed.get_score(), probed.get_conclusion()))
 
-    print export_string
+    # print export_string
     # print probed.get_geneStart()
     # print type(probed.generate_export())
     # target.write(probed.generate_export())
