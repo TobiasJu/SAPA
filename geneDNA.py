@@ -16,7 +16,7 @@ class GeneDNA:
         self.__na_sequence = na_sequence
         self.__aa_sequence = aa_sequence
 
-
+    # setter
     def set_name(self, name):
         self.__name = name
 
@@ -52,3 +52,4 @@ class GeneDNA:
 
     def get_aa_sequence(self):
         return self.__aa_sequence
+
