@@ -4,7 +4,7 @@ class Translator:
 
     def translate_dna_sequence(self, dna_sequence):
 
-        codontable = {
+        codon_table = {
             'ATA': 'I', 'ATC': 'I', 'ATT': 'I', 'ATG': 'M',
             'ACA': 'T', 'ACC': 'T', 'ACG': 'T', 'ACT': 'T',
             'AAC': 'N', 'AAT': 'N', 'AAA': 'K', 'AAG': 'K',
@@ -29,8 +29,8 @@ class Translator:
         cds = str(sequencestart[:int(stop) + 3])
 
         for n in range(0, len(cds), 3):
-            if cds[n:n + 3] in codontable:
-                proteinsequence += codontable[cds[n:n + 3]]
+            if cds[n:n + 3] in codon_table:
+                proteinsequence += codon_table[cds[n:n + 3]]
             dna_sequence = ''
 
         print proteinsequence
