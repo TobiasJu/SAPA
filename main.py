@@ -188,7 +188,6 @@ for cmuta in coding_mutations:
             else:
                 dna.append(hit_dna)
             # print l_count
-            l_count += 1
         #else:
             #break
         l_count += 1
