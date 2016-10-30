@@ -2,7 +2,10 @@
 class Translator:
     __dna_sequence = ""
 
-    def translate_dna_sequence(self, dna_sequence):
+    @staticmethod
+    def translate_dna_sequence(dna_sequence):
+
+        dna_sequence.upper()
 
         codon_table = {
             'ATA': 'I', 'ATC': 'I', 'ATT': 'I', 'ATG': 'M',
@@ -33,5 +36,6 @@ class Translator:
                 proteinsequence += codon_table[cds[n:n + 3]]
             dna_sequence = ''
 
-        print proteinsequence
+        print "translated!"
+        return proteinsequence
 

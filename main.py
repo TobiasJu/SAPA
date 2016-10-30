@@ -6,6 +6,7 @@ from mutation import Mutation
 from allProt import AllProt
 from probedMutation import ProbedMutation
 from dna_to_aa_translator import Translator
+from geneDNA import GeneDNA
 import argparse
 
 # argparse for information
@@ -101,7 +102,7 @@ for mutation in mutations:
         del mutations[i]
     # more filters to come
     i += 1
-print("past filter: ", len(mutations))
+print "past filter: " + str(len(mutations))
 
 coding_mutations = []
 # search after unknown mutations and find corresponding genes
@@ -122,8 +123,7 @@ for mutation in mutations:
                     prot.get_chromosome():
                 # print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
                 #                                                                        prot.get_start(), prot.get_end())
-                print "found Gene: "
-                print prot.get_gene()
+                print "found Gene: " + prot.get_gene()
                 # print gene.get_geneSyn()
                 # rint gene.get_geneDesc()
                 # export_list.append(ProbedMutation()
@@ -144,28 +144,29 @@ for mutation in mutations:
                                                        "non pathogenic", 0.50))
 
 
-# find DNA sequence for gene each region
-for cmuta in coding_mutations:
+# find DNA sequence for gene in each region and translate it #
+mutation_with_sequence = {}
+for c_muta in coding_mutations:
     # print cmuta.toString() # geht nicht????
-    print cmuta.get_gene()
+    # print c_muta.get_gene()
     # print cmuta.get_geneChromosome()
-    gene_start = cmuta.get_geneStart()
+    gene_start = c_muta.get_geneStart()
     gene50start_rest = int(gene_start % 50)
     gene50start = int(gene_start) / 50
     gene50float = gene_start / 50
     # print gene50float
-    print "START: " + str(gene50start)
-    print gene50start_rest
-    gene_end = cmuta.get_geneEnd()
+    # print "START: " + str(gene50start)
+    # print gene50start_rest
+    gene_end = c_muta.get_geneEnd()
     gene50end = int(gene_end) / 50
     gene50end_rest = int(gene_end % 50)
-    print "END: " + str(gene50end)
-    print gene50end_rest
+    # print "END: " + str(gene50end)
+    # print gene50end_rest
     expected_length = (gene_end - gene_start)
     print "Expected gene length: " + str(expected_length)
-    openString = "C:\\hg19\\chromFa\\" + cmuta.get_geneChromosome() + ".fa"
+    openString = "C:\\hg19\\chromFa\\" + c_muta.get_geneChromosome() + ".fa"
     hg19_chromosome = open(openString, "r")
-    print "open: " + cmuta.get_geneChromosome()
+    # print "open: " + c_muta.get_geneChromosome()
 
     dna = []
     l_count = 0
@@ -174,7 +175,6 @@ for cmuta in coding_mutations:
         if gene50end >= l_count >= gene50start:
             dna_line = dna_line.strip()
             hit_dna = list(dna_line)
-
             # ignore first X bases
             if first_run:
                 base_counter = 0
@@ -187,28 +187,42 @@ for cmuta in coding_mutations:
                 first_run = False
             else:
                 dna.append(hit_dna)
-            # print l_count
-        #else:
-            #break
+            # noch zu lang am Ende
         l_count += 1
 
-    print "END OF FOOOR LOOP"
-    # print dna
-    # flatten dna list
+    # flatten dna list #
     dna = list(itertools.chain(*dna))
 
     # print "".join(dna)
-    dna = "".join(dna)
-    print "final gene length: " + str(len(dna))
-    trans = Translator()
-    trans.translate_dna_sequence(str(dna))
+    # print "final gene length: " + str(len(dna))
+    # print "".join(dna)
+    # over_size = len(dna) - expected_length
+    # print "zu viel: " + str(over_size)
 
-        # chromosome_list.append(line.split("\w"))
-        # ZU VIEL SPEICHER!
-        # print l_count
+    # remove oversize #
+    dna = dna[:expected_length]
+    # dna_joined = "".join(reversed(dna))
+    dna_joined = "".join(dna)
+    # print "final gene size: " + str(len(dna))
+    # print "".join(dna)
+    # print "divided by 3: " + str(float(len(dna)/3))
+
+    # Translate DNA to AA #
+    amino_seq = Translator().translate_dna_sequence(str(dna_joined))
+    g_dna = GeneDNA(c_muta.get_gene(), c_muta.get_geneChromosome(), c_muta.get_geneStart(), c_muta.get_geneEnd(), dna,
+                    amino_seq)
+
+    # print "Element name: " + element.get_name()
+
+    mutation_with_sequence[c_muta] = g_dna
+
+for c_muta, g_dna in mutation_with_sequence.iteritems():
+    print c_muta.get_gene()
+    print g_dna.get_name()
+    print "".join(g_dna.get_na_sequence())
+    print g_dna.get_aa_sequence()
 
 
-    # eher schlecht!
 
 
 # ensemble API
@@ -218,10 +232,10 @@ for cmuta in coding_mutations:
 # write in export table
 target = open("output.csv", 'w')
 export_cnt = 0
-for probed in coding_mutations:
+for cmuta in coding_mutations:
     # write Header first:
     if export_cnt == 0:
-        header = str(probed.print_header())
+        header = str(cmuta.print_header())
         # print type(probed.print_header())
         target.write(header)
         target.write("\n")
@@ -230,16 +244,16 @@ for probed in coding_mutations:
     # print probed.get_id()
     export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
                         "{}\t{}\t{}\t"
-                        "".format(probed.get_id(), probed.get_chr(), probed.get_pos(),
-                                  probed.get_ref(), probed.get_alt(), probed.get_type(),
-                                  probed.get_context(), probed.get_consequences(),
-                                  probed.get_dbSNP(), probed.get_cosmic(), probed.get_clinVar(),
-                                  probed.get_qual(), probed.get_altFreq(),
-                                  probed.get_totalDepth(), probed.get_refDepth(),
-                                  probed.get_altDepth(), probed.get_strandBias(), probed.get_geneChromosome(),
-                                  probed.get_gene(), probed.get_geneSyn(), probed.get_geneDesc(),
-                                  probed.get_proteinClass(), probed.get_geneStart(), probed.get_geneEnd(),
-                                  probed.get_score(), probed.get_conclusion()))
+                        "".format(cmuta.get_id(), cmuta.get_chr(), cmuta.get_pos(),
+                                  cmuta.get_ref(), cmuta.get_alt(), cmuta.get_type(),
+                                  cmuta.get_context(), cmuta.get_consequences(),
+                                  cmuta.get_dbSNP(), cmuta.get_cosmic(), cmuta.get_clinVar(),
+                                  cmuta.get_qual(), cmuta.get_altFreq(),
+                                  cmuta.get_totalDepth(), cmuta.get_refDepth(),
+                                  cmuta.get_altDepth(), cmuta.get_strandBias(), cmuta.get_geneChromosome(),
+                                  cmuta.get_gene(), cmuta.get_geneSyn(), cmuta.get_geneDesc(),
+                                  cmuta.get_proteinClass(), cmuta.get_geneStart(), cmuta.get_geneEnd(),
+                                  cmuta.get_score(), cmuta.get_conclusion()))
 
     # print export_string
     # print probed.get_geneStart()
