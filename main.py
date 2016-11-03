@@ -152,71 +152,75 @@ for c_muta in coding_mutations:
     # print cmuta.toString() # geht nicht????
     # print c_muta.get_gene()
     # print cmuta.get_geneChromosome()
-    gene_start = c_muta.get_geneStart()
-    gene50start_rest = int(gene_start % 50)
-    gene50start = int(gene_start) / 50
-    gene50float = gene_start / 50
+    # gene_start = c_muta.get_geneStart()
+    # gene50start_rest = int(gene_start % 50)
+    # gene50start = int(gene_start) / 50
+    # gene50float = gene_start / 50
     # print gene50float
     # print "START: " + str(gene50start)
     # print gene50start_rest
-    gene_end = c_muta.get_geneEnd()
-    gene50end = int(gene_end) / 50
-    gene50end_rest = int(gene_end % 50)
+    # gene_end = c_muta.get_geneEnd()
+    # gene50end = int(gene_end) / 50
+    # gene50end_rest = int(gene_end % 50)
     # print "END: " + str(gene50end)
     # print gene50end_rest
-    expected_length = (gene_end - gene_start)
-    print "Expected gene length: " + str(expected_length)
+    # expected_length = (gene_end - gene_start)
+    print "Expected gene length: " + str(c_muta.get_geneEnd() - c_muta.get_geneStart())
     openString = "C:\\hg19\\chromFa\\" + c_muta.get_geneChromosome() + ".fa"
     hg19_chromosome = open(openString, "r")
     # print "open: " + c_muta.get_geneChromosome()
 
-    dna = []
-    full_chromosome = ""
-    l_count = 0
-    first_run = True
-    for dna_line in hg19_chromosome:
-        # full_chromosome += dna_line.strip()
-        if gene50end >= l_count >= gene50start:
-            dna_line = dna_line.strip()
-            hit_dna = list(dna_line)
+    with open(openString) as gf:
+        chromosome = gf.read()
+        chromosome = chromosome.replace(">"+c_muta.get_geneChromosome(), '')
+        chromosome = chromosome.replace("\n", '').replace("\r", '').replace("\n\r", '')
+
+    print chromosome[0:120]
+    print len(chromosome)
+
+    gene = chromosome[c_muta.get_geneStart():c_muta.get_geneEnd()]
+    print len(gene)
+    # DEPRECATED GENE FETCH #
+    # dna = []
+    # l_count = 0
+    # first_run = True
+    # for dna_line in hg19_chromosome:
+        # if gene50end >= l_count >= gene50start:
+            # dna_line = dna_line.strip()
+            # hit_dna = list(dna_line)
             # ignore first X bases
-            if first_run:
-                base_counter = 0
-                for base in hit_dna:
-                    if gene50start_rest <= base_counter:
-                        dna.append(base)
+            # if first_run:
+                # base_counter = 0
+                # for base in hit_dna:
+                    # if gene50start_rest <= base_counter:
+                        # dna.append(base)
                     # else:
                         # print "SKIP"
-                    base_counter += 1
-                first_run = False
-            else:
-                dna.append(hit_dna)
-            # noch zu lang am Ende
-        l_count += 1
-
-    # print full_chromosome
-
+                    # base_counter += 1
+                # first_run = False
+            # else:
+                # dna.append(hit_dna)
+        # l_count += 1
     # flatten dna list #
-    dna = list(itertools.chain(*dna))
-
+    # dna = list(itertools.chain(*dna))
     # print "".join(dna)
     # print "final gene length: " + str(len(dna))
     # print "".join(dna)
     # over_size = len(dna) - expected_length
     # print "zu viel: " + str(over_size)
-
     # remove oversize #
-    dna = dna[:expected_length]
+    # dna = dna[:expected_length]
     # dna_joined = "".join(reversed(dna))
-    dna_joined = "".join(dna)
+    # dna_joined = "".join(dna)
     # print "final gene size: " + str(len(dna))
     # print "".join(dna)
     # print "divided by 3: " + str(float(len(dna)/3))
 
     # Translate DNA to AA #
-    amino_seq = Translator().translate_dna_sequence(str(dna_joined))
-    g_dna = GeneDNA(c_muta.get_gene(), c_muta.get_geneChromosome(), c_muta.get_geneStart(), c_muta.get_geneEnd(), dna,
-                    amino_seq)
+    amino_seq = Translator().translate_dna_sequence(gene)
+    print amino_seq
+    g_dna = GeneDNA(c_muta.get_gene(), c_muta.get_geneChromosome(), c_muta.get_geneStart(), c_muta.get_geneEnd(),
+                    gene, amino_seq)
 
     # print "Element name: " + element.get_name()
 
@@ -224,8 +228,8 @@ for c_muta in coding_mutations:
 
 for c_muta, g_dna in mutation_with_sequence.iteritems():
     print c_muta.get_gene()
-    print g_dna.get_name()
-    print "".join(g_dna.get_na_sequence())
+    # print g_dna.get_name()
+    # print "".join(g_dna.get_na_sequence())
     print g_dna.get_aa_sequence()
 
 
