@@ -143,6 +143,8 @@ for mutation in mutations:
                                                        prot.get_proteinClass(), prot.get_start(), prot.get_end(),
                                                        "non pathogenic", 0.50))
 
+# sys.exit("ENDE")
+
 
 # find DNA sequence for gene in each region and translate it #
 mutation_with_sequence = {}
@@ -169,9 +171,11 @@ for c_muta in coding_mutations:
     # print "open: " + c_muta.get_geneChromosome()
 
     dna = []
+    full_chromosome = ""
     l_count = 0
     first_run = True
     for dna_line in hg19_chromosome:
+        # full_chromosome += dna_line.strip()
         if gene50end >= l_count >= gene50start:
             dna_line = dna_line.strip()
             hit_dna = list(dna_line)
@@ -189,6 +193,8 @@ for c_muta in coding_mutations:
                 dna.append(hit_dna)
             # noch zu lang am Ende
         l_count += 1
+
+    # print full_chromosome
 
     # flatten dna list #
     dna = list(itertools.chain(*dna))

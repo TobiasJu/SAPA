@@ -1,6 +1,5 @@
 from mutation import Mutation
 
-
 # initialize super class
 class ProbedMutation(Mutation):
     __geneChromosome = ""
@@ -16,15 +15,15 @@ class ProbedMutation(Mutation):
     def __init__(self, id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,
                  totalDepth, refDepth, altDepth, strandBias, geneChromosome, gene, geneSyn, geneDesc, proteinClass,
                  geneStart, geneEnd, conclusion, score):
-        self.__geneChromosome = geneChromosome,
-        self.__gene = gene,
-        self.__geneSyn = geneSyn,
-        self.__geneDesc = geneDesc,
-        self.__proteinClass = proteinClass,
-        self.__geneStart = geneStart,
-        self.__geneEnd = geneEnd,
-        self.__conclusion = conclusion,
-        self.__score = score,
+        self.__geneChromosome = geneChromosome
+        self.__gene = gene
+        self.__geneSyn = geneSyn
+        self.__geneDesc = geneDesc
+        self.__proteinClass = proteinClass
+        self.__geneStart = geneStart
+        self.__geneEnd = geneEnd
+        self.__conclusion = conclusion
+        self.__score = score
         super(ProbedMutation, self).__init__(id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar,
                                              qual, altFreq, totalDepth, refDepth, altDepth, strandBias)
 
@@ -59,10 +58,10 @@ class ProbedMutation(Mutation):
     # getters for the super class parameters
 
     def get_geneChromosome(self):
-        return str(self.__geneChromosome[0])
+        return str(self.__geneChromosome)
 
     def get_gene(self):
-        return str(self.__gene[0])
+        return str(self.__gene)
 
     def get_geneSyn(self):
         return self.__geneSyn
@@ -74,10 +73,10 @@ class ProbedMutation(Mutation):
         return self.__proteinClass
 
     def get_geneStart(self):
-        return int(self.__geneStart[0])
+        return int(self.__geneStart)
 
     def get_geneEnd(self):
-        return int(self.__geneEnd[0])
+        return int(self.__geneEnd)
 
     def get_conclusion(self):
         return self.__conclusion
@@ -92,13 +91,13 @@ class ProbedMutation(Mutation):
                "Total Depth\tRef Depth\tAlt Depth\tStrand Bias\tGene Chromosome\tGene\tGene synonym\tGene description\t" \
                "Protein class\tGene Start\tGene End\tpathogenic Score\tConclusion"
 
-    # warum gehet das nicht?
+    # warum geht das nicht?
     def toString(self):
         return "ID: {}\tChr: {}\tPos: {}\tRef: {}\tAlt: {}\tType: {}\tContext: {}\tConsequence: {}\tdbSNP: {}\t" \
                "COSMIC: {}\tClinVar: {}\tQual: {}\tAlt Freq: {}\tTotal Depth: {}\tRef Depth: {}\tAlt Depth: {}\t" \
                "Strand Bias: {}\tGene Chromosome: {}\tGene: {}\tGene synonym: {}\tGene description: {}\t" \
                "Protein class: {}\tGene Start: {}\tGene End: {}\tpathogenic Score: {}\t" \
-               "conclusion: {}".format(self.__id,
+               "conclusion: {}".format(Mutation.__id,
                                        self.__chr,
                                        self.__pos,
                                        self.__ref,

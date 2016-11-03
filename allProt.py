@@ -13,14 +13,14 @@ class AllProt:
 
     # constructor
     def __init__(self, gene, geneSyn, ensembl, geneDesc, chromosome, start, end, proteinClass, REST):
-        self.__gene = gene,
-        self.__geneSyn = geneSyn,
-        self.__ensembl = ensembl,
-        self.__geneDesc = geneDesc,
-        self.__chromosome = chromosome,
-        self.__start = start,
-        self.__end = end,
-        self.__proteinClass = proteinClass,
+        self.__gene = gene
+        self.__geneSyn = geneSyn
+        self.__ensembl = ensembl
+        self.__geneDesc = geneDesc
+        self.__chromosome = chromosome
+        self.__start = start
+        self.__end = end
+        self.__proteinClass = proteinClass
         self.__REST = REST
 
     # setter
@@ -37,7 +37,7 @@ class AllProt:
 
     # getter
     def get_gene(self):
-        return str(self.__gene[0])
+        return str(self.__gene)
 
     def get_geneSyn(self):
         return self.__geneSyn
@@ -49,18 +49,13 @@ class AllProt:
         return self.__geneDesc
 
     def get_chromosome(self):
-        return str(self.__chromosome[0])
+        return str(self.__chromosome)
 
     def get_start(self):
-        # wieso ist das ein TUPEL???
-
-        # print type(self.__start)
-        return int(self.__start[0])
+        return int(self.__start)
 
     def get_end(self):
-        # ist auch ein Tupel...
-        # print int(self.__end[0])
-        return int(self.__end[0])
+        return int(self.__end)
 
     def get_proteinClass(self):
         return self.__proteinClass
