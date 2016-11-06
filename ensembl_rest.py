@@ -80,6 +80,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 3:
         species, symbol = sys.argv[1:]
     else:
+        print "NO SELECTION DONE, TRYING EXAMPLE"
         species, symbol = 'human', 'BRAF'
 
 #    run(species, symbol)
