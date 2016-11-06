@@ -1,6 +1,6 @@
 # mutation class for storing the patient data
 
-class Mutation(object): # warum muss hier object hin??
+class Mutation(object):  # warum muss hier object hin??
     __id = 0
     __chr = ""
     __pos = 0  # int
@@ -18,7 +18,6 @@ class Mutation(object): # warum muss hier object hin??
     __refDepth = 0  # int
     __altDepth = 0  # int
     __strandBias = 0.0  # float
-    #__conclusion = ""
 
     # constructor
     def __init__(self, id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,
@@ -40,7 +39,6 @@ class Mutation(object): # warum muss hier object hin??
         self.__refDepth = refDepth
         self.__altDepth = altDepth
         self.__strandBias = strandBias
-        # self.__conclusion = conclusion
 
     # setter
     def set_id(self, id):
@@ -186,4 +184,22 @@ class Mutation(object): # warum muss hier object hin??
                                          self.__refDepth,
                                          self.__altDepth,
                                          self.__strandBias)
-                                         #self.__conclusion)
+
+    def export(self):
+        return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t\n".format(self.__chr,
+                                                                                               self.__pos,
+                                                                                               self.__pos,
+                                                                                               self.__ref,
+                                                                                               self.__alt,
+                                                                                               self.__type,
+                                                                                               self.__context,
+                                                                                               self.__consequence,
+                                                                                               self.__dbSNP,
+                                                                                               self.__cosmic,
+                                                                                               self.__clinVar,
+                                                                                               self.__qual,
+                                                                                               self.__altFreq,
+                                                                                               self.__totalDepth,
+                                                                                               self.__refDepth,
+                                                                                               self.__altDepth,
+                                                                                               self.__strandBias)
