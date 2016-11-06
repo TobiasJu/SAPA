@@ -61,6 +61,7 @@ for mutation in mutations:
 
 tab_mutations.close()
 
+# WORKS JUST UNDER UBUNTU #
 #dir_path = os.path.dirname(os.path.realpath(__file__))
 #print dir_path
 
