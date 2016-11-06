@@ -1,5 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import sys
 import os
+import subprocess
 import ensembl_rest
 import itertools
 from mutation import Mutation
@@ -47,6 +51,27 @@ for dna_line in variant_lines:
         print "INVALID DATA LENGHT in Line {}".format(l_count)
         print dna_line
         l_count += 1
+
+# write tab delimited file for annovar #
+
+tab_mutations = open('amplicon_variants_tab.csv', 'w')
+print "Writing tab delimited File"
+for mutation in mutations:
+    tab_mutations.write(mutation.export())
+
+tab_mutations.close()
+
+#dir_path = os.path.dirname(os.path.realpath(__file__))
+#print dir_path
+
+#pipe = subprocess.Popen(["perl", "./perl/table_annovar.pl", dir_path], stdin=subprocess.PIPE)
+#pipe.stdin.write(dir_path)
+#pipe.stdin.close()
+
+#if pipe == 0:
+#    print("Passed!")
+#else:
+#    print("Failed!")
 
 print "created User Mutation Objects\n"
 f.close()
@@ -109,8 +134,9 @@ coding_mutations = []
 for mutation in mutations:
     # print mutation.get_id()
     # print type(mutation.get_context()) = list
-    if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" \
-            and "Coding" in mutation.get_context():
+    # if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" \
+            # and "Coding" in mutation.get_context():
+    if "Coding" in mutation.get_context():
 
         print "{} ID: {}, Position: {}".format("unknown mutation", mutation.get_id(), mutation.get_pos())
 
@@ -122,7 +148,8 @@ for mutation in mutations:
             if prot.get_start() < mutation.get_pos() < prot.get_end() and mutation.get_chr() == \
                     prot.get_chromosome():
                 # print "Mutation Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
-                #                                                                        prot.get_start(), prot.get_end())
+                #                                                                        prot.get_start(),
+                #                                                                        prot.get_end())
                 print "found Gene: " + prot.get_gene()
                 # print gene.get_geneSyn()
                 # rint gene.get_geneDesc()
@@ -175,7 +202,7 @@ for c_muta in coding_mutations:
         chromosome = chromosome.replace(">"+c_muta.get_geneChromosome(), '')
         chromosome = chromosome.replace("\n", '').replace("\r", '').replace("\n\r", '')
 
-    print chromosome[0:120]
+    # print chromosome[0:120]
     print len(chromosome)
 
     gene = chromosome[c_muta.get_geneStart():c_muta.get_geneEnd()]
@@ -218,7 +245,7 @@ for c_muta in coding_mutations:
 
     # Translate DNA to AA #
     amino_seq = Translator().translate_dna_sequence(gene)
-    print amino_seq
+    # print amino_seq
     g_dna = GeneDNA(c_muta.get_gene(), c_muta.get_geneChromosome(), c_muta.get_geneStart(), c_muta.get_geneEnd(),
                     gene, amino_seq)
 
@@ -228,15 +255,16 @@ for c_muta in coding_mutations:
 
 for c_muta, g_dna in mutation_with_sequence.iteritems():
     print c_muta.get_gene()
-    # print g_dna.get_name()
+    print c_muta.get_geneChromosome()
+    print c_muta.get_pos()
     # print "".join(g_dna.get_na_sequence())
     print g_dna.get_aa_sequence()
 
 
 
 
-# ensemble API
-# ensembl_rest.run(species="human", symbol="BRAF")
+# ensemble API for GRCh37 hg19
+# ensembl_rest.run(species="human", symbol="DOPEY2")
 
 
 # write in export table
