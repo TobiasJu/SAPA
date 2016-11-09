@@ -194,7 +194,7 @@ for c_muta in coding_mutations:
     # print gene50end_rest
     # expected_length = (gene_end - gene_start)
     print "Expected gene length: " + str(c_muta.get_geneEnd() - c_muta.get_geneStart())
-    openString = "C:\\hg19\\chromFa\\" + c_muta.get_geneChromosome() + ".fa"
+    openString = "E:\\hg19\\chromFa\\" + c_muta.get_geneChromosome() + ".fa"
     hg19_chromosome = open(openString, "r")
     # print "open: " + c_muta.get_geneChromosome()
 
