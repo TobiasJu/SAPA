@@ -19,18 +19,30 @@ group = parser.add_mutually_exclusive_group()
 group.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
 group.add_argument("-q", "--quiet", action="store_true", help="prevent output")
 parser.add_argument("-o", "--output", action="store_true", help="store the output in a file")
-parser.add_argument("-n", "--number", type=int, help="number X")
-
+parser.add_argument("-n", "--number", type=int, help="just a Test number")
+parser.add_argument("-f", "--input_file", help="tab separated table with SNP's")
+parser.add_argument("-d", "--input_directory", type=str, help="hg19 directory")
 args = parser.parse_args()
+
+try:
+    options = parser.parse_args()
+except:
+    parser.print_help()
+    sys.exit(0)
+
+print args
 
 # if args.verbose:
 # do something
 
-f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
-variant_lines = f.readlines()[1:]
-l_count = 0
+
+with open(args.input_file) as f:
+    # f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
+    variant_lines = f.readlines()[1:]
+
 
 # create mutation Objects from the given Data of a patient
+l_count = 0
 mutations = []
 for dna_line in variant_lines:
     # remove /n form end of line
@@ -176,7 +188,7 @@ for mutation in mutations:
 mutation_with_sequence = {}
 for c_muta in coding_mutations:
     print "Expected gene length: " + str(c_muta.get_geneEnd() - c_muta.get_geneStart())
-    openString = "E:\\hg19\\chromFa\\" + c_muta.get_geneChromosome() + ".fa"
+    openString = args.input_directory + "\\chromFa\\" + c_muta.get_geneChromosome() + ".fa"
     hg19_chromosome = open(openString, "r")
     with open(openString) as gf:
         chromosome = gf.read()
