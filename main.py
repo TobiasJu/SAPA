@@ -19,18 +19,30 @@ group = parser.add_mutually_exclusive_group()
 group.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
 group.add_argument("-q", "--quiet", action="store_true", help="prevent output")
 parser.add_argument("-o", "--output", action="store_true", help="store the output in a file")
-parser.add_argument("-n", "--number", type=int, help="number X")
-
+parser.add_argument("-n", "--number", type=int, help="just a Test number")
+parser.add_argument("-f", "--input_file", help="tab separated table with SNP's")
+parser.add_argument("-d", "--input_directory", type=str, help="hg19 directory")
 args = parser.parse_args()
+
+try:
+    options = parser.parse_args()
+except:
+    parser.print_help()
+    sys.exit(0)
+
+print args
 
 # if args.verbose:
 # do something
 
-f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
-variant_lines = f.readlines()[1:]
-l_count = 0
+
+with open(args.input_file) as f:
+    # f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
+    variant_lines = f.readlines()[1:]
+
 
 # create mutation Objects from the given Data of a patient
+l_count = 0
 mutations = []
 for dna_line in variant_lines:
     # remove /n form end of line
@@ -171,78 +183,21 @@ for mutation in mutations:
                                                        prot.get_proteinClass(), prot.get_start(), prot.get_end(),
                                                        "non pathogenic", 0.50))
 
-# sys.exit("ENDE")
-
 
 # find DNA sequence for gene in each region and translate it #
 mutation_with_sequence = {}
 for c_muta in coding_mutations:
-    # print cmuta.toString() # geht nicht????
-    # print c_muta.get_gene()
-    # print cmuta.get_geneChromosome()
-    # gene_start = c_muta.get_geneStart()
-    # gene50start_rest = int(gene_start % 50)
-    # gene50start = int(gene_start) / 50
-    # gene50float = gene_start / 50
-    # print gene50float
-    # print "START: " + str(gene50start)
-    # print gene50start_rest
-    # gene_end = c_muta.get_geneEnd()
-    # gene50end = int(gene_end) / 50
-    # gene50end_rest = int(gene_end % 50)
-    # print "END: " + str(gene50end)
-    # print gene50end_rest
-    # expected_length = (gene_end - gene_start)
     print "Expected gene length: " + str(c_muta.get_geneEnd() - c_muta.get_geneStart())
-    openString = "E:\\hg19\\chromFa\\" + c_muta.get_geneChromosome() + ".fa"
+    openString = args.input_directory + "\\chromFa\\" + c_muta.get_geneChromosome() + ".fa"
     hg19_chromosome = open(openString, "r")
-    # print "open: " + c_muta.get_geneChromosome()
-
     with open(openString) as gf:
         chromosome = gf.read()
         chromosome = chromosome.replace(">"+c_muta.get_geneChromosome(), '')
         chromosome = chromosome.replace("\n", '').replace("\r", '').replace("\n\r", '')
 
-    # print chromosome[0:120]
     print len(chromosome)
-
     gene = chromosome[c_muta.get_geneStart():c_muta.get_geneEnd()]
     print len(gene)
-    # DEPRECATED GENE FETCH #
-    # dna = []
-    # l_count = 0
-    # first_run = True
-    # for dna_line in hg19_chromosome:
-        # if gene50end >= l_count >= gene50start:
-            # dna_line = dna_line.strip()
-            # hit_dna = list(dna_line)
-            # ignore first X bases
-            # if first_run:
-                # base_counter = 0
-                # for base in hit_dna:
-                    # if gene50start_rest <= base_counter:
-                        # dna.append(base)
-                    # else:
-                        # print "SKIP"
-                    # base_counter += 1
-                # first_run = False
-            # else:
-                # dna.append(hit_dna)
-        # l_count += 1
-    # flatten dna list #
-    # dna = list(itertools.chain(*dna))
-    # print "".join(dna)
-    # print "final gene length: " + str(len(dna))
-    # print "".join(dna)
-    # over_size = len(dna) - expected_length
-    # print "zu viel: " + str(over_size)
-    # remove oversize #
-    # dna = dna[:expected_length]
-    # dna_joined = "".join(reversed(dna))
-    # dna_joined = "".join(dna)
-    # print "final gene size: " + str(len(dna))
-    # print "".join(dna)
-    # print "divided by 3: " + str(float(len(dna)/3))
 
     # Translate DNA to AA #
     amino_seq = Translator().translate_dna_sequence(gene)
@@ -258,10 +213,7 @@ for c_muta, g_dna in mutation_with_sequence.iteritems():
     print c_muta.get_gene()
     print c_muta.get_geneChromosome()
     print c_muta.get_pos()
-    # print "".join(g_dna.get_na_sequence())
     print g_dna.get_aa_sequence()
-
-
 
 
 # ensemble API for GRCh37 hg19
