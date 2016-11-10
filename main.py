@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import re
+import csv
 import sys
 import os
 import subprocess
@@ -77,7 +78,7 @@ f.close()
 
 # write tab delimited file for annovar #
 tab_mutations = open('amplicon_variants_tab.csv', 'w')
-print "Writing tab delimited File"
+print "creating tab delimited file for annovar"
 for mutation in mutations:
     tab_mutations.write(mutation.export())
 tab_mutations.close()
@@ -90,7 +91,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 params = "amplicon_variants_tab.csv /mnt/c/annovar/humandb/ -buildver hg19 -out myanno -remove -protocol " \
          "refGene,cytoBand,genomicSuperDups,esp6500siv2_all,1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas," \
-         "1000g2014oct_eur,snp138,ljb26_all -operation g,r,r,f,f,f,f,f,f,f -nastring . -csvout"
+         "1000g2014oct_eur,snp138,ljb26_all -operation g,r,r,f,f,f,f,f,f,f -nastring . "  # -csvout
 
 annovar = "./perl/table_annovar.pl "
 
@@ -100,10 +101,29 @@ p.communicate()
 
 print annovar + params
 
-### parse annovar file ###
+# parse annovar file ###
+l_count = 0
+with open('myanno.hg19_multianno.csv', 'rb') as annovar_csvfile:
+    annovar = csv.reader(annovar_csvfile, delimiter=',', quotechar='"')
+    for row in annovar:
+        print ', '.join(row)
+
+    # data = """part 1;"this is ; part 2;";'this is ; part 3';part 4;this "is ; part" 5"""
+    # pattern = re.compile(r'''((?:[^;"']|"[^"]*"|'[^']*')+)''')
+    # print pattern.split(data)[1::2]
 
 
 
+    #if l_count == 1:
+    #    # create header
+    #    print "header: " + str(split_line)
+    #else:
+    #    print len(split_line)
+    #    print str(split_line)
+
+    l_count += 1
+print l_count
+annovar_csvfile.close()
 
 # create Objects containing all human proteins ###
 allHumanProteins = []
