@@ -22,26 +22,34 @@ parser.add_argument("-o", "--output", action="store_true", help="store the outpu
 parser.add_argument("-n", "--number", type=int, help="just a Test number")
 parser.add_argument("-f", "--input_file", help="tab separated table with SNP's")
 parser.add_argument("-d", "--input_directory", type=str, help="hg19 directory")
+
 args = parser.parse_args()
 
-try:
-    options = parser.parse_args()
-except:
+# sanity check ###
+if not len(sys.argv) > 1:
+    parser.print_help()
+    sys.exit(0)
+
+if not args.input_file:
+    print "ERROR, please enter a input file parameter"
+    parser.print_help()
+    sys.exit(0)
+
+if not args.input_directory:
+    print "ERROR, please enter a input directory"
     parser.print_help()
     sys.exit(0)
 
 print args
 
 # if args.verbose:
-# do something
+# print "detailed output selected"
 
-
+# load the input file into a variable
 with open(args.input_file) as f:
-    # f = open('data/truseq-amplicon-variants_tobi.csv', 'r')
     variant_lines = f.readlines()[1:]
 
-
-# create mutation Objects from the given Data of a patient
+# create mutation Objects from the given patient Data ###
 l_count = 0
 mutations = []
 for dna_line in variant_lines:
@@ -60,40 +68,48 @@ for dna_line in variant_lines:
                                   int(split_line[10]), split_line[11], split_line[12], split_line[13], split_line[14],
                                   split_line[15]))
     else:
-        print "INVALID DATA LENGHT in Line {}".format(l_count)
+        print "INVALID DATA (length) in Line {}".format(l_count)
         print dna_line
         l_count += 1
 
-# write tab delimited file for annovar #
+print "created User Mutation Objects\n"
+f.close()
 
+# write tab delimited file for annovar #
 tab_mutations = open('amplicon_variants_tab.csv', 'w')
 print "Writing tab delimited File"
 for mutation in mutations:
     tab_mutations.write(mutation.export())
-
 tab_mutations.close()
 
-# WORKS JUST UNDER UBUNTU #
-#dir_path = os.path.dirname(os.path.realpath(__file__))
-#print dir_path
+# WORKS JUST UNDER UBUNTU OR THE UBUNTU BASH FOR WINDOWS #
+# run Annovar ###
+print "running Annovar"
+dir_path = os.path.dirname(os.path.realpath(__file__))
+# print dir_path
 
-#pipe = subprocess.Popen(["perl", "./perl/table_annovar.pl", dir_path], stdin=subprocess.PIPE)
-#pipe.stdin.write(dir_path)
-#pipe.stdin.close()
+params = "amplicon_variants_tab.csv /mnt/c/annovar/humandb/ -buildver hg19 -out myanno -remove -protocol " \
+         "refGene,cytoBand,genomicSuperDups,esp6500siv2_all,1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas," \
+         "1000g2014oct_eur,snp138,ljb26_all -operation g,r,r,f,f,f,f,f,f,f -nastring . -csvout"
 
-#if pipe == 0:
-#    print("Passed!")
-#else:
-#    print("Failed!")
+annovar = "./perl/table_annovar.pl "
 
-print "created User Mutation Objects\n"
-f.close()
-line_count = 0
+p = subprocess.Popen([annovar + params], shell=True)
+# wait until it's finished
+p.communicate()
 
-# create Objects containing all human proteins
+print annovar + params
+
+### parse annovar file ###
+
+
+
+
+# create Objects containing all human proteins ###
 allHumanProteins = []
 allProtFile = open('data/allprots.csv', 'r')
 lines = allProtFile.readlines()[1:]
+line_count = 0
 for dna_line in lines:
     # remove /n form end of line
     dna_line = dna_line.strip()
@@ -117,18 +133,12 @@ for dna_line in lines:
         allHumanProteins.append(AllProt(prot, geneSyn, ensembl, geneDesc, chromosome, int(start),
                                         int(end), split_line[6], split_line[7:-1]))
 
-        # else:
-        # print len(split_line)
-        # print split_line
-        # allHumanProteins.append(AllProt(split_line[0], "unknown", "unknown",
-        # "unknown", "unknown", "unknown", "unknown", "unknown", "unknown"))
-# print "{} -> {}".format(start, end)
 allProtFile.close()
 print "created all protein objects"
 # print(mutations[0].toString)
 print "Mutation count: ", l_count
 
-# filter all entries in the patient mutation data set
+# filter all entries in the patient mutation data set ###
 i = 0
 for mutation in mutations:
     # only clinically relevant quality
@@ -143,16 +153,12 @@ for mutation in mutations:
 print "past filter: " + str(len(mutations))
 
 coding_mutations = []
-# search after unknown mutations and find corresponding genes
+# search after unknown mutations and find corresponding genes ###
 for mutation in mutations:
-    # print mutation.get_id()
-    # print type(mutation.get_context()) = list
     # if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" \
             # and "Coding" in mutation.get_context():
     if "Coding" in mutation.get_context():
-
         print "{} ID: {}, Position: {}".format("unknown mutation", mutation.get_id(), mutation.get_pos())
-
         for prot in allHumanProteins:
             # print type(gene.get_gene())
             # print gene.get_gene()
@@ -164,12 +170,6 @@ for mutation in mutations:
                 #                                                                        prot.get_start(),
                 #                                                                        prot.get_end())
                 print "found Gene: " + prot.get_gene()
-                # print gene.get_geneSyn()
-                # rint gene.get_geneDesc()
-                # export_list.append(ProbedMutation()
-
-                # FAM83A	BJ-TSA-9, MGC14128	ENSG00000147689	Family with sequence similarity 83, member A	8
-                # 123178960-123210079 POS 123195662
 
                 coding_mutations.append(ProbedMutation(mutation.get_id(), mutation.get_chr(), mutation.get_pos(),
                                                        mutation.get_ref(), mutation.get_alt(), mutation.get_type(),
@@ -183,12 +183,11 @@ for mutation in mutations:
                                                        prot.get_proteinClass(), prot.get_start(), prot.get_end(),
                                                        "non pathogenic", 0.50))
 
-
 # find DNA sequence for gene in each region and translate it #
 mutation_with_sequence = {}
 for c_muta in coding_mutations:
     print "Expected gene length: " + str(c_muta.get_geneEnd() - c_muta.get_geneStart())
-    openString = args.input_directory + "\\chromFa\\" + c_muta.get_geneChromosome() + ".fa"
+    openString = args.input_directory + "/chromFa/" + c_muta.get_geneChromosome() + ".fa"
     hg19_chromosome = open(openString, "r")
     with open(openString) as gf:
         chromosome = gf.read()
