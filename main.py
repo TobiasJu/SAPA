@@ -12,6 +12,7 @@ from allProt import AllProt
 from probedMutation import ProbedMutation
 from dna_to_aa_translator import Translator
 from geneDNA import GeneDNA
+from annovarParser import AnnovarParser
 import argparse
 
 # argparse for information
@@ -95,36 +96,50 @@ params = "amplicon_variants_tab.csv /mnt/c/annovar/humandb/ -buildver hg19 -out 
 
 annovar = "./perl/table_annovar.pl "
 
-p = subprocess.Popen([annovar + params], shell=True)
+# p = subprocess.Popen([annovar + params], shell=True)
 # wait until it's finished
-p.communicate()
+# p.communicate()
 
 print annovar + params
 
 # parse annovar file ###
+annovar = []
 l_count = 0
-with open('myanno.hg19_multianno.csv', 'rb') as annovar_csvfile:
-    annovar = csv.reader(annovar_csvfile, delimiter=',', quotechar='"')
-    for row in annovar:
-        print ', '.join(row)
-
-    # data = """part 1;"this is ; part 2;";'this is ; part 3';part 4;this "is ; part" 5"""
-    # pattern = re.compile(r'''((?:[^;"']|"[^"]*"|'[^']*')+)''')
-    # print pattern.split(data)[1::2]
-
-
-
-    #if l_count == 1:
-    #    # create header
-    #    print "header: " + str(split_line)
-    #else:
-    #    print len(split_line)
-    #    print str(split_line)
-
-    l_count += 1
+with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
+    for row in annovar_file:
+        # filter header
+        if l_count == 0:
+            print "skip header"
+        else:
+            row.rstrip()
+            row = row.split("\t")
+            if len(row) == 43:
+                annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
+                                             row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16],
+                                             row[17],
+                                             row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25],
+                                             row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33],
+                                             row[34], row[35], row[36], row[37], row[38], row[39], row[40], row[41],
+                                             row[42]))
+        l_count += 1
 print l_count
-annovar_csvfile.close()
+annovar_file.close()
+print "annotated SNPs"
 
+# iterate over annovar data and get final scores ###
+for data in annovar:
+    score = data._AnnovarParser__SIFT_score
+    if score == ".":
+        print "not a number" + score
+    else:
+        print score
+        rel_score = float(data._AnnovarParser__SIFT_score) / data._AnnovarParser__SIFT_max
+        print rel_score
+
+
+### READ EVALUATION PAPER FIRST!!!
+
+sys.exit(0)
 # create Objects containing all human proteins ###
 allHumanProteins = []
 allProtFile = open('data/allprots.csv', 'r')
@@ -159,24 +174,25 @@ print "created all protein objects"
 print "Mutation count: ", l_count
 
 # filter all entries in the patient mutation data set ###
-i = 0
-for mutation in mutations:
-    # only clinically relevant quality
-    if mutation.get_qual() <= 95:
-        del mutations[i]
+# i = 0
+# for mutation in mutations:
+# only clinically relevant quality
+#    if mutation.get_qual() <= 95:
+#        del mutations[i]
 
-    # if mutation does not change the amino acid, it does not affect the cell (in nearly all cases)
-    if "synonymous_variant" in mutation.get_consequences():
-        del mutations[i]
-    # more filters to come
-    i += 1
-print "past filter: " + str(len(mutations))
+# if mutation does not change the amino acid, it does not affect the cell (in nearly all cases)
+#    if "synonymous_variant" in mutation.get_consequences():
+#        del mutations[i]
+# more filters to come
+#    i += 1
+# print "past filter: " + str(len(mutations))
 
-coding_mutations = []
+
 # search after unknown mutations and find corresponding genes ###
+coding_mutations = []
 for mutation in mutations:
     # if mutation.get_dbSNP() == "" and mutation.get_cosmic() == "" and mutation.get_clinVar() == "" \
-            # and "Coding" in mutation.get_context():
+    # and "Coding" in mutation.get_context():
     if "Coding" in mutation.get_context():
         print "{} ID: {}, Position: {}".format("unknown mutation", mutation.get_id(), mutation.get_pos())
         for prot in allHumanProteins:
@@ -211,7 +227,7 @@ for c_muta in coding_mutations:
     hg19_chromosome = open(openString, "r")
     with open(openString) as gf:
         chromosome = gf.read()
-        chromosome = chromosome.replace(">"+c_muta.get_geneChromosome(), '')
+        chromosome = chromosome.replace(">" + c_muta.get_geneChromosome(), '')
         chromosome = chromosome.replace("\n", '').replace("\r", '').replace("\n\r", '')
 
     print len(chromosome)
@@ -233,7 +249,6 @@ for c_muta, g_dna in mutation_with_sequence.iteritems():
     print c_muta.get_geneChromosome()
     print c_muta.get_pos()
     print g_dna.get_aa_sequence()
-
 
 # ensemble API for GRCh37 hg19
 # ensembl_rest.run(species="human", symbol="DOPEY2")
