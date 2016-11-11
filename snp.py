@@ -1,6 +1,6 @@
 # mutation class for storing the patient data
 
-class Mutation(object):  # warum muss hier object hin??
+class SNP(object):  # warum muss hier object hin??
     __id = 0
     __chr = ""
     __pos = 0  # int

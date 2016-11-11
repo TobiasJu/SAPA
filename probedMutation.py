@@ -1,7 +1,7 @@
-from mutation import Mutation
+from snp import SNP
 
 # initialize super class
-class ProbedMutation(Mutation):
+class ProbedMutation(SNP):
     __geneChromosome = ""
     __gene = ""
     __geneSyn = ""
@@ -9,12 +9,12 @@ class ProbedMutation(Mutation):
     __proteinClass = ""
     __geneStart = 0
     __geneEnd = 0
-    __conclusion = ""
-    __score = 0.0
+    # __conclusion = ""
+    # __score = 0.0
 
     def __init__(self, id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,
                  totalDepth, refDepth, altDepth, strandBias, geneChromosome, gene, geneSyn, geneDesc, proteinClass,
-                 geneStart, geneEnd, conclusion, score):
+                 geneStart, geneEnd):  #, conclusion, score):
         self.__geneChromosome = geneChromosome
         self.__gene = gene
         self.__geneSyn = geneSyn
@@ -22,8 +22,8 @@ class ProbedMutation(Mutation):
         self.__proteinClass = proteinClass
         self.__geneStart = geneStart
         self.__geneEnd = geneEnd
-        self.__conclusion = conclusion
-        self.__score = score
+        # self.__conclusion = conclusion
+        # self.__score = score
         super(ProbedMutation, self).__init__(id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar,
                                              qual, altFreq, totalDepth, refDepth, altDepth, strandBias)
 
@@ -73,31 +73,31 @@ class ProbedMutation(Mutation):
         return self.__proteinClass
 
     def get_geneStart(self):
-        return int(self.__geneStart)
+        return self.__geneStart
 
     def get_geneEnd(self):
-        return int(self.__geneEnd)
+        return self.__geneEnd
 
-    def get_conclusion(self):
-        return self.__conclusion
-
-    def get_score(self):
-        return self.__score
+    # def get_conclusion(self):
+    #     return self.__conclusion
+    #
+    # def get_score(self):
+    #     return self.__score
 
     # class functions
 
     def print_header(self):
         return "ID\tChr\tPos\tRef\tAlt\tType\tContext\tConsequence\tdbSNP\tCOSMIC\tClinVar\tQual\tAlt Freq\t" \
                "Total Depth\tRef Depth\tAlt Depth\tStrand Bias\tGene Chromosome\tGene\tGene synonym\tGene description\t" \
-               "Protein class\tGene Start\tGene End\tpathogenic Score\tConclusion"
+               "Protein class\tGene Start\tGene End\t"
 
     # warum geht das nicht?
     def toString(self):
         return "ID: {}\tChr: {}\tPos: {}\tRef: {}\tAlt: {}\tType: {}\tContext: {}\tConsequence: {}\tdbSNP: {}\t" \
                "COSMIC: {}\tClinVar: {}\tQual: {}\tAlt Freq: {}\tTotal Depth: {}\tRef Depth: {}\tAlt Depth: {}\t" \
                "Strand Bias: {}\tGene Chromosome: {}\tGene: {}\tGene synonym: {}\tGene description: {}\t" \
-               "Protein class: {}\tGene Start: {}\tGene End: {}\tpathogenic Score: {}\t" \
-               "conclusion: {}".format(Mutation.__id,
+               "Protein class: {}\tGene Start: {}\tGene End: {}\t" \
+               "conclusion: {}".format(SNP.__id,
                                        self.__chr,
                                        self.__pos,
                                        self.__ref,
@@ -120,13 +120,13 @@ class ProbedMutation(Mutation):
                                        self.__geneDesc,
                                        self.__proteinClass,
                                        self.__geneStart,
-                                       self.__geneEnd,
-                                       self.__score,
+                                       # self.__geneEnd,
+                                       # self.__score,
                                        self.__conclusion)
 
     # warum gehet das auch nicht?
     def generate_export(self):
-        return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
+        return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
                "".format(self.__id,
                          self.__chr,
                          self.__pos,
@@ -149,6 +149,6 @@ class ProbedMutation(Mutation):
                          self.__geneDesc,
                          self.__proteinClass,
                          self.__geneStart,
-                         self.__geneEnd,
-                         self.__conclusion,
+                         # self.__geneEnd,
+                         # self.__conclusion,
                          self.__score)

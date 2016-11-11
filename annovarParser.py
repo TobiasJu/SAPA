@@ -95,7 +95,7 @@ class AnnovarParser:
         self.__MutationAssessor_score = MutationAssessor_score
         self.__MutationAssessor_pred = MutationAssessor_pred
         self.__FATHMM_score = FATHMM_score
-        self.__FATHMM_pred  = FATHMM_pred
+        self.__FATHMM_pred = FATHMM_pred
         self.__RadialSVM_score = RadialSVM_score
         self.__RadialSVM_pred = RadialSVM_pred
         self.__LR_score = LR_score
@@ -108,7 +108,7 @@ class AnnovarParser:
         self.__phyloP100way_vertebrate = phyloP100way_vertebrate
         self.__SiPhy_29way_logOdds = SiPhy_29way_logOdds
 
-
+    # class functions
 
     def print_header(self):
         return "Chr\tStart\tEnd\tRef\tAlt\tFunc_refGene\tGene_refGene\tGeneDetail_refGene\tExonicFunc_refGene\t" \
@@ -120,3 +120,49 @@ class AnnovarParser:
                "\tRadialSVM_score\tRadialSVM_pred\tLR_score\tLR_pred\tVEST3_score\tCADD_raw\tCADD_phred\tGERP_RS\t" \
                "phyloP46way_placental\tphyloP100way_vertebrate\tSiPhy_29way_logOdds"
 
+    def export_tab(self):
+        return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
+               "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
+               "".format(self.__Chr,
+                         self.__Start,
+                         self.__End,
+                         self.__Ref,
+                         self.__Alt,
+                         self.__Func_refGene,
+                         self.__Gene_refGene,
+                         self.__GeneDetail_refGene,
+                         self.__ExonicFunc_refGene,
+                         self.__AAChange_refGene,
+                         self.__cytoBand,
+                         self.__genomicSuperDups,
+                         self.__esp6500siv2_all,
+                         self.__g2014oct_all,
+                         self.__g2014oct_afr,
+                         self.__g2014oct_eas,
+                         self.__g2014oct_eur,
+                         self.__snp138,
+                         self.__SIFT_score,
+                         self.__SIFT_pred,
+                         self.__Polyphen2_HDIV_score,
+                         self.__Polyphen2_HDIV_pred,
+                         self.__Polyphen2_HVAR_score,
+                         self.__Polyphen2_HVAR_pred,
+                         self.__LRT_score,
+                         self.__LRT_pred,
+                         self.__MutationTaster_score,
+                         self.__MutationTaster_pred,
+                         self.__MutationAssessor_score,
+                         self.__MutationAssessor_pred,
+                         self.__FATHMM_score,
+                         self.__FATHMM_pred,
+                         self.__RadialSVM_score,
+                         self.__RadialSVM_pred,
+                         self.__LR_score,
+                         self.__LR_pred,
+                         self.__VEST3_score,
+                         self.__CADD_raw,
+                         self.__CADD_phred,
+                         self.__GERP_RS,
+                         self.__phyloP46way_placental,
+                         self.__phyloP100way_vertebrate,
+                         self.__SiPhy_29way_logOdds)
