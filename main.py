@@ -21,14 +21,13 @@ parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group()
 group.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
 group.add_argument("-q", "--quiet", action="store_true", help="prevent output")
-parser.add_argument("-l", "--log", action="store_true", help="store the output in a log file")
+# parser.add_argument("-l", "--log", action="store_true", help="store the output in a log file")
 parser.add_argument("-n", "--number", type=int, help="just a Test number")
-parser.add_argument("-f", "--input_file", help="tab separated table with SNP's")
+parser.add_argument("-i", "--input_file", help="tab separated table with SNP's")
 parser.add_argument("-d", "--input_directory", type=str, help="hg19 directory")
 parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.csv)")
-parser.add_argument("-l", "--light", action="store_true", help="run annotation just with a region based approach, for "
-                                                               "faster computing and less download file demand")
-
+parser.add_argument("-f", "--fast", action="store_true", help="run annotation just with a region based approach, "
+                                                              "for faster computing and less download file demand")
 args = parser.parse_args()
 
 # sanity check ###
@@ -106,8 +105,9 @@ print "created tab delimited file for annovar"
 # WORKS JUST UNDER UBUNTU OR THE UBUNTU BASH FOR WINDOWS #
 # get annovar databases if needed ###
 
-annovar = "./perl/table_annovar.pl "
-databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/","-buildver hg19 -downdb cytoBand hg19/",
+annotate_variation = "./perl/annotate_variation.pl "
+databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
+             "-buildver hg19 -downdb cytoBand hg19/",
              "-buildver hg19 -downdb genomicSuperDups hg19/",
              "-buildver hg19 -downdb -webfrom annovar esp6500siv2_all hg19/",
              "-buildver hg19 -downdb -webfrom annovar 1000g2014oct hg19/",
@@ -117,24 +117,48 @@ databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/","-buildver 
 
 if not exists("hg19/refGene.txt"):
     print "downloading dependencies..."
-    p = subprocess.Popen([annovar + databases[0]], shell=True)
-    # wait until it's finished
+    p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
+    p.communicate()
+
+if not exists("hg19/cytoBand.txt"):
+    print "downloading dependencies..."
+    p = subprocess.Popen([annotate_variation + databases[1]], shell=True)
     p.communicate()
 
 if not exists("hg19/genomicSuperDups.txt"):
     print "downloading dependencies..."
-    p = subprocess.Popen([annovar + databases[1]], shell=True)
-    # wait until it's finished
+    p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
+    p.communicate()
+
+if not exists("hg19/esp6500siv2_all.txt"):
+    print "downloading dependencies..."
+    p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
+    p.communicate()
+
+if not exists("hg19/1000g2014oct.txt"):
+    print "downloading dependencies..."
+    p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
+    p.communicate()
+
+if not exists("hg19/snp138.txt"):
+    print "downloading dependencies..."
+    p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
+    p.communicate()
+
+if not exists("hg19/ljb26_all.txt"):
+    print "downloading dependencies..."
+    p = subprocess.Popen([annotate_variation + databases[6]], shell=True)
     p.communicate()
 
 # run Annovar ###
 print "running annovar"
+annovar = "./perl/table_annovar.pl "
 dir_path = os.path.dirname(os.path.realpath(__file__))
 # print dir_path
 
 annovar_database = "/mnt/d/annovar/hg19/"
 
-if args.light:
+if args.fast:
     params = "amplicon_variants_tab.csv" + annovar_database + "-buildver hg19 -out myanno -remove -protocol" \
                                                               " refGene -operation g -nastring ."
 else:
@@ -144,9 +168,9 @@ else:
 
 
 
-# p = subprocess.Popen([annovar + params], shell=True)
+p = subprocess.Popen([annovar + params], shell=True)
 # wait until it's finished
-# p.communicate()
+p.communicate()
 
 print annovar + params
 
