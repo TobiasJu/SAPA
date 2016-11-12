@@ -24,7 +24,7 @@ group.add_argument("-q", "--quiet", action="store_true", help="prevent output")
 # parser.add_argument("-l", "--log", action="store_true", help="store the output in a log file")
 parser.add_argument("-n", "--number", type=int, help="just a Test number")
 parser.add_argument("-i", "--input_file", help="tab separated table with SNP's")
-parser.add_argument("-d", "--input_directory", type=str, help="hg19 directory")
+parser.add_argument("-d", "--input_directory", type=str, help="hg19 database directory (default /hg19)")
 parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.csv)")
 parser.add_argument("-f", "--fast", action="store_true", help="run annotation just with a region based approach, "
                                                               "for faster computing and less download file demand")
@@ -40,10 +40,10 @@ if not args.input_file:
     parser.print_help()
     sys.exit(0)
 
-if not args.input_directory:
-    print "ERROR, please enter a input directory"
-    parser.print_help()
-    sys.exit(0)
+# if not args.input_directory:
+#    print "ERROR, please enter a input directory"
+#    parser.print_help()
+#    sys.exit(0)
 
 print args
 
@@ -64,7 +64,7 @@ for snp_entry in variant_lines:
     split_line[0] = split_line[0].translate(None, '"')
     split_line[-1] = split_line[-1].translate(None, '"')
 
-    if len(split_line) == 16:
+    if len(split_line) >= 16:
         context = split_line[5].split(",")
         consequences = split_line[6].split(",")
         l_count += 1
@@ -84,14 +84,14 @@ f.close()
 print "pre filter SNP count: " + str(len(snps))
 i = 0
 for mutation in snps:
-# only clinically relevant quality
-   if mutation.get_qual() <= 95:
+    # only clinically relevant quality
+    if mutation.get_qual() <= 95:
        del snps[i]
 
-# if mutation does not change the amino acid, it does not affect the cell (in nearly all cases)
-   if "synonymous_variant" in mutation.get_consequences():
-       del snps[i]
-   i += 1
+    # if mutation does not change the amino acid, it does not affect the cell (in most cases)
+    if "synonymous_variant" in mutation.get_consequences():
+        del snps[i]
+    i += 1
 print "past filter SNP count: " + str(len(snps))
 
 
@@ -115,40 +115,46 @@ databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
              "-buildver hg19 -downdb -webfrom annovar ljb26_all hg19/"
              ]
 
-if not exists("hg19/refGene.txt"):
-    print "downloading dependencies..."
-    p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
-    p.communicate()
+if args.fast:
+    if not exists("hg19/refGene.txt"):
+        print "downloading dependencies..."
+        p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
+        p.communicate()
+else:
+    if not exists("hg19/refGene.txt"):
+        print "downloading dependencies..."
+        p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
+        p.communicate()
 
-if not exists("hg19/cytoBand.txt"):
-    print "downloading dependencies..."
-    p = subprocess.Popen([annotate_variation + databases[1]], shell=True)
-    p.communicate()
+    if not exists("hg19/cytoBand.txt"):
+        print "downloading dependencies..."
+        p = subprocess.Popen([annotate_variation + databases[1]], shell=True)
+        p.communicate()
 
-if not exists("hg19/genomicSuperDups.txt"):
-    print "downloading dependencies..."
-    p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
-    p.communicate()
+    if not exists("hg19/genomicSuperDups.txt"):
+        print "downloading dependencies..."
+        p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
+        p.communicate()
 
-if not exists("hg19/esp6500siv2_all.txt"):
-    print "downloading dependencies..."
-    p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
-    p.communicate()
+    if not exists("hg19/esp6500siv2_all.txt"):
+        print "downloading dependencies..."
+        p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
+        p.communicate()
 
-if not exists("hg19/1000g2014oct.txt"):
-    print "downloading dependencies..."
-    p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
-    p.communicate()
+    if not exists("hg19/1000g2014oct.txt"):
+        print "downloading dependencies..."
+        p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
+        p.communicate()
 
-if not exists("hg19/snp138.txt"):
-    print "downloading dependencies..."
-    p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
-    p.communicate()
+    if not exists("hg19/snp138.txt"):
+        print "downloading dependencies..."
+        p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
+        p.communicate()
 
-if not exists("hg19/ljb26_all.txt"):
-    print "downloading dependencies..."
-    p = subprocess.Popen([annotate_variation + databases[6]], shell=True)
-    p.communicate()
+    if not exists("hg19/ljb26_all.txt"):
+        print "downloading dependencies..."
+        p = subprocess.Popen([annotate_variation + databases[6]], shell=True)
+        p.communicate()
 
 # run Annovar ###
 print "running annovar"
@@ -156,7 +162,10 @@ annovar = "./perl/table_annovar.pl "
 dir_path = os.path.dirname(os.path.realpath(__file__))
 # print dir_path
 
-annovar_database = "/mnt/d/annovar/hg19/"
+if args.input_directory:
+    annovar_database = args.input_file
+else:
+    annovar_database = "/hg19/"
 
 if args.fast:
     params = "amplicon_variants_tab.csv" + annovar_database + "-buildver hg19 -out myanno -remove -protocol" \
@@ -165,8 +174,6 @@ else:
     params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
              "refGene,cytoBand,genomicSuperDups,esp6500siv2_all,1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas," \
              "1000g2014oct_eur,snp138,ljb26_all -operation g,r,r,f,f,f,f,f,f,f -nastring . "  # -csvout
-
-
 
 p = subprocess.Popen([annovar + params], shell=True)
 # wait until it's finished
