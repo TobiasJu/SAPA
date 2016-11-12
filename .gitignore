@@ -1,4 +1,6 @@
-/data
+data/c*
+data/P*
+data/t*
 *.pyc
 .idea
 hg19/
