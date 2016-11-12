@@ -25,9 +25,10 @@ group.add_argument("-q", "--quiet", action="store_true", help="prevent output in
 # parser.add_argument("-n", "--number", type=int, help="just a Test number")
 parser.add_argument("-i", "--input_file", help="tab separated table with SNP's")
 parser.add_argument("-d", "--input_directory", type=str, help="hg19 database directory (default /hg19)")
-parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.csv)")
+parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.txt)")
 parser.add_argument("-f", "--fast", action="store_true", help="run annotation just with a region based approach, "
                                                               "for faster computing and less download file demand")
+parser.add_argument("-fi", "--filter", action="store_true", help="filter SNPs for nonsynonymus and significant SNPs")
 args = parser.parse_args()
 
 # sanity check ###
@@ -81,19 +82,19 @@ print "created patient SNP objects\n"
 f.close()
 
 # filter all entries in the patient mutation data set ###
-print "pre filter SNP count: " + str(len(snps))
-i = 0
-for mutation in snps:
-    # only clinically relevant quality
-    if mutation.get_qual() <= 95:
-       del snps[i]
+if args.filter:
+    print "pre filter SNP count: " + str(len(snps))
+    i = 0
+    for mutation in snps:
+        # only clinically relevant quality
+        if mutation.get_qual() <= 95:
+           del snps[i]
 
-    # if mutation does not change the amino acid, it does not affect the cell (in most cases)
-    if "synonymous_variant" in mutation.get_consequences():
-        del snps[i]
-    i += 1
-print "past filter SNP count: " + str(len(snps))
-
+        # if mutation does not change the amino acid, it does not affect the cell (in most cases)
+        if "synonymous_variant" in mutation.get_consequences():
+            del snps[i]
+        i += 1
+    print "past filter SNP count: " + str(len(snps))
 
 # write tab delimited file for annovar #
 tab_mutations = open('amplicon_variants_tab.csv', 'w')
@@ -146,7 +147,12 @@ else:
         p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
         p.communicate()
 
-    if not os.path.isfile("hg19/hg19_1000g2014oct.txt"):
+    if os.path.isfile("hg19/hg19_1000g2014oct.zip"):
+        print "ERROR: unzip is not installed in your system. \nPlease manually uncompress the files " \
+              "(hg19_1000g2014oct.zip) at the hg19 directory, and rename them by adding hg19_ prefix to the file names."
+        sys.exit(0)
+
+    if not os.path.isfile("hg19/hg19_ALL.sites.2014_10.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
         p.communicate()
@@ -193,8 +199,15 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
     for row in annovar_file:
         # filter header
         if l_count != 0:
-            row.rstrip()
+            print row
+            row = row.strip()
+            print row
             row = row.split("\t")
+            if len(row) == 11:  # fast run
+                annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
+                                             row[9], row[10], ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
+                                             ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
+                                             ".", ".", ".", ".", ".", ".", "."))
             if len(row) == 43:
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
                                              row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16],
@@ -205,8 +218,7 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
                                              row[42]))
         l_count += 1
 annovar_file.close()
-print "annotated SNPs"
-print "annotated SNP count: " + str(len(annovar))
+print "annotated SNPs count: " + str(len(annovar))
 
 # iterate over annovar data and get final scores ###
 for data in annovar:
@@ -255,7 +267,7 @@ for snp_entry in lines:
 allProtFile.close()
 print "created all human protein objects"
 
-# search after SNP find corresponding genes ###
+# search after SNP corresponding genes ###
 coding_mutations = []
 for mutation in snps:
     if "Coding" in mutation.get_context():
@@ -267,7 +279,6 @@ for mutation in snps:
                 #                                                                        prot.get_start(),
                 #                                                                        prot.get_end())
                 print "found Gene: " + prot.get_gene()
-
                 coding_mutations.append(ProbedMutation(mutation.get_id(), mutation.get_chr(), mutation.get_pos(),
                                                        mutation.get_ref(), mutation.get_alt(), mutation.get_type(),
                                                        mutation.get_context(), mutation.get_consequences(),
@@ -328,8 +339,8 @@ for mutation in snps:
 
 # write in export table ###
 if not args.output_file:
-    target = open("output.csv", 'w')
-    print "writing export in: output.csv"
+    target = open("output.txt", 'w')
+    print "writing export in: output.txt"
 else:
     target = open(args.output_file, 'w')
     print "writing export in: " + args.output_file

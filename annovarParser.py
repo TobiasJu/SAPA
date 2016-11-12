@@ -111,7 +111,7 @@ class AnnovarParser:
     # class functions
 
     def print_header(self):
-        return "Chr\tStart\tEnd\tRef\tAlt\tFunc_refGene\tGene_refGene\tGeneDetail_refGene\tExonicFunc_refGene\t" \
+        return "Chr\tSNP Start\tSNP End\tRef\tAlt\tFunc_refGene\tGene_refGene\tGeneDetail_refGene\tExonicFunc_refGene\t" \
                "AAChange_refGene\tcytoBand\tgenomicSuperDups\tesp6500siv2_all\t1000g2014oct_all\t1000g2014oct_afr\t" \
                "1000g2014oct_eas" \
                "\t1000g2014oct_eur\tsnp138\tSIFT_score\tSIFT_pred\tPolyphen2_HDIV_score\tPolyphen2_HDIV_pred\t" \
