@@ -1,6 +1,7 @@
 data/c*
 data/P*
 data/t*
+data/allprots_split.xlsx
 *.pyc
 .idea
 hg19/
