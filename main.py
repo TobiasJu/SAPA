@@ -19,10 +19,10 @@ import argparse
 # argparse for information
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group()
-group.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
-group.add_argument("-q", "--quiet", action="store_true", help="prevent output")
+# group.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
+group.add_argument("-q", "--quiet", action="store_true", help="prevent output in command line")
 # parser.add_argument("-l", "--log", action="store_true", help="store the output in a log file")
-parser.add_argument("-n", "--number", type=int, help="just a Test number")
+# parser.add_argument("-n", "--number", type=int, help="just a Test number")
 parser.add_argument("-i", "--input_file", help="tab separated table with SNP's")
 parser.add_argument("-d", "--input_directory", type=str, help="hg19 database directory (default /hg19)")
 parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.csv)")
@@ -120,6 +120,16 @@ if args.fast:
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
         p.communicate()
+
+    if not exists("hg19/genomicSuperDups.txt"):
+        print "downloading dependencies..."
+        p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
+        p.communicate()
+
+    if not exists("hg19/snp138.txt"):
+        print "downloading dependencies..."
+        p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
+        p.communicate()
 else:
     if not exists("hg19/refGene.txt"):
         print "downloading dependencies..."
@@ -163,17 +173,20 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 # print dir_path
 
 if args.input_directory:
-    annovar_database = args.input_file
+    annovar_database = args.input_directory
 else:
     annovar_database = "/hg19/"
 
 if args.fast:
-    params = "amplicon_variants_tab.csv" + annovar_database + "-buildver hg19 -out myanno -remove -protocol" \
-                                                              " refGene -operation g -nastring ."
+    params = "amplicon_variants_tab.csv " + annovar_database + "-buildver hg19 -out myanno -remove -protocol " \
+                                                               "refGene,genomicSuperDups,snp138 -operation g,r,f " \
+                                                               "-nastring ."
 else:
     params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
              "refGene,cytoBand,genomicSuperDups,esp6500siv2_all,1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas," \
-             "1000g2014oct_eur,snp138,ljb26_all -operation g,r,r,f,f,f,f,f,f,f -nastring . "  # -csvout
+             "1000g2014oct_eur,snp138,ljb26_all -operation g,r,r,f,f,f,f,f,f,f -nastring . "
+
+#./perl/table_annovar.pl amplicon_variants_tab.csv /hg19/ -buildver hg19 -out myanno -remove -protocol refGene,genomicSuperDups,snp138 -operation g,r,f -nastring .
 
 p = subprocess.Popen([annovar + params], shell=True)
 # wait until it's finished
