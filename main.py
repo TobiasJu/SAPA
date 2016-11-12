@@ -116,52 +116,47 @@ databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
              ]
 
 if args.fast:
-    if os.path.isfile("hg19/refGene.txt"):
+    if not os.path.isfile("hg19/hg19_refGene.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
         p.communicate()
 
-    if os.path.isfile("hg19/genomicSuperDups.txt"):
-        print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
-        p.communicate()
-
-    if os.path.isfile("hg19/snp138.txt"):
+    if not os.path.isfile("hg19/hg19_snp138.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
         p.communicate()
 else:
-    if not exists("hg19/refGene.txt"):
+    if not os.path.isfile("hg19/hg19_refGene.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
         p.communicate()
 
-    if not exists("hg19/cytoBand.txt"):
+    if not os.path.isfile("hg19/hg19_cytoBand.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[1]], shell=True)
         p.communicate()
 
-    if not exists("hg19/genomicSuperDups.txt"):
+    if not os.path.isfile("hg19/hg19_genomicSuperDups.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
         p.communicate()
 
-    if not exists("hg19/esp6500siv2_all.txt"):
+    if not os.path.isfile("hg19/hg19_esp6500siv2_all.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
         p.communicate()
 
-    if not exists("hg19/1000g2014oct.txt"):
+    if not os.path.isfile("hg19/hg19_1000g2014oct.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
         p.communicate()
 
-    if not exists("hg19/snp138.txt"):
+    if not os.path.isfile("hg19/hg19_snp138.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
         p.communicate()
 
-    if not exists("hg19/ljb26_all.txt"):
+    if not os.path.isfile("hg19/hg19_ljb26_all.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[6]], shell=True)
         p.communicate()
@@ -179,20 +174,17 @@ else:
 
 if args.fast:
     params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
-                                                               "refGene,genomicSuperDups,snp138 -operation g,r,f " \
-                                                               "-nastring ."
+                                                               "refGene,snp138 -operation g,f -nastring ."
 else:
     params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
              "refGene,cytoBand,genomicSuperDups,esp6500siv2_all,1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas," \
              "1000g2014oct_eur,snp138,ljb26_all -operation g,r,r,f,f,f,f,f,f,f -nastring . "
-
-#./perl/table_annovar.pl amplicon_variants_tab.csv /hg19/ -buildver hg19 -out myanno -remove -protocol refGene,genomicSuperDups,snp138 -operation g,r,f -nastring .
+print annovar + params
+#./perl/table_annovar.pl amplicon_variants_tab.csv /hg19/ -buildver hg19 -out myanno -remove -protocol refGene,snp138 -operation g,f -nastring .
 
 p = subprocess.Popen([annovar + params], shell=True)
 # wait until it's finished
 p.communicate()
-
-print annovar + params
 
 # parse annovar file ###
 annovar = []
