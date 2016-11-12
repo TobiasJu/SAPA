@@ -116,17 +116,17 @@ databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
              ]
 
 if args.fast:
-    if not exists("hg19/refGene.txt"):
+    if os.path.isfile("hg19/refGene.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
         p.communicate()
 
-    if not exists("hg19/genomicSuperDups.txt"):
+    if os.path.isfile("hg19/genomicSuperDups.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
         p.communicate()
 
-    if not exists("hg19/snp138.txt"):
+    if os.path.isfile("hg19/snp138.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
         p.communicate()
@@ -175,10 +175,10 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 if args.input_directory:
     annovar_database = args.input_directory
 else:
-    annovar_database = "/hg19/"
+    annovar_database = "hg19/"
 
 if args.fast:
-    params = "amplicon_variants_tab.csv " + annovar_database + "-buildver hg19 -out myanno -remove -protocol " \
+    params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
                                                                "refGene,genomicSuperDups,snp138 -operation g,r,f " \
                                                                "-nastring ."
 else:
