@@ -362,7 +362,7 @@ export_cnt = 0
 for cmuta in coding_mutations:
     # write header first:
     if export_cnt == 0:
-        header = str(cmuta.print_header()) + str(annovar[0].print_header())
+        header = str(cmuta.print_header()) + str(annovar[0].print_header() + "\tcombined score\tESM score")
         target.write(header)
         target.write("\n")
     # write rows in table
@@ -380,6 +380,8 @@ for cmuta in coding_mutations:
                                   ))
     export_string += str(annovar[export_cnt].export_tab())
     target.write(export_string)
+    final_score = "\t\t"
+    target.write(final_score)
     target.write("\n")
     export_cnt += 1
 target.close()
