@@ -1,6 +1,7 @@
 # mutation class for storing the patient data
 
-class SNP(object):  # warum muss hier object hin??
+
+class SNP(object):
     __id = 0
     __chr = ""
     __pos = 0  # int
@@ -18,6 +19,7 @@ class SNP(object):  # warum muss hier object hin??
     __refDepth = 0  # int
     __altDepth = 0  # int
     __strandBias = 0.0  # float
+    #__start/end = 0
 
     # constructor
     def __init__(self, id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,

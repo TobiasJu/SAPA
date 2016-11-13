@@ -88,7 +88,7 @@ if args.filter:
     for mutation in snps:
         # only clinically relevant quality
         if mutation.get_qual() <= 95:
-           del snps[i]
+            del snps[i]
 
         # if mutation does not change the amino acid, it does not affect the cell (in most cases)
         if "synonymous_variant" in mutation.get_consequences():
@@ -99,8 +99,24 @@ if args.filter:
 # write tab delimited file for annovar #
 tab_mutations = open('amplicon_variants_tab.csv', 'w')
 for mutation in snps:
+    # check if type is deletion, correction of the data for annovar
+    if "Deletion" in mutation.get_type():
+        mutation.set_alt("-")
+        print mutation.get_alt()
+        print mutation.get_ref()
+        malus = (len(mutation.get_ref()) - 1)
+        #print malus
+        mutation.set_ref(mutation.get_ref()[1])
+        print mutation.get_ref()
+        newStart = mutation.get_pos() - malus
+        newEnd = mutation.get_pos() + malus
+        print mutation.get_pos()
+        print newStart
+        print newEnd
+
     tab_mutations.write(mutation.export())
 tab_mutations.close()
+# sys.exit(0)
 print "created tab delimited file for annovar"
 
 # WORKS JUST UNDER UBUNTU OR THE UBUNTU BASH FOR WINDOWS #
@@ -199,9 +215,7 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
     for row in annovar_file:
         # filter header
         if l_count != 0:
-            print row
             row = row.strip()
-            print row
             row = row.split("\t")
             if len(row) == 11:  # fast run
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
@@ -270,7 +284,7 @@ print "created all human protein objects"
 # search after SNP corresponding genes ###
 coding_mutations = []
 for mutation in snps:
-    if "Coding" in mutation.get_context():
+    if "Coding" in mutation.get_consequences():
         print "{} ID: {}, Position: {}".format("unknown mutation", mutation.get_id(), mutation.get_pos())
         for prot in allHumanProteins:
             if prot.get_start() < mutation.get_pos() < prot.get_end() and mutation.get_chr() == \
@@ -356,7 +370,7 @@ for cmuta in coding_mutations:
                         "{}\t"
                         "".format(cmuta.get_id(), cmuta.get_chr(), cmuta.get_pos(),
                                   cmuta.get_ref(), cmuta.get_alt(), cmuta.get_type(),
-                                  cmuta.get_context(), cmuta.get_consequences(),
+                                  ','.join(cmuta.get_context()), ','.join(cmuta.get_consequences()),
                                   cmuta.get_dbSNP(), cmuta.get_cosmic(), cmuta.get_clinVar(),
                                   cmuta.get_qual(), cmuta.get_altFreq(),
                                   cmuta.get_totalDepth(), cmuta.get_refDepth(),
@@ -370,5 +384,5 @@ for cmuta in coding_mutations:
     export_cnt += 1
 target.close()
 
-
+#','.join(
 print "FIN"
