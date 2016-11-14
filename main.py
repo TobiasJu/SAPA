@@ -23,7 +23,9 @@ group = parser.add_mutually_exclusive_group()
 group.add_argument("-q", "--quiet", action="store_true", help="prevent output in command line")
 # parser.add_argument("-l", "--log", action="store_true", help="store the output in a log file")
 # parser.add_argument("-n", "--number", type=int, help="just a Test number")
+parser.add_argument("-m", "--manual", action="store_true", help="display the manual for this program")
 parser.add_argument("-i", "--input_file", help="tab separated table with SNP's")
+parser.add_argument("-s", "--separator", help='set the input file separator (default: ",")')
 parser.add_argument("-d", "--input_directory", type=str, help="hg19 database directory (default /hg19)")
 parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.txt)")
 parser.add_argument("-f", "--fast", action="store_true", help="run annotation just with a region based approach, "
@@ -33,6 +35,18 @@ args = parser.parse_args()
 
 # sanity check ###
 if not len(sys.argv) > 1:
+    parser.print_help()
+    sys.exit(0)
+
+if args.manual:
+    print """Mutation Information / SNP Information
+
+This program is designed to add additional information to an Illumina truseq amplicon variants file.
+
+It will add
+
+Please Note that during the first run of the program, the required database will be downloaded. This may take some time, depending on your internet connection.
+             """
     parser.print_help()
     sys.exit(0)
 
@@ -61,7 +75,10 @@ snps = []
 for snp_entry in variant_lines:
     # remove /n form end of line
     snp_entry = snp_entry.strip()
-    split_line = snp_entry.split('","')
+    if not args.separator:
+        split_line = snp_entry.split('","')
+    else:
+        split_line = snp_entry.split(args.separator)
     split_line[0] = split_line[0].translate(None, '"')
     split_line[-1] = split_line[-1].translate(None, '"')
 
