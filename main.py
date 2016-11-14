@@ -43,9 +43,20 @@ if args.manual:
 
 This program is designed to add additional information to an Illumina truseq amplicon variants file.
 
-It will add
+The followong Parameters are added to the file:
 
-Please Note that during the first run of the program, the required database will be downloaded. This may take some time, depending on your internet connection.
+- COMING SOON
+
+Please Note that during the first run of the program, the required database will be downloaded. This may take some time,
+ depending on your internet connection.
+
+Several commonly used databases are integrated: ‘cytoBand’ for the chromosome coordinate of each cytogenetic band,
+‘1000g2014oct’ for alternative allele frequency in the 1000 Genomes Project (version October 2014), ‘exac03’
+for the variants reported in the Exome Aggregation Consortium (version 0.3)50, ‘ljb26_all’ for various functional
+deleteriousness prediction scores from the dbNSFP database (version 2.6)51, ‘clinvar_20140929’ for the variants
+reported in the ClinVar database (version 20140929)52 and ‘snp138’ for the dbSNP database (version 138)53.
+Note that the first command does not have the ‘--webfrom annovar’ argument, so it downloads the file from
+the UCSC Genome Browser annotation database
              """
     parser.print_help()
     sys.exit(0)
