@@ -26,11 +26,13 @@ group.add_argument("-q", "--quiet", action="store_true", help="prevent output in
 parser.add_argument("-m", "--manual", action="store_true", help="display the manual for this program")
 parser.add_argument("-i", "--input_file", help="tab separated table with SNP's")
 parser.add_argument("-s", "--separator", help='set the input file separator (default: ",")')
+parser.add_argument("-t", "--text_delimiter", help='set the input text delimiter (default: ")')
 parser.add_argument("-d", "--input_directory", type=str, help="hg19 database directory (default /hg19)")
 parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.txt)")
 parser.add_argument("-f", "--fast", action="store_true", help="run annotation just with a region based approach, "
                                                               "for faster computing and less download file demand")
-parser.add_argument("-fi", "--filter", action="store_true", help="filter SNPs for nonsynonymus and significant SNPs")
+parser.add_argument("-fi", "--filter", action="store_true", help="filter SNPs for nonsynonymus and clinically "
+                                                                 "significant (>95%%) SNPs")
 args = parser.parse_args()
 
 # sanity check ###
@@ -43,7 +45,7 @@ if args.manual:
 
 This program is designed to add additional information to an Illumina truseq amplicon variants file.
 
-The followong Parameters are added to the file:
+The following Parameters are added to the file:
 
 - COMING SOON
 
@@ -55,8 +57,6 @@ Several commonly used databases are integrated: ‘cytoBand’ for the chromosom
 for the variants reported in the Exome Aggregation Consortium (version 0.3)50, ‘ljb26_all’ for various functional
 deleteriousness prediction scores from the dbNSFP database (version 2.6)51, ‘clinvar_20140929’ for the variants
 reported in the ClinVar database (version 20140929)52 and ‘snp138’ for the dbSNP database (version 138)53.
-Note that the first command does not have the ‘--webfrom annovar’ argument, so it downloads the file from
-the UCSC Genome Browser annotation database
              """
     parser.print_help()
     sys.exit(0)
@@ -77,36 +77,42 @@ print args
 # print "detailed output selected"
 
 # load the input file into a variable
-with open(args.input_file) as f:
-    variant_lines = f.readlines()[1:]
-
-# create mutation Objects from the given patient Data ###
-l_count = 0
-snps = []
-for snp_entry in variant_lines:
-    # remove /n form end of line
-    snp_entry = snp_entry.strip()
-    if not args.separator:
-        split_line = snp_entry.split('","')
+with open(args.input_file) as csvfile:
+    if args.separator and args.text_delimiter:
+        f = csv.reader(csvfile, args.separator, args.text_delimiter)
+    elif args.separator and not args.text_delimiter or args.text_delimiter and not args.separator:
+        print "please enter delimiter AND quote chars"
+        sys.exit(0)
     else:
-        split_line = snp_entry.split(args.separator)
-    split_line[0] = split_line[0].translate(None, '"')
-    split_line[-1] = split_line[-1].translate(None, '"')
-
-    if len(split_line) >= 16:
-        context = split_line[5].split(",")
-        consequences = split_line[6].split(",")
-        l_count += 1
-        snps.append(SNP(l_count, split_line[0], split_line[1], split_line[2], split_line[3], split_line[4],
-                        context, consequences, split_line[7], split_line[8], split_line[9],
-                        int(split_line[10]), split_line[11], split_line[12], split_line[13], split_line[14],
-                        split_line[15]))
-    else:
-        print "INVALID DATA (length) in Line {}".format(l_count)
+        f = csv.reader(csvfile, delimiter=',', quotechar='"')
+    #variant_lines = f.readlines()[1:]
+    # create mutation Objects from the given patient Data ###
+    l_count = 0
+    snps = []
+    next(f)
+    for snp_entry in f:
         print snp_entry
+        sys.exit(0)
+        # remove /n form end of line
+        variant_line = snp_entry.strip()
+
+        variant_line[0] = variant_line[0].translate(None, '"')
+        variant_line[-1] = variant_line[-1].translate(None, '"')
+
+        if len(variant_line) >= 16:
+            context = variant_line[5].split(",")
+            consequences = variant_line[6].split(",")
+            l_count += 1
+            snps.append(SNP(l_count, variant_line[0], variant_line[1], variant_line[2], variant_line[3], variant_line[4],
+                            context, consequences, variant_line[7], variant_line[8], variant_line[9],
+                            int(variant_line[10]), variant_line[11], variant_line[12], variant_line[13], variant_line[14],
+                            variant_line[15]))
+        else:
+            print "INVALID DATA (length) in Line {}".format(l_count)
+            print snp_entry
         l_count += 1
 
-print "created patient SNP objects\n"
+print "created patient SNP objects with " + str(len(snps)) + "Unique SNPs\n"
 f.close()
 
 # filter all entries in the patient mutation data set ###
@@ -288,24 +294,24 @@ line_count = 0
 for snp_entry in lines:
     # remove /n form end of line
     snp_entry = snp_entry.strip()
-    split_line = snp_entry.split('\t')
+    variant_line = snp_entry.split('\t')
     line_count += 1
-    if len(split_line) >= 20:
+    if len(variant_line) >= 20:
         i = 0
-        for split in split_line:
-            split_line[i] = split_line[i].translate(None, "\'")
+        for split in variant_line:
+            variant_line[i] = variant_line[i].translate(None, "\'")
             i += 1
-        prot = split_line[0]
-        geneSyn = split_line[1].split(",")
-        ensembl = split_line[2]
-        position = split_line[5].split("-")
+        prot = variant_line[0]
+        geneSyn = variant_line[1].split(",")
+        ensembl = variant_line[2]
+        position = variant_line[5].split("-")
         start = position[0]
         end = position[1]
-        geneDesc = split_line[3].split(",")
-        chromosome = "chr" + str(split_line[4])
+        geneDesc = variant_line[3].split(",")
+        chromosome = "chr" + str(variant_line[4])
         # print chromosome
         allHumanProteins.append(AllProt(prot, geneSyn, ensembl, geneDesc, chromosome, int(start),
-                                        int(end), split_line[6], split_line[7:-1]))
+                                        int(end), variant_line[6], variant_line[7:-1]))
 allProtFile.close()
 print "created all human protein objects"
 
