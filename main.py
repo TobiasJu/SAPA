@@ -79,22 +79,21 @@ print args
 # load the input file into a variable
 with open(args.input_file) as csvfile:
     if args.separator and args.text_delimiter:
-        f = csv.reader(csvfile, args.separator, args.text_delimiter)
+        variant_lines = csv.reader(csvfile, args.separator, args.text_delimiter)
     elif args.separator and not args.text_delimiter or args.text_delimiter and not args.separator:
         print "please enter delimiter AND quote chars"
         sys.exit(0)
     else:
-        f = csv.reader(csvfile, delimiter=',', quotechar='"')
+        variant_lines = csv.reader(csvfile, delimiter=',', quotechar='"')
     #variant_lines = f.readlines()[1:]
     # create mutation Objects from the given patient Data ###
     l_count = 0
     snps = []
-    next(f)
-    for snp_entry in f:
-        print snp_entry
-        sys.exit(0)
+    next(variant_lines)
+    for variant_line in variant_lines:
+        print variant_line
         # remove /n form end of line
-        variant_line = snp_entry.strip()
+        # variant_line = snp_entry.strip()
 
         variant_line[0] = variant_line[0].translate(None, '"')
         variant_line[-1] = variant_line[-1].translate(None, '"')
@@ -109,11 +108,10 @@ with open(args.input_file) as csvfile:
                             variant_line[15]))
         else:
             print "INVALID DATA (length) in Line {}".format(l_count)
-            print snp_entry
+            print variant_line
         l_count += 1
-
 print "created patient SNP objects with " + str(len(snps)) + "Unique SNPs\n"
-f.close()
+csvfile.close()
 
 # filter all entries in the patient mutation data set ###
 if args.filter:
@@ -134,6 +132,7 @@ if args.filter:
 tab_mutations = open('amplicon_variants_tab.csv', 'w')
 for mutation in snps:
     # check if type is deletion, correction of the data for annovar
+    print type(mutation.get_pos())
     if "Deletion" in mutation.get_type():
         mutation.set_alt("-")
         print mutation.get_alt()
@@ -150,7 +149,6 @@ for mutation in snps:
 
     tab_mutations.write(mutation.export())
 tab_mutations.close()
-# sys.exit(0)
 print "created tab delimited file for annovar"
 
 # WORKS JUST UNDER UBUNTU OR THE UBUNTU BASH FOR WINDOWS #
@@ -187,10 +185,10 @@ else:
         p = subprocess.Popen([annotate_variation + databases[1]], shell=True)
         p.communicate()
 
-    if not os.path.isfile("hg19/hg19_genomicSuperDups.txt"):
-        print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
-        p.communicate()
+#    if not os.path.isfile("hg19/hg19_genomicSuperDups.txt"):
+#        print "downloading dependencies..."
+#        p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
+#        p.communicate()
 
     if not os.path.isfile("hg19/hg19_esp6500siv2_all.txt"):
         print "downloading dependencies..."
@@ -233,8 +231,8 @@ if args.fast:
                                                                "refGene,snp138 -operation g,f -nastring ."
 else:
     params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
-             "refGene,cytoBand,genomicSuperDups,esp6500siv2_all,1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas," \
-             "1000g2014oct_eur,snp138,ljb26_all -operation g,r,r,f,f,f,f,f,f,f -nastring . "
+             "refGene,cytoBand,esp6500siv2_all,1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas," \
+             "1000g2014oct_eur,snp138,ljb26_all -operation g,r,f,f,f,f,f,f,f -nastring . "
 print annovar + params
 #./perl/table_annovar.pl amplicon_variants_tab.csv /hg19/ -buildver hg19 -out myanno -remove -protocol refGene,snp138 -operation g,f -nastring .
 
