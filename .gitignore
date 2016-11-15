@@ -1,6 +1,7 @@
 data/c*
 data/P*
-data/t*
+data/truseq-*
+data/test*
 data/allprots_split.xlsx
 *.pyc
 .idea
