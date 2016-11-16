@@ -85,11 +85,18 @@ with open(args.input_file) as csvfile:
         sys.exit(0)
     else:
         variant_lines = csv.reader(csvfile, delimiter=',', quotechar='"')
-    #variant_lines = f.readlines()[1:]
+
     # create mutation Objects from the given patient Data ###
+
+    # skip header if there
+    has_header = csv.Sniffer().has_header(csvfile.read(1024))
+    csvfile.seek(0)  # rewind
+    incsv = csv.reader(csvfile)
+    if has_header:
+        next(variant_lines)
+        print "skipping header"
     l_count = 0
     snps = []
-    next(variant_lines)
     for variant_line in variant_lines:
         # print variant_line
         # remove /n form end of line
@@ -102,10 +109,10 @@ with open(args.input_file) as csvfile:
             context = variant_line[5].split(",")
             consequences = variant_line[6].split(",")
             l_count += 1
-            snps.append(SNP(l_count, variant_line[0], variant_line[1], variant_line[2], variant_line[3], variant_line[4],
-                            context, consequences, variant_line[7], variant_line[8], variant_line[9],
-                            int(variant_line[10]), variant_line[11], variant_line[12], variant_line[13], variant_line[14],
-                            variant_line[15]))
+            snps.append(SNP(l_count, variant_line[0], variant_line[1], variant_line[2], variant_line[3],
+                            variant_line[4], context, consequences, variant_line[7], variant_line[8], variant_line[9],
+                            int(variant_line[10]), variant_line[11], variant_line[12], variant_line[13],
+                            variant_line[14], variant_line[15]))
         else:
             print "INVALID DATA (length) in Line {}".format(l_count)
             print variant_line
@@ -136,14 +143,10 @@ for mutation in snps:
         mutation.set_alt("-")
         print mutation.get_alt()
         print mutation.get_ref()
-        malus = (len(mutation.get_ref()) - 1)
-        #print malus
         mutation.set_ref(mutation.get_ref()[1])
         print mutation.get_ref()
-        newStart = mutation.get_pos() - malus
-        newEnd = mutation.get_pos() + malus
+        newEnd = mutation.get_pos() + (len(mutation.get_ref()) - 1)
         print mutation.get_pos()
-        print newStart
         print newEnd
 
     tab_mutations.write(mutation.export())
@@ -156,7 +159,6 @@ print "created tab delimited file for annovar"
 annotate_variation = "./perl/annotate_variation.pl "
 databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
              "-buildver hg19 -downdb cytoBand hg19/",
-             "-buildver hg19 -downdb genomicSuperDups hg19/",
              "-buildver hg19 -downdb -webfrom annovar esp6500siv2_all hg19/",
              "-buildver hg19 -downdb -webfrom annovar 1000g2014oct hg19/",
              "-buildver hg19 -downdb -webfrom annovar snp138 hg19/",
@@ -191,7 +193,7 @@ else:
 
     if not os.path.isfile("hg19/hg19_esp6500siv2_all.txt"):
         print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
+        p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
         p.communicate()
 
     if os.path.isfile("hg19/hg19_1000g2014oct.zip"):
@@ -201,17 +203,17 @@ else:
 
     if not os.path.isfile("hg19/hg19_ALL.sites.2014_10.txt"):
         print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
+        p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
         p.communicate()
 
     if not os.path.isfile("hg19/hg19_snp138.txt"):
         print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
+        p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
         p.communicate()
 
     if not os.path.isfile("hg19/hg19_ljb26_all.txt"):
         print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[6]], shell=True)
+        p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
         p.communicate()
 
 # run Annovar ###
