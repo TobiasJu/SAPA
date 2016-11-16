@@ -19,7 +19,7 @@ class SNP(object):
     __refDepth = 0  # int
     __altDepth = 0  # int
     __strandBias = 0.0  # float
-    #__start/end = 0
+    __new_end = 0
 
     # constructor
     def __init__(self, id, chr, pos, ref, alt, type, context, consequence, dbSNP, cosmic, clinVar, qual, altFreq,
@@ -27,6 +27,7 @@ class SNP(object):
         self.__id = id
         self.__chr = chr
         self.__pos = pos
+        self.__new_end = pos
         self.__ref = ref
         self.__alt = alt
         self.__type = type
@@ -51,6 +52,7 @@ class SNP(object):
 
     def set_pos(self, pos):
         self.__pos = pos
+        self.__new_end = pos
 
     def set_ref(self, ref):
         self.__ref = ref
@@ -110,6 +112,9 @@ class SNP(object):
     def set_strandBias(self, strandBias):
         self.__strandBias = strandBias
 
+    def set_new_end(self, new_end):
+        self.__new_end = new_end
+
     # getter
     def get_id(self):
         return int(self.__id)
@@ -162,6 +167,12 @@ class SNP(object):
     def get_strandBias(self):
         return float(self.__strandBias)
 
+    def get_new_end(self):
+        if self.__new_end == 0:
+            return self.__pos
+        else:
+            return self.__new_end
+
     # def get_conclusion(self):
     #     return self.__conclusion
 
@@ -190,7 +201,7 @@ class SNP(object):
     def export(self):
         return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t\n".format(self.__chr,
                                                                                                self.__pos,
-                                                                                               self.__pos,
+                                                                                               self.__new_end,
                                                                                                self.__ref,
                                                                                                self.__alt,
                                                                                                self.__type,
