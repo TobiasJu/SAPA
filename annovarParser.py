@@ -13,7 +13,6 @@ class AnnovarParser:
     __ExonicFunc_refGene = ""
     __AAChange_refGene = ""
     __cytoBand = ""
-    __genomicSuperDups = ""
     __esp6500siv2_all = 0.0
     __g2014oct_all = 0.0
     __g2014oct_afr = 0.0
@@ -58,7 +57,7 @@ class AnnovarParser:
 
     # constructor
     def __init__(self, Chr, Start, End, Ref, Alt, Func_refGene, Gene_refGene, GeneDetail_refGene, ExonicFunc_refGene,
-                 AAChange_refGene, cytoBand, genomicSuperDups, esp6500siv2_all, g2014oct_all, g2014oct_afr,
+                 AAChange_refGene, cytoBand, esp6500siv2_all, g2014oct_all, g2014oct_afr,
                  g2014oct_eas, g2014oct_eur, snp138, SIFT_score, SIFT_pred, Polyphen2_HDIV_score, Polyphen2_HDIV_pred,
                  Polyphen2_HVAR_score, Polyphen2_HVAR_pred, LRT_score, LRT_pred, MutationTaster_score,
                  MutationTaster_pred, MutationAssessor_score, MutationAssessor_pred, FATHMM_score, FATHMM_pred,
@@ -75,7 +74,6 @@ class AnnovarParser:
         self.__ExonicFunc_refGene = ExonicFunc_refGene
         self.__AAChange_refGene = AAChange_refGene
         self.__cytoBand = cytoBand
-        self.__genomicSuperDups = genomicSuperDups
         self.__esp6500siv2_all = esp6500siv2_all
         self.__g2014oct_all = g2014oct_all
         self.__g2014oct_afr = g2014oct_afr
@@ -112,7 +110,7 @@ class AnnovarParser:
 
     def print_header(self):
         return "Chr\tSNP Start\tSNP End\tRef\tAlt\tFunc_refGene\tGene_refGene\tGeneDetail_refGene\tExonicFunc_refGene\t" \
-               "AAChange_refGene\tcytoBand\tgenomicSuperDups\tesp6500siv2_all\t1000g2014oct_all\t1000g2014oct_afr\t" \
+               "AAChange_refGene\tcytoBand\tesp6500siv2_all\t1000g2014oct_all\t1000g2014oct_afr\t" \
                "1000g2014oct_eas" \
                "\t1000g2014oct_eur\tsnp138\tSIFT_score\tSIFT_pred\tPolyphen2_HDIV_score\tPolyphen2_HDIV_pred\t" \
                "Polyphen2_HVAR_score\tPolyphen2_HVAR_pred\tLRT_score\tLRT_pred\tMutationTaster_score\t" \
@@ -122,7 +120,7 @@ class AnnovarParser:
 
     def export_tab(self):
         return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
-               "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
+               "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
                "".format(self.__Chr,
                          self.__Start,
                          self.__End,
@@ -134,7 +132,6 @@ class AnnovarParser:
                          self.__ExonicFunc_refGene,
                          self.__AAChange_refGene,
                          self.__cytoBand,
-                         self.__genomicSuperDups,
                          self.__esp6500siv2_all,
                          self.__g2014oct_all,
                          self.__g2014oct_afr,
