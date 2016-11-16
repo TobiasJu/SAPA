@@ -91,7 +91,7 @@ with open(args.input_file) as csvfile:
     snps = []
     next(variant_lines)
     for variant_line in variant_lines:
-        print variant_line
+        # print variant_line
         # remove /n form end of line
         # variant_line = snp_entry.strip()
 
@@ -110,7 +110,7 @@ with open(args.input_file) as csvfile:
             print "INVALID DATA (length) in Line {}".format(l_count)
             print variant_line
         l_count += 1
-print "created patient SNP objects with " + str(len(snps)) + "Unique SNPs\n"
+print "created patient SNP objects with " + str(len(snps)) + " unique SNPs\n"
 csvfile.close()
 
 # filter all entries in the patient mutation data set ###
@@ -216,7 +216,7 @@ else:
 
 # run Annovar ###
 print "running annovar"
-annovar = "./perl/table_annovar.pl "
+annovar_pl = "./perl/table_annovar.pl "
 dir_path = os.path.dirname(os.path.realpath(__file__))
 # print dir_path
 
@@ -232,10 +232,10 @@ else:
     params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
              "refGene,cytoBand,esp6500siv2_all,1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas," \
              "1000g2014oct_eur,snp138,ljb26_all -operation g,r,f,f,f,f,f,f,f -nastring . "
-print annovar + params
+print annovar_pl + params
 #./perl/table_annovar.pl amplicon_variants_tab.csv /hg19/ -buildver hg19 -out myanno -remove -protocol refGene,snp138 -operation g,f -nastring .
 
-p = subprocess.Popen([annovar + params], shell=True)
+p = subprocess.Popen([annovar_pl + params], shell=True)
 # wait until it's finished
 p.communicate()
 
@@ -248,18 +248,21 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
         if l_count != 0:
             row = row.strip()
             row = row.split("\t")
-            if len(row) == 11:  # fast run
+            if len(row) == 10:  # fast run
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
                                              row[9], row[10], ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
                                              ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
                                              ".", ".", ".", ".", ".", "."))
-            if len(row) == 43:
+            elif len(row) == 42:
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
                                              row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16],
                                              row[17],
                                              row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25],
                                              row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33],
                                              row[34], row[35], row[36], row[37], row[38], row[39], row[40], row[41]))
+            else:
+                print "ERROR could not handle this row: "
+                print row
         l_count += 1
 annovar_file.close()
 print "annotated SNPs count: " + str(len(annovar))
