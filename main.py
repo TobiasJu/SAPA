@@ -140,15 +140,15 @@ tab_mutations = open('amplicon_variants_tab.csv', 'w')
 for mutation in snps:
     # check if type is deletion, correction of the data for annovar
     if "Deletion" in mutation.get_type():
-        mutation.set_alt("-")
+        print mutation.get_ref()
         print mutation.get_alt()
-        print mutation.get_ref()
-        mutation.set_ref(mutation.get_ref()[1])
-        print mutation.get_ref()
         newEnd = mutation.get_pos() + (len(mutation.get_ref()) - 1)
+        mutation.set_alt("-")
+        mutation.set_ref(mutation.get_ref()[1])
         print mutation.get_pos()
+        print mutation.get_ref()
+        print mutation.get_alt()
         print newEnd
-
     tab_mutations.write(mutation.export())
 tab_mutations.close()
 print "created tab delimited file for annovar"
