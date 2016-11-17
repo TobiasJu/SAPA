@@ -108,7 +108,6 @@ with open(args.input_file) as csvfile:
         if len(variant_line) >= 16:
             context = variant_line[5].split(",")
             consequences = variant_line[6].split(",")
-            l_count += 1
             snps.append(SNP(l_count, variant_line[0], variant_line[1], variant_line[2], variant_line[3],
                             variant_line[4], context, consequences, variant_line[7], variant_line[8], variant_line[9],
                             int(variant_line[10]), variant_line[11], variant_line[12], variant_line[13],
@@ -201,15 +200,15 @@ else:
         p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
         p.communicate()
 
-    if os.path.isfile("hg19/hg19_1000g2014oct.zip"):
-        print "ERROR: unzip is not installed in your system. \nPlease manually uncompress the files " \
-              "(hg19_1000g2014oct.zip) at the hg19 directory, and rename them by adding hg19_ prefix to the file names."
-        sys.exit(0)
+    #if os.path.isfile("hg19/hg19_1000g2014oct.zip"):
+    #    print "ERROR: unzip is not installed in your system. \nPlease manually uncompress the files " \
+    #          "(hg19_1000g2014oct.zip) at the hg19 directory, and rename them by adding hg19_ prefix to the file names."
+    #    sys.exit(0)
 
-    if not os.path.isfile("hg19/hg19_ALL.sites.2014_10.txt"):
-        print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
-        p.communicate()
+    #if not os.path.isfile("hg19/hg19_ALL.sites.2014_10.txt"):
+    #    print "downloading dependencies..."
+    #    p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
+    #    p.communicate()
 
     if not os.path.isfile("hg19/hg19_snp138.txt"):
         print "downloading dependencies..."
@@ -237,9 +236,9 @@ if args.fast:
                                                                "refGene,snp138 -operation g,f -nastring ."
 else:
     params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
-             "refGene,cytoBand,esp6500siv2_all,1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas," \
-             "1000g2014oct_eur,snp138,ljb26_all -operation g,r,f,f,f,f,f,f,f -nastring . "
+             "refGene,cytoBand,esp6500siv2_all,snp138,ljb26_all -operation g,r,f,f,f -nastring . "
 print annovar_pl + params
+# 1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas,1000g2014oct_eur,
 #./perl/table_annovar.pl amplicon_variants_tab.csv /hg19/ -buildver hg19 -out myanno -remove -protocol refGene,snp138 -operation g,f -nastring .
 
 p = subprocess.Popen([annovar_pl + params], shell=True)
@@ -255,18 +254,18 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
         if l_count != 0:
             row = row.strip()
             row = row.split("\t")
-            if len(row) == 10:  # fast run
+            if len(row) == 6:  # fast run
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
                                              row[9], row[10], ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
                                              ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
                                              ".", ".", ".", ".", ".", "."))
-            elif len(row) == 42:
+            elif len(row) == 38:
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
                                              row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16],
                                              row[17],
                                              row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25],
                                              row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33],
-                                             row[34], row[35], row[36], row[37], row[38], row[39], row[40], row[41]))
+                                             row[34], row[35], row[36], row[37]))
             else:
                 print "ERROR could not handle this row: "
                 print row
