@@ -74,10 +74,6 @@ class AnnovarParser:
         self.__AAChange_refGene = AAChange_refGene
         self.__cytoBand = cytoBand
         self.__esp6500siv2_all = esp6500siv2_all
-#        self.__g2014oct_all = g2014oct_all
-#        self.__g2014oct_afr = g2014oct_afr
-#        self.__g2014oct_eas = g2014oct_eas
-#        self.__g2014oct_eur = g2014oct_eur
         self.__snp138 = snp138
         self.__SIFT_score = SIFT_score
         self.__SIFT_pred = SIFT_pred
@@ -105,6 +101,11 @@ class AnnovarParser:
         self.__phyloP100way_vertebrate = phyloP100way_vertebrate
         self.__SiPhy_29way_logOdds = SiPhy_29way_logOdds
 
+        #        self.__g2014oct_all = g2014oct_all
+        #        self.__g2014oct_afr = g2014oct_afr
+        #        self.__g2014oct_eas = g2014oct_eas
+        #        self.__g2014oct_eur = g2014oct_eur
+
         # g2014oct_all, g2014oct_afr, g2014oct_eas, g2014oct_eur,
 
     # class functions
@@ -116,7 +117,8 @@ class AnnovarParser:
                "Polyphen2_HVAR_score\tPolyphen2_HVAR_pred\tLRT_score\tLRT_pred\tMutationTaster_score\t" \
                "MutationTaster_pred\tMutationAssessor_score\tMutationAssessor_pred\tFATHMM_score\tFATHMM_pred" \
                "\tRadialSVM_score\tRadialSVM_pred\tLR_score\tLR_pred\tVEST3_score\tCADD_raw\tCADD_phred\tGERP_RS\t" \
-               "phyloP46way_placental\tphyloP100way_vertebrate\tSiPhy_29way_logOdds"
+               "phyloP46way_placental\tphyloP100way_vertebrate\tSiPhy_29way_logOdds\tfunction prediction scores" \
+               "\tconservation scores\tensemble scores "
 
 #1000g2014oct_all\t1000g2014oct_afr\t""1000g2014oct_eas" \"\t1000g2014oct_eur\t
 
@@ -135,10 +137,6 @@ class AnnovarParser:
                          self.__AAChange_refGene,
                          self.__cytoBand,
                          self.__esp6500siv2_all,
-#                         self.__g2014oct_all,
-#                         self.__g2014oct_afr,
-#                         self.__g2014oct_eas,
-#                         self.__g2014oct_eur,
                          self.__snp138,
                          self.__SIFT_score,
                          self.__SIFT_pred,
@@ -165,3 +163,8 @@ class AnnovarParser:
                          self.__phyloP46way_placental,
                          self.__phyloP100way_vertebrate,
                          self.__SiPhy_29way_logOdds)
+
+#                         self.__g2014oct_all,
+#                         self.__g2014oct_afr,
+#                         self.__g2014oct_eas,
+#                         self.__g2014oct_eur,

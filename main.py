@@ -140,19 +140,22 @@ for mutation in snps:
     # check if type is deletion, correction of the data for annovar
     if "Deletion" in mutation.get_type():
         ##### IST DAS RICHTIG??
-        # print mutation.get_ref()
+        print mutation.get_ref()
         # print mutation.get_alt()
         newEnd = mutation.get_pos() + (len(mutation.get_ref()) - 2)
         mutation.set_alt("-")
         if len(mutation.get_ref()) > 2:
             mutation.set_ref(0)
         else:
-            mutation.set_ref(mutation.get_ref()[1])
+            try:
+                mutation.set_ref(mutation.get_ref()[1])
+            except IndexError:
+                mutation.set_ref(mutation.get_ref()[0])
         mutation.set_new_end(newEnd)
         # print mutation.get_pos()
         # print newEnd
         # print mutation.get_ref()
-        # print mutation.get_alt()
+        print mutation.get_alt()
     tab_mutations.write(mutation.export())
 tab_mutations.close()
 print "created tab delimited file for annovar"
@@ -166,7 +169,7 @@ databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
              "-buildver hg19 -downdb -webfrom annovar esp6500siv2_all hg19/",
              "-buildver hg19 -downdb -webfrom annovar 1000g2014oct hg19/",
              "-buildver hg19 -downdb -webfrom annovar snp138 hg19/",
-             "-buildver hg19 -downdb -webfrom annovar ljb26_all hg19/"
+             "-buildver hg19 -downdb -webfrom annovar ljb26_all hg19/" #lib30 update!
              ]
 
 if args.fast:
@@ -189,11 +192,6 @@ else:
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[1]], shell=True)
         p.communicate()
-
-#    if not os.path.isfile("hg19/hg19_genomicSuperDups.txt"):
-#        print "downloading dependencies..."
-#        p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
-#        p.communicate()
 
     if not os.path.isfile("hg19/hg19_esp6500siv2_all.txt"):
         print "downloading dependencies..."
