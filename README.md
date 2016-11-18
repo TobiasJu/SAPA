@@ -8,16 +8,16 @@ SAPA is designed to add additional information to an **Illumina truseq amplicon*
 [^annovar]: Annovar is available here: http://annovar.openbioinformatics.org/. 
   
 
-
 First run 
 -------------
 <i class="icon-refresh"></i> To get startet simply type in:
 
 `./main.py -i data/truseq_example_data.csv`
 
-this will run the program with the example dataset. Your output will be saved in the `output.txt ` file.
+this will run the program with the example dataset. Your output will be saved in the `output.txt ` file.  
+  
 
-Please Note that during the first run of the program, the required **database will be downloaded**. This may take some time, depending on your internet connection. You may want to use the `-fast` argument to minimize the download size. 
+> **Please Note:** During the first run of the program, the required **database will be downloaded**. This may take some time, depending on your internet connection. You may want to use the `-fast` argument to minimize the download size.
 
 Features
 -------------
