@@ -179,7 +179,7 @@ class SNP(object):
     # class functions
     def toString(self):
         return "ID: {}, Chr: {}, Pos: {}, Ref: {}, Alt: {}, Type: {}, Context: {}, Consequence: {}, dbSNP: {}, " \
-               "COSMIC: {}, ClinVar: {}, Qual: {}, Alt Freq: {}, Total Depth: {},Ref Depth: {}, Alt Depth: {}, " \
+               "COSMIC: {}, ClinVar: {}, Qual: {}, Alt Freq: {}, Total Depth: {}, Ref Depth: {}, Alt Depth: {}, " \
                "Strand Bias: {} ".format(self.__id,
                                          self.__chr,
                                          self.__pos,
@@ -197,6 +197,11 @@ class SNP(object):
                                          self.__refDepth,
                                          self.__altDepth,
                                          self.__strandBias)
+
+    def print_header(self):
+        return "ID\tChr\tPos\tRef\tAlt\tType\tContext\tConsequence\tdbSNP\t" \
+               "COSMIC\tClinVar\tQual\tAlt Freq\tTotal Depth\t,Ref Depth\tAlt Depth\t" \
+               "Strand Bias\t"
 
     def export(self):
         return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t\n".format(self.__chr,

@@ -4,6 +4,7 @@ import re
 import csv
 import sys
 import os
+import collections
 from os.path import exists
 import subprocess
 import ensembl_rest
@@ -25,9 +26,10 @@ group.add_argument("-q", "--quiet", action="store_true", help="prevent output in
 # parser.add_argument("-n", "--number", type=int, help="just a Test number")
 parser.add_argument("-m", "--manual", action="store_true", help="display the manual for this program")
 parser.add_argument("-i", "--input_file", help="tab separated table with SNP's")
+parser.add_argument("-d", "--detail", action="store_true", help="write detailed output file")
 parser.add_argument("-s", "--separator", help='set the input file separator (default: ",")')
 parser.add_argument("-t", "--text_delimiter", help='set the input text delimiter (default: ")')
-parser.add_argument("-d", "--input_directory", type=str, help="hg19 database directory (default /hg19)")
+parser.add_argument("-id", "--input_directory", type=str, help="hg19 database directory (default /hg19)")
 parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.txt)")
 parser.add_argument("-f", "--fast", action="store_true", help="run annotation just with a region based approach, "
                                                               "for faster computing and less download file demand")
@@ -113,7 +115,7 @@ with open(args.input_file) as csvfile:
                             int(variant_line[10]), variant_line[11], variant_line[12], variant_line[13],
                             variant_line[14], variant_line[15]))
         else:
-            print "INVALID DATA (length) in Line {}".format(l_count)
+            print "INVALID DATA (length < 16) in Line {}".format(l_count)
             print variant_line
         l_count += 1
 print "created patient SNP objects with " + str(len(snps)) + " unique SNPs\n"
@@ -123,53 +125,51 @@ csvfile.close()
 if args.filter:
     print "pre filter SNP count: " + str(len(snps))
     i = 0
-    for mutation in snps:
+    for snp in snps:
         # only clinically relevant quality
-        if mutation.get_qual() <= 95:
+        if snp.get_qual() <= 95:
             del snps[i]
 
         # if mutation does not change the amino acid, it does not affect the cell (in most cases)
-        if "synonymous_variant" in mutation.get_consequences():
+        if "synonymous_variant" in snp.get_consequences():
             del snps[i]
         i += 1
     print "past filter SNP count: " + str(len(snps))
 
 # write tab delimited file for annovar #
 tab_mutations = open('amplicon_variants_tab.csv', 'w')
-for mutation in snps:
+for snp in snps:
     # check if type is deletion, correction of the data for annovar
-    if "Deletion" in mutation.get_type():
-        ##### IST DAS RICHTIG??
-        print mutation.get_ref()
+    if "Deletion" in snp.get_type():
+        print snp.get_ref()
         # print mutation.get_alt()
-        newEnd = mutation.get_pos() + (len(mutation.get_ref()) - 2)
-        mutation.set_alt("-")
-        if len(mutation.get_ref()) > 2:
-            mutation.set_ref(0)
+        newEnd = snp.get_pos() + (len(snp.get_ref()) - 2)
+        snp.set_alt("-")
+        if len(snp.get_ref()) > 2:
+            snp.set_ref(0)
         else:
             try:
-                mutation.set_ref(mutation.get_ref()[1])
+                snp.set_ref(snp.get_ref()[1])
             except IndexError:
-                mutation.set_ref(mutation.get_ref()[0])
-        mutation.set_new_end(newEnd)
+                snp.set_ref(snp.get_ref()[0])
+        snp.set_new_end(newEnd)
         # print mutation.get_pos()
         # print newEnd
         # print mutation.get_ref()
-        print mutation.get_alt()
-    tab_mutations.write(mutation.export())
+        print snp.get_alt()
+    tab_mutations.write(snp.export())
 tab_mutations.close()
 print "created tab delimited file for annovar"
 
 # WORKS JUST UNDER UBUNTU OR THE UBUNTU BASH FOR WINDOWS #
 # get annovar databases if needed ###
-
 annotate_variation = "./perl/annotate_variation.pl "
 databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
              "-buildver hg19 -downdb cytoBand hg19/",
              "-buildver hg19 -downdb -webfrom annovar esp6500siv2_all hg19/",
              "-buildver hg19 -downdb -webfrom annovar 1000g2014oct hg19/",
              "-buildver hg19 -downdb -webfrom annovar snp138 hg19/",
-             "-buildver hg19 -downdb -webfrom annovar ljb26_all hg19/" #lib30 update!
+             "-buildver hg19 -downdb -webfrom annovar ljb26_all hg19/"  # lib30 update!
              ]
 
 if args.fast:
@@ -198,12 +198,12 @@ else:
         p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
         p.communicate()
 
-    #if os.path.isfile("hg19/hg19_1000g2014oct.zip"):
+    # if os.path.isfile("hg19/hg19_1000g2014oct.zip"):
     #    print "ERROR: unzip is not installed in your system. \nPlease manually uncompress the files " \
     #          "(hg19_1000g2014oct.zip) at the hg19 directory, and rename them by adding hg19_ prefix to the file names."
     #    sys.exit(0)
 
-    #if not os.path.isfile("hg19/hg19_ALL.sites.2014_10.txt"):
+    # if not os.path.isfile("hg19/hg19_ALL.sites.2014_10.txt"):
     #    print "downloading dependencies..."
     #    p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
     #    p.communicate()
@@ -234,10 +234,11 @@ if args.fast:
                                                                "refGene,snp138 -operation g,f -nastring ."
 else:
     params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
-             "refGene,cytoBand,esp6500siv2_all,snp138,ljb26_all -operation g,r,f,f,f -nastring . "
+                                                               "refGene,cytoBand,esp6500siv2_all,snp138,ljb26_all " \
+                                                               "-operation g,r,f,f,f -nastring . "
 print annovar_pl + params
 # 1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas,1000g2014oct_eur,
-#./perl/table_annovar.pl amplicon_variants_tab.csv /hg19/ -buildver hg19 -out myanno -remove -protocol refGene,snp138 -operation g,f -nastring .
+# ./perl/table_annovar.pl amplicon_variants_tab.csv /hg19/ -buildver hg19 -out myanno -remove -protocol refGene,snp138 -operation g,f -nastring .
 
 p = subprocess.Popen([annovar_pl + params], shell=True)
 # wait until it's finished
@@ -256,7 +257,7 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
                                              row[9], row[10], ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
                                              ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
-                                             ".", ".", ".", ".", ".", "."))
+                                             ".", "."))
             elif len(row) == 38:
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
                                              row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16],
@@ -264,31 +265,35 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
                                              row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25],
                                              row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33],
                                              row[34], row[35], row[36], row[37]))
-            else:
+            else:  # fatal error
+                annovar.append(AnnovarParser(".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
+                                             ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
+                                             ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."))
                 print "ERROR could not handle this row: "
                 print row
         l_count += 1
 annovar_file.close()
 print "annotated SNPs count: " + str(len(annovar))
 
+# link annotations and SNPs together, with proofing! ###
+counters = 0
+snps_with_annotation = {}
+for snp, annotation in zip(snps, annovar):
+    if annotation._AnnovarParser__Chr == snp.get_chr() and int(annotation._AnnovarParser__Start) == snp.get_pos():
+        snps_with_annotation[snp] = annotation
+        counters += 1
+
 # iterate over annovar data and get final scores ###
 for data in annovar:
     score = data._AnnovarParser__SIFT_score
     if score != ".":
         rel_score = float(data._AnnovarParser__SIFT_score) / data._AnnovarParser__SIFT_max
-        #print rel_score
-
+        # print rel_score
 
 ###### some work to do here ####
 
-
-
-
-
-
-### READ EVALUATION PAPER FIRST!!!
-
 # sys.exit(0)
+
 # create Objects containing all human proteins ###
 allHumanProteins = []
 allProtFile = open('data/allprots.csv', 'r')
@@ -320,36 +325,36 @@ print "created all human protein objects"
 
 # search after SNP corresponding genes ###
 coding_mutations = []
-for mutation in snps:
-    if "Coding" in mutation.get_consequences():
-        print "{} ID: {}, Position: {}".format("unknown mutation", mutation.get_id(), mutation.get_pos())
+for snp in snps:
+    if "Coding" in snp.get_consequences():
+        print "{} ID: {}, Position: {}".format("unknown mutation", snp.get_id(), snp.get_pos())
         for prot in allHumanProteins:
-            if prot.get_start() < mutation.get_pos() < prot.get_end() and mutation.get_chr() == \
+            if prot.get_start() < snp.get_pos() < prot.get_end() and snp.get_chr() == \
                     prot.get_chromosome():
                 # print "SNP Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
                 #                                                                        prot.get_start(),
                 #                                                                        prot.get_end())
                 print "found Gene: " + prot.get_gene()
-                coding_mutations.append(ProbedMutation(mutation.get_id(), mutation.get_chr(), mutation.get_pos(),
-                                                       mutation.get_ref(), mutation.get_alt(), mutation.get_type(),
-                                                       mutation.get_context(), mutation.get_consequences(),
-                                                       mutation.get_dbSNP(), mutation.get_cosmic(),
-                                                       mutation.get_clinVar(), mutation.get_qual(),
-                                                       mutation.get_altFreq(), mutation.get_totalDepth(),
-                                                       mutation.get_refDepth(), mutation.get_altDepth(),
-                                                       mutation.get_strandBias(), str(prot.get_chromosome()),
+                coding_mutations.append(ProbedMutation(snp.get_id(), snp.get_chr(), snp.get_pos(),
+                                                       snp.get_ref(), snp.get_alt(), snp.get_type(),
+                                                       snp.get_context(), snp.get_consequences(),
+                                                       snp.get_dbSNP(), snp.get_cosmic(),
+                                                       snp.get_clinVar(), snp.get_qual(),
+                                                       snp.get_altFreq(), snp.get_totalDepth(),
+                                                       snp.get_refDepth(), snp.get_altDepth(),
+                                                       snp.get_strandBias(), str(prot.get_chromosome()),
                                                        prot.get_gene(), prot.get_geneSyn(), prot.get_geneDesc(),
                                                        prot.get_proteinClass(), prot.get_start(), prot.get_end()
                                                        ))
     else:
-        coding_mutations.append(ProbedMutation(mutation.get_id(), mutation.get_chr(), mutation.get_pos(),
-                                               mutation.get_ref(), mutation.get_alt(), mutation.get_type(),
-                                               mutation.get_context(), mutation.get_consequences(),
-                                               mutation.get_dbSNP(), mutation.get_cosmic(),
-                                               mutation.get_clinVar(), mutation.get_qual(),
-                                               mutation.get_altFreq(), mutation.get_totalDepth(),
-                                               mutation.get_refDepth(), mutation.get_altDepth(),
-                                               mutation.get_strandBias(), ".", ".", ".", ".", ".", ".", "."
+        coding_mutations.append(ProbedMutation(snp.get_id(), snp.get_chr(), snp.get_pos(),
+                                               snp.get_ref(), snp.get_alt(), snp.get_type(),
+                                               snp.get_context(), snp.get_consequences(),
+                                               snp.get_dbSNP(), snp.get_cosmic(),
+                                               snp.get_clinVar(), snp.get_qual(),
+                                               snp.get_altFreq(), snp.get_totalDepth(),
+                                               snp.get_refDepth(), snp.get_altDepth(),
+                                               snp.get_strandBias(), ".", ".", ".", ".", ".", ".", "."
                                                ))
 
 # find DNA sequence for gene in each region and translate it ###
@@ -396,32 +401,75 @@ else:
     target = open(args.output_file, 'w')
     print "writing export in: " + args.output_file
 export_cnt = 0
-for cmuta in coding_mutations:
+ordered_snps_with_annotation = collections.OrderedDict(sorted(snps_with_annotation.items()))
+for snp, annotation in ordered_snps_with_annotation.iteritems():
     # write header first:
     if export_cnt == 0:
-        header = str(cmuta.print_header()) + str(annovar[0].print_header() + "\tcombined score\tESM score")
+        if args.detail:
+            header = str(snp.print_header()) + str(annotation.print_header() + "\t")
+        else:
+            header = str(snp.print_header()) + "function prediction scores\tconservation scores\tensemble scores\t"
         target.write(header)
         target.write("\n")
     # write rows in table
-    export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
-                        "{}\t"
-                        "".format(cmuta.get_id(), cmuta.get_chr(), cmuta.get_pos(),
-                                  cmuta.get_ref(), cmuta.get_alt(), cmuta.get_type(),
-                                  ','.join(cmuta.get_context()), ','.join(cmuta.get_consequences()),
-                                  cmuta.get_dbSNP(), cmuta.get_cosmic(), cmuta.get_clinVar(),
-                                  cmuta.get_qual(), cmuta.get_altFreq(),
-                                  cmuta.get_totalDepth(), cmuta.get_refDepth(),
-                                  cmuta.get_altDepth(), cmuta.get_strandBias(), cmuta.get_geneChromosome(),
-                                  cmuta.get_gene(), cmuta.get_geneSyn(), cmuta.get_geneDesc(),
-                                  cmuta.get_proteinClass(), cmuta.get_geneStart(), cmuta.get_geneEnd()
-                                  ))
-    export_string += str(annovar[export_cnt].export_tab())
+    if args.detail:
+        export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}"
+                            "\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
+                            "{}\t{}\t{}\t{}\t{}\t"
+                            "".format(snp.get_id(), snp.get_chr(), snp.get_pos(), snp.get_ref(), snp.get_alt(),
+                                      snp.get_type(), ','.join(snp.get_context()), ','.join(snp.get_consequences()),
+                                      snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(), snp.get_qual(),
+                                      snp.get_altFreq(), snp.get_totalDepth(), snp.get_refDepth(),
+                                      snp.get_altDepth(), snp.get_strandBias(), annotation._AnnovarParser__Chr,
+                                      annotation._AnnovarParser__Start, annotation._AnnovarParser__End, 
+                                      annotation._AnnovarParser__Ref, annotation._AnnovarParser__Alt,
+                                      annotation._AnnovarParser__Func_refGene,
+                                      annotation._AnnovarParser__Gene_refGene,
+                                      annotation._AnnovarParser__GeneDetail_refGene,
+                                      annotation._AnnovarParser__ExonicFunc_refGene,
+                                      annotation._AnnovarParser__AAChange_refGene, annotation._AnnovarParser__cytoBand,
+                                      annotation._AnnovarParser__esp6500siv2_all, annotation._AnnovarParser__snp138,
+                                      annotation._AnnovarParser__SIFT_score, annotation._AnnovarParser__SIFT_pred,
+                                      annotation._AnnovarParser__Polyphen2_HDIV_score,
+                                      annotation._AnnovarParser__Polyphen2_HDIV_pred,
+                                      annotation._AnnovarParser__Polyphen2_HVAR_score,
+                                      annotation._AnnovarParser__Polyphen2_HVAR_pred,
+                                      annotation._AnnovarParser__LRT_score,
+                                      annotation._AnnovarParser__LRT_pred,
+                                      annotation._AnnovarParser__MutationTaster_score,
+                                      annotation._AnnovarParser__MutationTaster_pred,
+                                      annotation._AnnovarParser__MutationAssessor_score,
+                                      annotation._AnnovarParser__MutationAssessor_pred,
+                                      annotation._AnnovarParser__FATHMM_score,
+                                      annotation._AnnovarParser__FATHMM_pred,
+                                      annotation._AnnovarParser__RadialSVM_score,
+                                      annotation._AnnovarParser__RadialSVM_pred, annotation._AnnovarParser__LR_score,
+                                      annotation._AnnovarParser__LR_pred, annotation._AnnovarParser__VEST3_score,
+                                      annotation._AnnovarParser__CADD_raw, annotation._AnnovarParser__CADD_phred,
+                                      annotation._AnnovarParser__GERP_RS,
+                                      annotation._AnnovarParser__phyloP46way_placental,
+                                      annotation._AnnovarParser__phyloP100way_vertebrate,
+                                      annotation._AnnovarParser__SiPhy_29way_logOdds
+                                      ))
+        # snp.get_geneChromosome(),
+        # snp.get_gene(), snp.get_geneSyn(), snp.get_geneDesc(),
+        # snp.get_proteinClass(), snp.get_geneStart(), snp.get_geneEnd()
+        # ))
+    else:
+        export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
+                            "".format(snp.get_id(), snp.get_chr(), snp.get_pos(),
+                                      snp.get_ref(), snp.get_alt(), snp.get_type(),
+                                      ','.join(snp.get_context()), ','.join(snp.get_consequences()),
+                                      snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(),
+                                      snp.get_qual(), snp.get_altFreq(),
+                                      snp.get_totalDepth(), snp.get_refDepth(),
+                                      snp.get_altDepth(), snp.get_strandBias(), annotation._AnnovarParser__LR_score,
+                                      annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_raw
+                                      ))
     target.write(export_string)
-    final_score = "\t\t"
-    target.write(final_score)
     target.write("\n")
     export_cnt += 1
 target.close()
 
-#','.join(
-print "FIN"
+
+print "FINISHED"

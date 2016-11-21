@@ -96,8 +96,7 @@ class ProbedMutation(SNP):
         return "ID: {}\tChr: {}\tPos: {}\tRef: {}\tAlt: {}\tType: {}\tContext: {}\tConsequence: {}\tdbSNP: {}\t" \
                "COSMIC: {}\tClinVar: {}\tQual: {}\tAlt Freq: {}\tTotal Depth: {}\tRef Depth: {}\tAlt Depth: {}\t" \
                "Strand Bias: {}\tGene Chromosome: {}\tGene: {}\tGene synonym: {}\tGene description: {}\t" \
-               "Protein class: {}\tGene Start: {}\tGene End: {}\t" \
-               "conclusion: {}".format(SNP.__id,
+               "Protein class: {}\tGene Start: {}\tconclusion: {}".format(self.__id,
                                        self.__chr,
                                        self.__pos,
                                        self.__ref,
@@ -124,7 +123,7 @@ class ProbedMutation(SNP):
                                        # self.__score,
                                        self.__conclusion)
 
-    # warum gehet das auch nicht?
+    # warum gehet das auch nicht? -> Weil die Methode nicht auf die Klassenparameter der Unterklasse zugreifen kann
     def generate_export(self):
         return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
                "".format(self.__id,
