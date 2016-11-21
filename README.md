@@ -3,7 +3,7 @@ SAPA - SNP annotation programm for AML
 
 **75%** of a **Acute myeloid leukemia** (AML) patients SNPs are unique to them and their impact is still unresolved. 
 
-SAPA is designed to add additional information to an **Illumina truseq amplicon** variants csv file. Such as Scores for nonsynonymous scoring matrices, divided into **3** different **combined Scores**, function prediction scores, conservation scores and one ensemble score. So that the viewer gets more Information whether a mutation is delirious or harmless. Due to performance and data reasons, SAPA uses annovar[^annovar] and their precomputed SNP database, to quickly gather the deleterious prediction methods scores. 
+SAPA is designed to add additional information to an **Illumina truseq amplicon** variants csv file. Such as Scores for nonsynonymous scoring matrices, divided into **3** different **combined Scores**, function prediction scores, conservation scores and one ensemble score. So that the viewer gets more Information whether a mutation is delirious or harmless. Due to performance and data reasons, SAPA uses annovar<sup>1</sup> and their precomputed SNP database, to quickly gather the deleterious prediction methods scores. 
 
 [^annovar]: Annovar is available here: http://annovar.openbioinformatics.org/. 
   
@@ -22,6 +22,7 @@ this will run the program with the example dataset. Your output will be saved in
 
 Parameter
 -------------
+<a href="" rel="this is just cause of poor markdown implementation"><img src="images/paramters.png" alt="" /></a>
 `-h, --help`
 : show the help message and exit
 
@@ -127,7 +128,8 @@ As input file is a Illumina truseq amplicon variants file needed, which contains
 | 39933339  | A   | G   | SNV      | Coding                                     | synonymous_variant                                                                                  | rs5917933            |             |                | 100  | 0.998    | 14616       | 18        | 14592     | -100.0      |
 | 123195650 | A   | T   | SNV      | Coding                                     | missense_variant                                                                                    |                      |             |                | 47   | 0.073    | 109         | 100       | 8         | -100.0      |
 
-
-http://annovar.openbioinformatics.org/en/latest/
+References
+-------------
+<sup>1</sup> http://annovar.openbioinformatics.org/en/latest/
 
 > Written with [StackEdit](https://stackedit.io/).
