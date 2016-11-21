@@ -19,6 +19,53 @@ this will run the program with the example dataset. Your output will be saved in
 
 > **Please Note:** During the first run of the program, the required **database will be downloaded**. This may take some time, depending on your internet connection. You may want to use the `-fast` argument to minimize the download size.
 
+
+Parameter
+-------------
+`-h, --help`
+: show the help message and exit
+
+`-q, --quiet`
+: prevent output in command line, run the program and don't bother
+
+`-m, --manual`
+: display the manual for this program
+
+`-i, --input_file`
+: truseq amplicon table containing SNPs 
+	> e.g. `-i data/truseq_example_data.csv`
+
+`-d, --detail`
+: write detailed output file, with all the single scores of the deleteriousness prediction methods for nonsynonymous SNVs and amino acid substitution (if any) 
+
+`-s, --separator`
+: set the input file separator (default: `","`)
+	> e.g. `-s ";"`
+	this will set the column separator to a semicolon
+
+`-t, --text_delimiter`
+: set the input text delimiter (default: `"`)
+	> e.g. `-t "'"`
+	this will set the text delimiter to an apostrophe, if a column contains multiple entries 
+
+`-id, --input_directory` 
+: hg19 (GRCh37) database directory (default /hg19)
+	> e.g. `-id humandb/`
+	set the input directory to be named humandb 
+
+`-o, --output_file`
+: output file name (default output.txt)
+	> e.g. `-o annotated_snps_detailed.txt -d`
+	running the detailed operation mode, and saving it in the file annotated_snps_detailed.txt 
+
+`-f, --fast`
+: run annotation just with a region based approach, for faster computing and less download file demand
+
+`-fi, --filter`
+: filter all entries and only use nonsynonymus and clinically significant (>95%) SNPs in the output file
+
+
+
 Features
 -------------
 #### <i class="icon-pencil"></i>Added data to a SNP csv file
