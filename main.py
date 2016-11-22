@@ -169,7 +169,7 @@ databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
              "-buildver hg19 -downdb -webfrom annovar esp6500siv2_all hg19/",
              "-buildver hg19 -downdb -webfrom annovar 1000g2014oct hg19/",
              "-buildver hg19 -downdb -webfrom annovar snp138 hg19/",
-             "-buildver hg19 -downdb -webfrom annovar ljb26_all hg19/"  # lib30 update!
+             "-buildver hg19 -downdb -webfrom annovar dbnsfp30a hg19/"  # lib30 update!
              ]
 
 if args.fast:
@@ -198,22 +198,12 @@ else:
         p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
         p.communicate()
 
-    # if os.path.isfile("hg19/hg19_1000g2014oct.zip"):
-    #    print "ERROR: unzip is not installed in your system. \nPlease manually uncompress the files " \
-    #          "(hg19_1000g2014oct.zip) at the hg19 directory, and rename them by adding hg19_ prefix to the file names."
-    #    sys.exit(0)
-
-    # if not os.path.isfile("hg19/hg19_ALL.sites.2014_10.txt"):
-    #    print "downloading dependencies..."
-    #    p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
-    #    p.communicate()
-
     if not os.path.isfile("hg19/hg19_snp138.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
         p.communicate()
 
-    if not os.path.isfile("hg19/hg19_ljb26_all.txt"):
+    if not os.path.isfile("hg19/hg19_dbnsfp30a.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
         p.communicate()
@@ -234,7 +224,7 @@ if args.fast:
                                                                "refGene,snp138 -operation g,f -nastring ."
 else:
     params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
-                                                               "refGene,cytoBand,esp6500siv2_all,snp138,ljb26_all " \
+                                                               "refGene,cytoBand,esp6500siv2_all,snp138,dbnsfp30a " \
                                                                "-operation g,r,f,f,f -nastring . "
 print annovar_pl + params
 # 1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas,1000g2014oct_eur,
@@ -408,7 +398,8 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
         if args.detail:
             header = str(snp.print_header()) + str(annotation.print_header() + "\t")
         else:
-            header = str(snp.print_header()) + "function prediction scores\tconservation scores\tensemble scores\t"
+            header = str(snp.print_header()) + "function prediction scores\tconservation scores\tensemble scores\t" \
+                                               "final prediction\t"
         target.write(header)
         target.write("\n")
     # write rows in table
@@ -466,6 +457,14 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
                                       snp.get_altDepth(), snp.get_strandBias(), annotation._AnnovarParser__LR_score,
                                       annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_raw
                                       ))
+        if annotation._AnnovarParser__LR_pred == "T":
+            export_string += "Tolerated"
+        elif annotation._AnnovarParser__LR_pred == "D":
+            export_string += "Deleterious"
+        elif annotation._AnnovarParser__LR_pred == "P":
+            export_string += "possibly damaging"
+        else:
+            export_string += "."
     target.write(export_string)
     target.write("\n")
     export_cnt += 1
