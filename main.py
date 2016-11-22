@@ -79,9 +79,14 @@ print args
 # print "detailed output selected"
 
 # load the input file into a variable
+fail_count = 0
+success_count = 0
 with open(args.input_file) as csvfile:
     if args.separator and args.text_delimiter:
-        variant_lines = csv.reader(csvfile, args.separator, args.text_delimiter)
+        print args.separator
+        print args.text_delimiter
+        variant_lines = csv.reader(csvfile, delimiter="{}".format(args.separator),
+                                   quotechar="{}".format(args.text_delimiter))
     elif args.separator and not args.text_delimiter or args.text_delimiter and not args.separator:
         print "please enter delimiter AND quote chars"
         sys.exit(0)
@@ -91,7 +96,7 @@ with open(args.input_file) as csvfile:
     # create mutation Objects from the given patient Data ###
 
     # skip header if there
-    has_header = csv.Sniffer().has_header(csvfile.read(1024))
+    has_header = csv.Sniffer().has_header(csvfile.read(100))
     csvfile.seek(0)  # rewind
     incsv = csv.reader(csvfile)
     if has_header:
@@ -100,7 +105,7 @@ with open(args.input_file) as csvfile:
     l_count = 0
     snps = []
     for variant_line in variant_lines:
-        # print variant_line
+        print variant_line
         # remove /n form end of line
         # variant_line = snp_entry.strip()
 
@@ -108,18 +113,24 @@ with open(args.input_file) as csvfile:
         variant_line[-1] = variant_line[-1].translate(None, '"')
 
         if len(variant_line) >= 16:
+            success_count += 1
             context = variant_line[5].split(",")
             consequences = variant_line[6].split(",")
-            snps.append(SNP(l_count, variant_line[0], variant_line[1], variant_line[2], variant_line[3],
+            snps.append(SNP(l_count, variant_line[0], int(variant_line[1]), variant_line[2], variant_line[3],
                             variant_line[4], context, consequences, variant_line[7], variant_line[8], variant_line[9],
                             int(variant_line[10]), variant_line[11], variant_line[12], variant_line[13],
                             variant_line[14], variant_line[15]))
         else:
             print "INVALID DATA (length < 16) in Line {}".format(l_count)
             print variant_line
+            fail_count += 1
         l_count += 1
 print "created patient SNP objects with " + str(len(snps)) + " unique SNPs\n"
 csvfile.close()
+
+if fail_count > success_count:
+    print "INPUT ERROR! wrong separator selected"
+    sys.exit(0)
 
 # filter all entries in the patient mutation data set ###
 if args.filter:
@@ -169,7 +180,7 @@ databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
              "-buildver hg19 -downdb -webfrom annovar esp6500siv2_all hg19/",
              "-buildver hg19 -downdb -webfrom annovar 1000g2014oct hg19/",
              "-buildver hg19 -downdb -webfrom annovar snp138 hg19/",
-             "-buildver hg19 -downdb -webfrom annovar dbnsfp30a hg19/"  # lib30 update!
+             "-buildver hg19 -downdb -webfrom annovar ljb26_all hg19/"  # lib30 update! dbnsfp30a
              ]
 
 if args.fast:
@@ -203,7 +214,7 @@ else:
         p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
         p.communicate()
 
-    if not os.path.isfile("hg19/hg19_dbnsfp30a.txt"):
+    if not os.path.isfile("hg19/hg19_ljb26_all.txt"): # hg19/hg19_dbnsfp30a.txt
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
         p.communicate()
@@ -224,8 +235,8 @@ if args.fast:
                                                                "refGene,snp138 -operation g,f -nastring ."
 else:
     params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
-                                                               "refGene,cytoBand,esp6500siv2_all,snp138,dbnsfp30a " \
-                                                               "-operation g,r,f,f,f -nastring . "
+                                                               "refGene,cytoBand,esp6500siv2_all,snp138,ljb26_all " \
+                                                               "-operation g,r,f,f,f -nastring . "  # dbnsfp30a
 print annovar_pl + params
 # 1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas,1000g2014oct_eur,
 # ./perl/table_annovar.pl amplicon_variants_tab.csv /hg19/ -buildver hg19 -out myanno -remove -protocol refGene,snp138 -operation g,f -nastring .
@@ -261,6 +272,7 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
                                              ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."))
                 print "ERROR could not handle this row: "
                 print row
+                print len(row)
         l_count += 1
 annovar_file.close()
 print "annotated SNPs count: " + str(len(annovar))
