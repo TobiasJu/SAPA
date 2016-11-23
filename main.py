@@ -227,35 +227,64 @@ if args.fast:
         p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
         p.communicate()
 
+    if not os.path.isfile("hg19/hg19_refGene.txt"):
+        print "download failed! Please try again or download the file directly: "
+        sys.exit(0)
+
     if not os.path.isfile("hg19/hg19_snp138.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
         p.communicate()
+
+    if not os.path.isfile("hg19/hg19_snp138.txt"):
+        print "download failed! Please try again or download the file directly: "
+        sys.exit(0)
+
 else:
     if not os.path.isfile("hg19/hg19_refGene.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
         p.communicate()
 
+    if not os.path.isfile("hg19/hg19_refGene.txt"):
+        print "download failed! Please try again or download the file directly: "
+        sys.exit(0)
+
     if not os.path.isfile("hg19/hg19_cytoBand.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[1]], shell=True)
         p.communicate()
+
+    if not os.path.isfile("hg19/hg19_cytoBand.txt"):
+        print "download failed! Please try again or download the file directly: "
+        sys.exit(0)
 
     if not os.path.isfile("hg19/hg19_esp6500siv2_all.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
         p.communicate()
 
+    if not os.path.isfile("hg19/hg19_esp6500siv2_all.txt"):
+        print "download failed! Please try again or download the file directly: "
+        sys.exit(0)
+
     if not os.path.isfile("hg19/hg19_snp138.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
         p.communicate()
 
+    if not os.path.isfile("hg19/hg19_snp138.txt"):
+        print "download failed! Please try again or download the file directly: "
+        sys.exit(0)
+
     if not os.path.isfile("hg19/hg19_ljb26_all.txt"): # hg19/hg19_dbnsfp30a.txt
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
         p.communicate()
+
+    if not os.path.isfile("hg19/hg19_ljb26_all.txt"):
+        print "download failed! Please try again or download the file directly: "
+        sys.exit(0)
 
 # annotate the SNPs ###
 print "annotating the SNPs"
@@ -282,6 +311,7 @@ p.communicate()
 # parse annovar file ###
 annovar = []
 l_count = 0
+failed = 0
 with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
     for row in annovar_file:
         # filter header
@@ -307,8 +337,14 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
                 print "ERROR could not handle this row: "
                 print row
                 print len(row)
+                failed += 1
         l_count += 1
 annovar_file.close()
+
+if failed > l_count:
+    print "FATAL ERROR: "
+    sys.exit(0)
+
 if not args.quiet:
     print "annotated SNPs count: " + str(len(annovar))
 
