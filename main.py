@@ -571,7 +571,14 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
         elif annotation._AnnovarParser__MetaLR_pred == "P":
             export_string += "possibly damaging"
         elif annotation._AnnovarParser__MetaLR_pred == ".":
-            export_string += "."
+            if "Intron" in snp.get_context():
+                export_string += "Tolerated (Intron)"
+            elif "Intergenic" in snp.get_context():
+                export_string += "Tolerated (Intergenic)"
+            elif "Coding" in snp.get_context() and "synonymous_variant" in snp.get_consequences():
+                export_string += "Tolerated (synonymous_variant)"
+            else:
+                export_string += "."
     target.write(export_string)
     target.write("\n")
     export_cnt += 1
