@@ -30,7 +30,7 @@ parser.add_argument("-d", "--detail", action="store_true", help="write detailed 
 parser.add_argument("-s", "--separator", help='set the input file separator (default: ",")')
 parser.add_argument("-t", "--text_delimiter", help='set the input text delimiter (default: ")')
 parser.add_argument("-id", "--input_directory", type=str, help="hg19 database directory (default /hg19)")
-parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.txt)")
+parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.csv)")
 parser.add_argument("-f", "--fast", action="store_true", help="run annotation just with a region based approach, "
                                                               "for faster computing and less download file demand")
 parser.add_argument("-fi", "--filter", action="store_true", help="filter SNPs for nonsynonymus and clinically "
@@ -83,7 +83,7 @@ Parameters:
 -id, --input_directory : hg19 (GRCh37) database directory (default /hg19)
     > e.g. -id humandb/ set the input directory to be named humandb
 
--o, --output_file : output file name (default output.txt)
+-o, --output_file : output file name (default output.csv)
     > e.g. -o annotated_snps_detailed.txt -d running the detailed operation mode, and saving it in the file
               annotated_snps_detailed.txt
 
@@ -115,13 +115,11 @@ print args
 # if args.verbose:
 # print "detailed output selected"
 
-# load the input file into a variable
+# load the input file into a mutation Objects from the given patient Data ###
 fail_count = 0
 success_count = 0
 with open(args.input_file) as csvfile:
     if args.separator and args.text_delimiter:
-        print args.separator
-        print args.text_delimiter
         variant_lines = csv.reader(csvfile, delimiter="{}".format(args.separator),
                                    quotechar="{}".format(args.text_delimiter))
     elif args.separator and not args.text_delimiter or args.text_delimiter and not args.separator:
@@ -129,8 +127,6 @@ with open(args.input_file) as csvfile:
         sys.exit(0)
     else:
         variant_lines = csv.reader(csvfile, delimiter=',', quotechar='"')
-
-    # create mutation Objects from the given patient Data ###
 
     # skip header if there
     has_header = csv.Sniffer().has_header(csvfile.read(100))
@@ -142,13 +138,11 @@ with open(args.input_file) as csvfile:
     l_count = 0
     snps = []
     for variant_line in variant_lines:
-        print variant_line
         # remove /n form end of line
-        # variant_line = snp_entry.strip()
-
-        variant_line[0] = variant_line[0].translate(None, '"')
-        variant_line[-1] = variant_line[-1].translate(None, '"')
-
+        # variant_line = variant_line.strip()
+        # remove " from lines
+        # variant_line[0] = variant_line[0].translate(None, '"')
+        # variant_line[-1] = variant_line[-1].translate(None, '"')
         if len(variant_line) >= 16:
             success_count += 1
             context = variant_line[5].split(",")
@@ -189,7 +183,7 @@ tab_mutations = open('amplicon_variants_tab.csv', 'w')
 for snp in snps:
     # check if type is deletion, correction of the data for annovar
     if "Deletion" in snp.get_type():
-        print snp.get_ref()
+        # print snp.get_ref()
         # print mutation.get_alt()
         newEnd = snp.get_pos() + (len(snp.get_ref()) - 2)
         snp.set_alt("-")
@@ -204,7 +198,7 @@ for snp in snps:
         # print mutation.get_pos()
         # print newEnd
         # print mutation.get_ref()
-        print snp.get_alt()
+        # print snp.get_alt()
     tab_mutations.write(snp.export())
 tab_mutations.close()
 print "created tab delimited file for annovar"
@@ -256,8 +250,8 @@ else:
         p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
         p.communicate()
 
-# run Annovar ###
-print "running annovar"
+# annotate the SNPs ###
+print "annotating the SNPs"
 annovar_pl = "./perl/table_annovar.pl "
 dir_path = os.path.dirname(os.path.realpath(__file__))
 # print dir_path
@@ -275,9 +269,6 @@ else:
                                                                "refGene,cytoBand,esp6500siv2_all,snp138,ljb26_all " \
                                                                "-operation g,r,f,f,f -nastring . "  # dbnsfp30a
 print annovar_pl + params
-# 1000g2014oct_all,1000g2014oct_afr,1000g2014oct_eas,1000g2014oct_eur,
-# ./perl/table_annovar.pl amplicon_variants_tab.csv /hg19/ -buildver hg19 -out myanno -remove -protocol refGene,snp138 -operation g,f -nastring .
-
 p = subprocess.Popen([annovar_pl + params], shell=True)
 # wait until it's finished
 p.communicate()
@@ -434,8 +425,8 @@ for snp in snps:
 
 # write in export table ###
 if not args.output_file:
-    target = open("output.txt", 'w')
-    print "writing export in: output.txt"
+    target = open("output.csv", 'w')
+    print "writing export in: output.csv"
 else:
     target = open(args.output_file, 'w')
     print "writing export in: " + args.output_file
@@ -455,7 +446,7 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
     if args.detail:
         export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}"
                             "\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
-                            "{}\t{}\t{}\t{}\t{}\t"
+                            "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
                             "".format(snp.get_id(), snp.get_chr(), snp.get_pos(), snp.get_ref(), snp.get_alt(),
                                       snp.get_type(), ','.join(snp.get_context()), ','.join(snp.get_consequences()),
                                       snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(), snp.get_qual(),
