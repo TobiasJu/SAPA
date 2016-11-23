@@ -121,13 +121,14 @@ class AnnovarParser:
         # class functions
 
     def print_header(self):
-        return "Chr\tSNP Start\tSNP End\tRef\tAlt\tFunc_refGene\tGene_refGene\tGeneDetail_refGene\tExonicFunc_refGene" \
-               "\tAAChange_refGene\tcytoBand\tesp6500siv2_all\tsnp138\tSIFT_score\tSIFT_pred\tPolyphen2_HDIV_score\t" \
-               "Polyphen2_HDIV_pred\t" \
-               "Polyphen2_HVAR_score\tPolyphen2_HVAR_pred\tLRT_score\tLRT_pred\tMutationTaster_score\t" \
-               "MutationTaster_pred\tMutationAssessor_score\tMutationAssessor_pred\tFATHMM_score\tFATHMM_pred" \
-               "\tRadialSVM_score\tRadialSVM_pred\tLR_score\tLR_pred\tVEST3_score\tCADD_raw\tCADD_phred\tGERP_RS\t" \
-               "phyloP46way_placental\tphyloP100way_vertebrate\tSiPhy_29way_logOdds\t"
+        return "Chr\tStart\tEnd\tRef\tAlt\tFunc_refGene\tGene_refGene\tGeneDetail_refGene\tExonicFunc_refGene\t" \
+               "AAChange_refGene\tcytoBand\tesp6500siv2_all\tsnp138\tSIFT_score\tSIFT_pred\tPolyphen2_HDIV_score\t" \
+               "Polyphen2_HDIV_pred\tPolyphen2_HVAR_score\tPolyphen2_HVAR_pred\tLRT_score\tLRT_pred\t" \
+               "MutationTaster_score\tMutationTaster_pred\tMutationAssessor_score\tMutationAssessor_pred\tFATHMM_score" \
+               "\tFATHMM_pred\tPROVEAN_score\tPROVEAN_pred\tVEST3_score\tCADD_raw\tCADD_phred\tDANN_score\t" \
+               "fathmm_MKL_coding_score\tfathmm_MKL_coding_pred\tMetaSVM_score\tMetaSVM_pred\tMetaLR_score\t" \
+               "MetaLR_pred\tintegrated_fitCons_score\tintegrated_confidence_value\tGERP_RS\tphyloP7way_vertebrate\t" \
+               "phyloP20way_mammalian\tphastCons7way_vertebrate\tphastCons20way_mammalian\tSiPhy_29way_logOdds\t"
 
     def export_tab(self):
         return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
