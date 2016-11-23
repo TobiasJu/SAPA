@@ -95,7 +95,7 @@ The following scores are added to the advanced output file:
 
 #### <i class="icon-pencil"></i> Scoring explained (LJB23)
 
-| Score   (dbtype)           | variants in hg19 | Categorical   Prediction                                                                                             |   |   |
+| Score   (dbtype)           | variants in hg19 | Categorical   Prediction                                                                                             |
 |----------------------------|----------------------------------|----------------------------------------------------------------------------------------------------------------------|
 | SIFT (sift)                | 77593284                         | D:   Deleterious (sift<=0.05); T: tolerated (sift>0.05)                                                              |
 | PolyPhen 2 HDIV (pp2_hdiv) | 72533732                         | D:   Probably damaging (>=0.957), P: possibly damaging   (0.453<=pp2_hdiv<=0.956); B: benign (pp2_hdiv<=0.452)       |
