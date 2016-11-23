@@ -29,7 +29,7 @@ parser.add_argument("-i", "--input_file", help="tab separated table with SNP's")
 parser.add_argument("-d", "--detail", action="store_true", help="write detailed output file")
 parser.add_argument("-s", "--separator", help='set the input file separator (default: ",")')
 parser.add_argument("-t", "--text_delimiter", help='set the input text delimiter (default: ")')
-parser.add_argument("-id", "--input_directory", type=str, help="hg19 database directory (default /hg19)")
+# parser.add_argument("-id", "--input_directory", type=str, help="hg19 database directory (default /hg19)")
 parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.csv)")
 parser.add_argument("-f", "--fast", action="store_true", help="run annotation just with a region based approach, "
                                                               "for faster computing and less download file demand")
@@ -110,7 +110,8 @@ if not args.input_file:
 #    parser.print_help()
 #    sys.exit(0)
 
-print args
+if not args.quiet:
+    print args
 
 # if args.verbose:
 # print "detailed output selected"
@@ -134,7 +135,8 @@ with open(args.input_file) as csvfile:
     incsv = csv.reader(csvfile)
     if has_header:
         next(variant_lines)
-        print "skipping header"
+        if not args.quiet:
+            print "skipping header"
     l_count = 0
     snps = []
     for variant_line in variant_lines:
@@ -156,7 +158,8 @@ with open(args.input_file) as csvfile:
             print variant_line
             fail_count += 1
         l_count += 1
-print "created patient SNP objects with " + str(len(snps)) + " unique SNPs\n"
+if not args.quiet:
+    print "created patient SNP objects with " + str(len(snps)) + " unique SNPs\n"
 csvfile.close()
 
 if fail_count > success_count:
@@ -201,10 +204,14 @@ for snp in snps:
         # print snp.get_alt()
     tab_mutations.write(snp.export())
 tab_mutations.close()
-print "created tab delimited file for annovar"
+if not args.quiet:
+    print "created tab delimited file for annovar"
 
 # WORKS JUST UNDER UBUNTU OR THE UBUNTU BASH FOR WINDOWS #
 # get annovar databases if needed ###
+
+ad = "hg19/"  # annovar database
+
 annotate_variation = "./perl/annotate_variation.pl "
 databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
              "-buildver hg19 -downdb cytoBand hg19/",
@@ -256,20 +263,19 @@ annovar_pl = "./perl/table_annovar.pl "
 dir_path = os.path.dirname(os.path.realpath(__file__))
 # print dir_path
 
-if args.input_directory:
-    annovar_database = args.input_directory
-else:
-    annovar_database = "hg19/"
-
 if args.fast:
-    params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
+    params = "amplicon_variants_tab.csv " + ad + " -buildver hg19 -out myanno -remove -protocol " \
                                                                "refGene,snp138 -operation g,f -nastring ."
 else:
-    params = "amplicon_variants_tab.csv " + annovar_database + " -buildver hg19 -out myanno -remove -protocol " \
+    params = "amplicon_variants_tab.csv " + ad + " -buildver hg19 -out myanno -remove -protocol " \
                                                                "refGene,cytoBand,esp6500siv2_all,snp138,ljb26_all " \
                                                                "-operation g,r,f,f,f -nastring . "  # dbnsfp30a
-print annovar_pl + params
-p = subprocess.Popen([annovar_pl + params], shell=True)
+if args.quiet:
+    FNULL = open(os.devnull, 'w')
+    p = subprocess.Popen([annovar_pl + params], shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+else:
+    print annovar_pl + params
+    p = subprocess.Popen([annovar_pl + params], shell=True)
 # wait until it's finished
 p.communicate()
 
@@ -303,7 +309,8 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
                 print len(row)
         l_count += 1
 annovar_file.close()
-print "annotated SNPs count: " + str(len(annovar))
+if not args.quiet:
+    print "annotated SNPs count: " + str(len(annovar))
 
 # link annotations and SNPs together, with proofing! ###
 counters = 0
@@ -351,20 +358,23 @@ for snp_entry in lines:
         allHumanProteins.append(AllProt(prot, geneSyn, ensembl, geneDesc, chromosome, int(start),
                                         int(end), variant_line[6], variant_line[7:-1]))
 allProtFile.close()
-print "created all human protein objects"
+if not args.quiet:
+    print "created all human protein objects"
 
 # search after SNP corresponding genes ###
 coding_mutations = []
 for snp in snps:
     if "Coding" in snp.get_consequences():
-        print "{} ID: {}, Position: {}".format("unknown mutation", snp.get_id(), snp.get_pos())
+        if not args.quiet:
+            print "{} ID: {}, Position: {}".format("unknown mutation", snp.get_id(), snp.get_pos())
         for prot in allHumanProteins:
             if prot.get_start() < snp.get_pos() < prot.get_end() and snp.get_chr() == \
                     prot.get_chromosome():
                 # print "SNP Pos: {}, Ref Gene Start: {},  Ref Gene End: {}".format(mutation.get_pos(),
                 #                                                                        prot.get_start(),
                 #                                                                        prot.get_end())
-                print "found Gene: " + prot.get_gene()
+                if not args.quiet:
+                    print "found Gene: " + prot.get_gene()
                 coding_mutations.append(ProbedMutation(snp.get_id(), snp.get_chr(), snp.get_pos(),
                                                        snp.get_ref(), snp.get_alt(), snp.get_type(),
                                                        snp.get_context(), snp.get_consequences(),
