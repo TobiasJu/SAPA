@@ -29,27 +29,17 @@ class AnnovarParser:
     __MutationAssessor_pred = ""
     __FATHMM_score = 0.0
     __FATHMM_pred = ""
-    __PROVEAN_score = 0.0
-    __PROVEAN_pred = 0.0
+    __RadialSVM_score = 0.0
+    __RadialSVM_pred = ""
+    __LR_score = 0.0
+    __LR_pred = ""
     __VEST3_score = 0.0
     __CADD_raw = 0.0
     __CADD_phred = 0.0
-    __DANN_score = 0.0
-    __fathmm_MKL_coding_score = 0.0
-    __fathmm_MKL_coding_pred = 0.0
-    __MetaSVM_score = 0.0
-    __MetaSVM_pred = ""
-    __MetaLR_score = 0.0
-    __MetaLR_pred = ""
-    __integrated_fitCons_score = 0.0
-    __integrated_confidence_value = 0.0
     __GERP_RS = 0.0
-    __phyloP7way_vertebrate = 0.0
-    __phyloP20way_mammalian = 0.0
-    __phastCons7way_vertebrate = 0.0
-    __phastCons20way_mammalian = 0.0
+    __phyloP46way_placental = 0.0
+    __phyloP100way_vertebrate = 0.0
     __SiPhy_29way_logOdds = 0.0
-    # hypothetical max scores
     __SIFT_max = 10.0
     __Polyphen2_HDIV_max = 10.0
     __Polyphen2_HVAR_max = 10.0
@@ -63,13 +53,11 @@ class AnnovarParser:
 
     # constructor
     def __init__(self, Chr, Start, End, Ref, Alt, Func_refGene, Gene_refGene, GeneDetail_refGene, ExonicFunc_refGene,
-                 AAChange_refGene, cytoBand, esp6500siv2_all, snp138, SIFT_score, SIFT_pred, Polyphen2_HDIV_score,
-                 Polyphen2_HDIV_pred, Polyphen2_HVAR_score, Polyphen2_HVAR_pred, LRT_score, LRT_pred,
-                 MutationTaster_score, MutationTaster_pred, MutationAssessor_score, MutationAssessor_pred, FATHMM_score,
-                 FATHMM_pred, PROVEAN_score, PROVEAN_pred, VEST3_score, CADD_raw, CADD_phred, DANN_score,
-                 fathmm_MKL_coding_score, fathmm_MKL_coding_pred, MetaSVM_score, MetaSVM_pred, MetaLR_score,
-                 MetaLR_pred, integrated_fitCons_score, integrated_confidence_value, GERP_RS, phyloP7way_vertebrate,
-                 phyloP20way_mammalian, phastCons7way_vertebrate, phastCons20way_mammalian, SiPhy_29way_logOdds):
+                 AAChange_refGene, cytoBand, esp6500siv2_all, snp138, SIFT_score, SIFT_pred, Polyphen2_HDIV_score, Polyphen2_HDIV_pred,
+                 Polyphen2_HVAR_score, Polyphen2_HVAR_pred, LRT_score, LRT_pred, MutationTaster_score,
+                 MutationTaster_pred, MutationAssessor_score, MutationAssessor_pred, FATHMM_score, FATHMM_pred,
+                 RadialSVM_score, RadialSVM_pred, LR_score, LR_pred, VEST3_score, CADD_raw, CADD_phred,
+                 GERP_RS, phyloP46way_placental, phyloP100way_vertebrate, SiPhy_29way_logOdds):
         self.__Chr = Chr
         self.__Start = Start
         self.__End = End
@@ -97,28 +85,19 @@ class AnnovarParser:
         self.__MutationAssessor_pred = MutationAssessor_pred
         self.__FATHMM_score = FATHMM_score
         self.__FATHMM_pred = FATHMM_pred
-        self.__PROVEAN_score = PROVEAN_score
-        self.__PROVEAN_pred = PROVEAN_pred
+        self.__RadialSVM_score = RadialSVM_score
+        self.__RadialSVM_pred = RadialSVM_pred
+        self.__LR_score = LR_score
+        self.__LR_pred = LR_pred
         self.__VEST3_score = VEST3_score
         self.__CADD_raw = CADD_raw
         self.__CADD_phred = CADD_phred
-        self.__DANN_score = DANN_score
-        self.__fathmm_MKL_coding_score = fathmm_MKL_coding_score
-        self.__fathmm_MKL_coding_pred = fathmm_MKL_coding_pred
-        self.__MetaSVM_score = MetaSVM_score
-        self.__MetaSVM_pred = MetaSVM_pred
-        self.__MetaLR_score = MetaLR_score
-        self.__MetaLR_pred = MetaLR_pred
-        self.__integrated_fitCons_score = integrated_fitCons_score
-        self.__integrated_confidence_value = integrated_confidence_value
         self.__GERP_RS = GERP_RS
-        self.__phyloP7way_vertebrate = phyloP7way_vertebrate
-        self.__phyloP20way_mammalian = phyloP20way_mammalian
-        self.__phastCons7way_vertebrate = phastCons7way_vertebrate
-        self.__phastCons20way_mammalian = phastCons20way_mammalian
+        self.__phyloP46way_placental = phyloP46way_placental
+        self.__phyloP100way_vertebrate = phyloP100way_vertebrate
         self.__SiPhy_29way_logOdds = SiPhy_29way_logOdds
 
-        # class functions
+    # class functions
 
     def print_header(self):
         return "Chr\tSNP Start\tSNP End\tRef\tAlt\tFunc_refGene\tGene_refGene\tGeneDetail_refGene\tExonicFunc_refGene" \
@@ -175,3 +154,4 @@ class AnnovarParser:
 #                         self.__g2014oct_afr,
 #                         self.__g2014oct_eas,
 #                         self.__g2014oct_eur,
+0Suchvorgang...

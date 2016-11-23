@@ -218,7 +218,7 @@ databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
              "-buildver hg19 -downdb -webfrom annovar esp6500siv2_all hg19/",
              "-buildver hg19 -downdb -webfrom annovar 1000g2014oct hg19/",
              "-buildver hg19 -downdb -webfrom annovar snp138 hg19/",
-             "-buildver hg19 -downdb -webfrom annovar ljb26_all hg19/"  # lib30 update! dbnsfp30a
+             "-buildver hg19 -downdb -webfrom annovar dbnsfp30a hg19/"  # lib30 update! dbnsfp30a
              ]
 
 if args.fast:
@@ -277,12 +277,12 @@ else:
         print "download failed! Please try again or download the file directly: "
         sys.exit(0)
 
-    if not os.path.isfile("hg19/hg19_ljb26_all.txt"): # hg19/hg19_dbnsfp30a.txt
+    if not os.path.isfile("hg19/hg19_dbnsfp30a.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
         p.communicate()
 
-    if not os.path.isfile("hg19/hg19_ljb26_all.txt"):
+    if not os.path.isfile("hg19/hg19_dbnsfp30a.txt"):
         print "download failed! Please try again or download the file directly: "
         sys.exit(0)
 
@@ -297,8 +297,8 @@ if args.fast:
                                                                "refGene,snp138 -operation g,f -nastring ."
 else:
     params = "amplicon_variants_tab.csv " + ad + " -buildver hg19 -out myanno -remove -protocol " \
-                                                               "refGene,cytoBand,esp6500siv2_all,snp138,ljb26_all " \
-                                                               "-operation g,r,f,f,f -nastring . "  # dbnsfp30a
+                                                               "refGene,cytoBand,esp6500siv2_all,snp138,dbnsfp30a " \
+                                                               "-operation g,r,f,f,f -nastring . "
 if args.quiet:
     FNULL = open(os.devnull, 'w')
     p = subprocess.Popen([annovar_pl + params], shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
@@ -311,29 +311,31 @@ p.communicate()
 # parse annovar file ###
 annovar = []
 l_count = 0
-failed = 0
+failed = 1
 with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
     for row in annovar_file:
         # filter header
         if l_count != 0:
             row = row.strip()
             row = row.split("\t")
-            if len(row) == 6:  # fast run
+            if len(row) == 11:  # fast run
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
                                              row[9], row[10], ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
                                              ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
                                              ".", "."))
-            elif len(row) == 38:
+            elif len(row) == 47:
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
                                              row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16],
                                              row[17],
                                              row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25],
                                              row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33],
-                                             row[34], row[35], row[36], row[37]))
+                                             row[34], row[35], row[36], row[37], row[38], row[39], row[40], row[41],
+                                             row[42], row[43], row[44], row[45], row[46]))
             else:  # fatal error
                 annovar.append(AnnovarParser(".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
                                              ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
-                                             ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."))
+                                             ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
+                                             ".", ".", ".", ".", ".", ".", ".", "."))
                 print "ERROR could not handle this row: "
                 print row
                 print len(row)
@@ -341,8 +343,8 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
         l_count += 1
 annovar_file.close()
 
-if failed > l_count:
-    print "FATAL ERROR: "
+if failed == l_count:
+    print "FATAL ERROR: could not handle annovar input, SNP annotation failed"
     sys.exit(0)
 
 if not args.quiet:
@@ -540,16 +542,16 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
                                       snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(),
                                       snp.get_qual(), snp.get_altFreq(),
                                       snp.get_totalDepth(), snp.get_refDepth(),
-                                      snp.get_altDepth(), snp.get_strandBias(), annotation._AnnovarParser__LR_score,
+                                      snp.get_altDepth(), snp.get_strandBias(), annotation._AnnovarParser__MetaLR_score,
                                       annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_raw
                                       ))
-        if annotation._AnnovarParser__LR_pred == "T":
+        if annotation._AnnovarParser__MetaLR_pred == "T":
             export_string += "Tolerated"
-        elif annotation._AnnovarParser__LR_pred == "D":
+        elif annotation._AnnovarParser__MetaLR_pred == "D":
             export_string += "Deleterious"
-        elif annotation._AnnovarParser__LR_pred == "P":
+        elif annotation._AnnovarParser__MetaLR_pred == "P":
             export_string += "possibly damaging"
-        elif annotation._AnnovarParser__LR_pred == ".":
+        elif annotation._AnnovarParser__MetaLR_pred == ".":
             export_string += "."
     target.write(export_string)
     target.write("\n")
