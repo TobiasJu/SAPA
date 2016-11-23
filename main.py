@@ -43,22 +43,59 @@ if not len(sys.argv) > 1:
     sys.exit(0)
 
 if args.manual:
-    print """Mutation Information / SNP Information
+    print """SAPA - SNP annotation programm for AML
 
-This program is designed to add additional information to an Illumina truseq amplicon variants file.
+75% of a Acute myeloid leukemia (AML) patients SNPs are unique to them and their impact is still unresolved.
 
-The following Parameters are added to the file:
+SAPA is designed to add additional information to an Illumina truseq amplicon variants csv file. Such as Scores
+for nonsynonymous scoring matrices, divided into 3 different combined Scores, function prediction scores,
+conservation scores and one ensemble score. So that the viewer gets more Information whether a mutation is delirious
+or harmless. Due to performance and data reasons, SAPA uses annovar1 and their precomputed SNP database, to quickly
+gather the deleterious prediction methods scores.
 
-- COMING SOON
+First run:
+
+./main.py -i data/truseq_example_data.csv
 
 Please Note that during the first run of the program, the required database will be downloaded. This may take some time,
  depending on your internet connection.
 
+Parameters:
+
+-h, --help : show the help message and exit
+
+-q, --quiet : prevent output in command line, run the program and don't bother
+
+-m, --manual : display the manual for this program
+
+-i, --input_file : truseq amplicon table containing SNPs
+    > e.g. -i data/truseq_example_data.csv
+
+-d, --detail : write detailed output file, with all the single scores of the deleteriousness prediction methods
+               for nonsynonymous SNVs and amino acid substitution (if any)
+
+-s, --separator : set the input file separator (default: ",")
+    > e.g. -s ";" this will set the column separator to a semicolon
+
+-t, --text_delimiter : set the input text delimiter (default: ")
+    > e.g. -t "'" this will set the text delimiter to an apostrophe, if a column contains multiple entries
+
+-id, --input_directory : hg19 (GRCh37) database directory (default /hg19)
+    > e.g. -id humandb/ set the input directory to be named humandb
+
+-o, --output_file : output file name (default output.txt)
+    > e.g. -o annotated_snps_detailed.txt -d running the detailed operation mode, and saving it in the file
+              annotated_snps_detailed.txt
+
+-f, --fast : run annotation just with a region based approach, for faster computing and less download file demand
+
+-fi, --filter : filter all entries and only use nonsynonymus and clinically significant (>95%) SNPs in the output file
+
 Several commonly used databases are integrated: ‘cytoBand’ for the chromosome coordinate of each cytogenetic band,
-‘1000g2014oct’ for alternative allele frequency in the 1000 Genomes Project (version October 2014), ‘exac03’
-for the variants reported in the Exome Aggregation Consortium (version 0.3)50, ‘ljb26_all’ for various functional
-deleteriousness prediction scores from the dbNSFP database (version 2.6)51, ‘clinvar_20140929’ for the variants
-reported in the ClinVar database (version 20140929)52 and ‘snp138’ for the dbSNP database (version 138)53.
+‘exac03’ for the variants reported in the Exome Aggregation Consortium (version 0.3)50, ‘dbnsfp30a’ for various
+functional deleteriousness prediction scores from the dbNSFP database (version 2.6)51,
+‘clinvar_20140929’ for the variants reported in the ClinVar database (version 20140929)52 and
+‘snp138’ for the dbSNP database (version 138).
              """
     parser.print_help()
     sys.exit(0)
@@ -475,7 +512,7 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
             export_string += "Deleterious"
         elif annotation._AnnovarParser__LR_pred == "P":
             export_string += "possibly damaging"
-        else:
+        elif annotation._AnnovarParser__LR_pred == ".":
             export_string += "."
     target.write(export_string)
     target.write("\n")
