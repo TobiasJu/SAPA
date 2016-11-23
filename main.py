@@ -231,12 +231,12 @@ if args.fast:
         print "download failed! Please try again or download the file directly: "
         sys.exit(0)
 
-    if not os.path.isfile("hg19/hg19_snp138.txt"):
+    if not os.path.isfile("hg19/hg19_dbnsfp30a.txt"):
         print "downloading dependencies..."
         p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
         p.communicate()
 
-    if not os.path.isfile("hg19/hg19_snp138.txt"):
+    if not os.path.isfile("hg19/hg19_dbnsfp30a.txt"):
         print "download failed! Please try again or download the file directly: "
         sys.exit(0)
 
@@ -294,7 +294,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 if args.fast:
     params = "amplicon_variants_tab.csv " + ad + " -buildver hg19 -out myanno -remove -protocol " \
-                                                               "refGene,snp138 -operation g,f -nastring ."
+                                                               "refGene,dbnsfp30a -operation g,f -nastring ."  #snp138
 else:
     params = "amplicon_variants_tab.csv " + ad + " -buildver hg19 -out myanno -remove -protocol " \
                                                                "refGene,cytoBand,esp6500siv2_all,snp138,dbnsfp30a " \
@@ -318,19 +318,20 @@ with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
         if l_count != 0:
             row = row.strip()
             row = row.split("\t")
-            if len(row) == 11:  # fast run
+            if len(row) == 44:  # fast run
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
-                                             row[9], row[10], ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
-                                             ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
-                                             ".", "."))
+                                             row[9], ".", ".", ",", row[10], row[11], row[12], row[13], row[14], row[15], row[16],
+                                             row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24],
+                                             row[25], row[26], row[27], row[28], row[29], row[30], row[31], row[32],
+                                             row[33], row[34], row[35], row[36], row[37], row[38], row[39], row[40],
+                                             row[41], row[42], row[43]))
             elif len(row) == 47:
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
                                              row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16],
-                                             row[17],
-                                             row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25],
-                                             row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33],
-                                             row[34], row[35], row[36], row[37], row[38], row[39], row[40], row[41],
-                                             row[42], row[43], row[44], row[45], row[46]))
+                                             row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24],
+                                             row[25], row[26], row[27], row[28], row[29], row[30], row[31], row[32],
+                                             row[33], row[34], row[35], row[36], row[37], row[38], row[39], row[40],
+                                             row[41], row[42], row[43], row[44], row[45], row[46]))
             else:  # fatal error
                 annovar.append(AnnovarParser(".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
                                              ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".",
