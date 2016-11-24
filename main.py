@@ -486,7 +486,7 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
     # write header first:
     if export_cnt == 0:
         if args.detail:
-            header = str(snp.print_header()) + str(annotation.print_header() + "\tfinal prediction\t")
+            header = str(snp.print_header()) + str(annotation.print_header() + "final prediction\t")
         else:
             header = str(snp.print_header()) + "Gene\tfunction prediction scores [0-1]\tconservation scores\t" \
                                                "ensemble scores\tfinal prediction\t"
@@ -585,9 +585,13 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
 
     # change digit format to german
     export_string = export_string.replace('.', ',')
-
-    target.write(export_string)
-    target.write("\n")
+    # filter deleterious only
+    if args.filter_deleterious and annotation._AnnovarParser__MetaLR_pred == "D":
+        target.write(export_string)
+        target.write("\n")
+    if not args.filter_deleterious:
+        target.write(export_string)
+        target.write("\n")
     export_cnt += 1
 target.close()
 
