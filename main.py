@@ -35,6 +35,7 @@ parser.add_argument("-f", "--fast", action="store_true", help="run annotation ju
                                                               "for faster computing and less download file demand")
 parser.add_argument("-fi", "--filter", action="store_true", help="filter SNPs for nonsynonymus and clinically "
                                                                  "significant (>95%%) SNPs")
+parser.add_argument("-fd", "--filter_deleterious", action="store_true", help="output only deleterious SNPs")
 args = parser.parse_args()
 
 # sanity check ###
@@ -485,10 +486,10 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
     # write header first:
     if export_cnt == 0:
         if args.detail:
-            header = str(snp.print_header()) + str(annotation.print_header() + "\t")
+            header = str(snp.print_header()) + str(annotation.print_header() + "\tfinal prediction\t")
         else:
-            header = str(snp.print_header()) + "function prediction scores\tconservation scores\tensemble scores\t" \
-                                               "final prediction\t"
+            header = str(snp.print_header()) + "Gene\tfunction prediction scores [0-1]\tconservation scores\t" \
+                                               "ensemble scores\tfinal prediction\t"
         target.write(header)
         target.write("\n")
     # write rows in table
@@ -554,31 +555,37 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
         # snp.get_proteinClass(), snp.get_geneStart(), snp.get_geneEnd()
         # ))
     else:
-        export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
+        export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
                             "".format(snp.get_id(), snp.get_chr(), snp.get_pos(),
                                       snp.get_ref(), snp.get_alt(), snp.get_type(),
                                       ','.join(snp.get_context()), ','.join(snp.get_consequences()),
                                       snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(),
                                       snp.get_qual(), snp.get_altFreq(),
                                       snp.get_totalDepth(), snp.get_refDepth(),
-                                      snp.get_altDepth(), snp.get_strandBias(), annotation._AnnovarParser__MetaLR_score,
+                                      snp.get_altDepth(), snp.get_strandBias(),
+                                      annotation._AnnovarParser__Gene_refGene,
+                                      annotation._AnnovarParser__MetaLR_score,
                                       annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_raw
                                       ))
-        if annotation._AnnovarParser__MetaLR_pred == "T":
-            export_string += "Tolerated"
-        elif annotation._AnnovarParser__MetaLR_pred == "D":
-            export_string += "Deleterious"
-        elif annotation._AnnovarParser__MetaLR_pred == "P":
-            export_string += "possibly damaging"
-        elif annotation._AnnovarParser__MetaLR_pred == ".":
-            if "Intron" in snp.get_context():
-                export_string += "Tolerated (Intron)"
-            elif "Intergenic" in snp.get_context():
-                export_string += "Tolerated (Intergenic)"
-            elif "Coding" in snp.get_context() and "synonymous_variant" in snp.get_consequences():
-                export_string += "Tolerated (synonymous_variant)"
-            else:
-                export_string += "."
+    if annotation._AnnovarParser__MetaLR_pred == "T":
+        export_string += "Tolerated"
+    elif annotation._AnnovarParser__MetaLR_pred == "D":
+        export_string += "Deleterious"
+    elif annotation._AnnovarParser__MetaLR_pred == "P":
+        export_string += "possibly damaging"
+    elif annotation._AnnovarParser__MetaLR_pred == ".":
+        if "Intron" in snp.get_context():
+            export_string += "Tolerated (Intron)"
+        elif "Intergenic" in snp.get_context():
+            export_string += "Tolerated (Intergenic)"
+        elif "Coding" in snp.get_context() and "synonymous_variant" in snp.get_consequences():
+            export_string += "Tolerated (synonymous_variant)"
+        else:
+            export_string += "."
+
+    # change digit format to german
+    export_string = export_string.replace('.', ',')
+
     target.write(export_string)
     target.write("\n")
     export_cnt += 1
