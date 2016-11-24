@@ -215,7 +215,7 @@ class SNP(object):
 
     def print_header(self):
         return "ID\tChr\tPos\tRef\tAlt\tType\tContext\tConsequence\tdbSNP\t" \
-               "COSMIC\tClinVar\tQual\tAlt Freq\tTotal Depth\tRef Depth\tAlt Depth\t" \
+               "COSMIC\tClinVar\tQual\tAlt Freq [%]\tTotal Depth\tRef Depth\tAlt Depth\t" \
                "Strand Bias\t"
 
     def export(self):

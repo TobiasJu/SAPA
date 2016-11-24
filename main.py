@@ -497,6 +497,10 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
         target.write(header)
         target.write("\n")
     # write rows in table
+    try:
+        altFreq = snp.get_altFreq() * 100
+    except ValueError:
+        altFreq = snp.get_altFreq()
     if args.detail:
         export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}"
                             "\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
@@ -504,7 +508,7 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
                             "".format(snp.get_id(), snp.get_chr(), snp.get_pos(), snp.get_ref(), snp.get_alt(),
                                       snp.get_type(), ','.join(snp.get_context()), ','.join(snp.get_consequences()),
                                       snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(), snp.get_qual(),
-                                      snp.get_altFreq(), snp.get_totalDepth(), snp.get_refDepth(),
+                                      altFreq, snp.get_totalDepth(), snp.get_refDepth(),
                                       snp.get_altDepth(), snp.get_strandBias(),
                                       annotation._AnnovarParser__Chr,
                                       annotation._AnnovarParser__Start,
