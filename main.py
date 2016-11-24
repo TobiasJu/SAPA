@@ -154,6 +154,12 @@ with open(args.input_file) as csvfile:
                             variant_line[4], context, consequences, variant_line[7], variant_line[8], variant_line[9],
                             int(variant_line[10]), variant_line[11], variant_line[12], variant_line[13],
                             variant_line[14], variant_line[15]))
+        elif len(variant_line) < 16:
+            success_count += 1
+            context = variant_line[5].split(",")
+            consequences = variant_line[6].split(",")
+            snps.append(SNP(l_count, variant_line[0], int(variant_line[1]), variant_line[2], variant_line[3],
+                            ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."))
         else:
             print "INVALID DATA (length < 16) in Line {}".format(l_count)
             print variant_line
@@ -361,14 +367,12 @@ for snp, annotation in zip(snps, annovar):
         counters += 1
 
 # iterate over annovar data and get final scores ###
-for data in annovar:
-    score = data._AnnovarParser__SIFT_score
-    if score != ".":
-        rel_score = float(data._AnnovarParser__SIFT_score) / data._AnnovarParser__SIFT_max
+# for data in annovar:
+    # score = data._AnnovarParser__SIFT_score
+    # if score != ".":
+        # rel_score = float(data._AnnovarParser__SIFT_score) / data._AnnovarParser__SIFT_max
         # print rel_score
-
 ###### some work to do here ####
-
 # sys.exit(0)
 
 # create Objects containing all human proteins ###

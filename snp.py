@@ -150,31 +150,46 @@ class SNP(object):
         return self.__clinVar
 
     def get_qual(self):
-        return int(self.__qual)
+        try:
+            return int(self.__qual)
+        except ValueError:
+            return self.__qual
 
     def get_altFreq(self):
-        return float(self.__altFreq)
+        try:
+            return float(self.__altFreq)
+        except ValueError:
+            return self.__altFreq
 
     def get_totalDepth(self):
-        return int(self.__totalDepth)
+        try:
+            return int(self.__totalDepth)
+        except ValueError:
+            return self.__totalDepth
 
     def get_refDepth(self):
-        return int(self.__refDepth)
+        try:
+            return int(self.__refDepth)
+        except ValueError:
+            return self.__refDepth
 
     def get_altDepth(self):
-        return int(self.__altDepth)
+        try:
+            return int(self.__altDepth)
+        except ValueError:
+            return self.__altDepth
 
     def get_strandBias(self):
-        return float(self.__strandBias)
+        try:
+            return float(self.__strandBias)
+        except ValueError:
+            return self.__strandBias
 
     def get_new_end(self):
         if self.__new_end == 0:
             return self.__pos
         else:
             return self.__new_end
-
-    # def get_conclusion(self):
-    #     return self.__conclusion
 
     # class functions
     def toString(self):
