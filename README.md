@@ -77,25 +77,123 @@ No worries your input file will not be overwritten, a new file with the data fro
 - ensemble score
 - final prediction
 
-#### <i class="icon-pencil"></i> Scoring explained (LJB23)
+#### <i class="icon-pencil"></i> Scoring explained (dbnsfp30a)
 
-| Score   (dbtype)           | variants in hg19 | Categorical   Prediction                                                                                             |
-|----------------------------|----------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| SIFT (sift)                | 77593284                         | D:   Deleterious (sift<=0.05); T: tolerated (sift>0.05)                                                              |
-| PolyPhen 2 HDIV (pp2_hdiv) | 72533732                         | D:   Probably damaging (>=0.957), P: possibly damaging   (0.453<=pp2_hdiv<=0.956); B: benign (pp2_hdiv<=0.452)       |
-| PolyPhen 2 HVar (pp2_hvar) | 72533732                         | D:   Probably damaging (>=0.909), P: possibly damaging   (0.447<=pp2_hdiv<=0.909); B: benign (pp2_hdiv<=0.446)       |
-| LRT (lrt)                  | 68069321                         | D:   Deleterious; N: Neutral; U: Unknown                                                                             |
-| MutationTaster (mt)        | 88473874                         | A"   ("disease_causing_automatic"); "D"   ("disease_causing"); "N" ("polymorphism");   "P" ("polymorphism_automatic" |   |   |
-| MutationAssessor (ma)      | 74631375                         | H:   high; M: medium; L: low; N: neutral. H/M means functional and L/N means   non-functional                        |
-| FATHMM (fathmm)            | 70274896                         | D:   Deleterious; T: Tolerated                                                                                       |
-| MetaSVM (metasvm)          | 82098217                         | D:   Deleterious; T: Tolerated                                                                                       |
-| MetaLR (metalr)            | 82098217                         | D:   Deleterious; T: Tolerated                                                                                       |
-| GERP++ (gerp++)            | 89076718                         | higher   scores are more deleterious                                                                                 |
-| PhyloP (phylop)            | 89553090                         | higher   scores are more deleterious                                                                                 |
-| SiPhy (siphy)              | 88269630                         | higher   scores are more deleterious                                                                                 |
+- **SIFT**
+	- Score	ranges from 0 to 1. The amino acid substitution is predicted damaging is the score is <= 0.05, and tolerated if the score is > 0.05.
+	- http://sift.jcvi.org/www/SIFT_help.html
+	
+- **Polyphen2 **
+	- Scores ranges from 0 to 1
+	- D: Probably damaging (>=0.957), P: possibly damaging (0.453<=pp2_hdiv<=0.956); B: benign (pp2_hdiv<=0.452)
+	- http://genetics.bwh.harvard.edu/pph2/dokuwiki/overview
 
-For a complete description of the single scores visit:
-http://annovar.openbioinformatics.org/en/latest/user-guide/filter/#ljb42-dbnsfp-non-synonymous-variants-annotation
+- **LRT ** 
+	- Scores ranges from 0 to 1
+	- D: Deleterious; N: Neutral; U: Unknown
+	- https://www.researchgate.net/profile/Justin_Fay/publication/26671245_Identification_of_deleterious_mutations_within_three_human_genomes/links/00b49529eabbc6aa2b000000.pdf
+
+- **MutationTaster **
+	- Scores ranges from 0 to 1
+	- 	A = "disease_causing_automatic"; D =“disease_causing”; N = “polymorphism”; P = “polymorphism_automatic”
+	- http://www.mutationtaster.org/
+
+
+- **MutationAssessor**
+	- Scores ranges from -5.545 to 5.975
+	- H: high; M: medium; L: low; N: neutral. H/M means functional and L/N means non-functional
+	- http://mutationassessor.org/r3/
+
+
+- **FATHMM**
+	- Scores ranges from -16.13 to 10.64 
+	- D: Deleterious; T: Tolerated
+	- http://fathmm.biocompute.org.uk/
+
+
+- **PROVEAN **
+	- Scores ranges from -13 to 4
+	- Deleterious PROVEAN < -2,5 ; Tolerated PROVEAN > -2,5 
+	- http://provean.jcvi.org/about.php
+
+
+- **VEST3**
+	- Scores ranges from 0 to 1. 
+	- The larger the score the more likely the mutation may cause functional change.
+	- http://karchinlab.org/apps/appVest.html
+
+
+- **CADD**
+	- Scores ranges from ?? to ??
+	- The larger the score the more likely the SNP has damaging effect.
+	- http://cadd.gs.washington.edu/
+
+- **CADD_phred**
+	- This is phred-like rank score based on whole genome CADD raw scores.
+	- The larger the score the more likely the SNP has damaging effect.
+
+- **DANN**
+	- Scores ranges from 0.01 to 0.99
+	- The higher the score the more likely the mutation may cause functional change.
+	- DANN uses the same feature set and training data as CADD to train a deep neural network (DNN)
+	- https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4341060/
+
+- **FATHMM_MKL_coding_score**
+	- Scores ranges from 0 - 1
+	- The higher the score, the greater the confidence of a functional mutation.
+	- http://fathmm.biocompute.org.uk/fathmmMKL.htm
+
+- **MetaSVM**
+	- Scores ranges from -1 to +1
+	- D: Deleterious; T: Tolerated
+	- Uses a radial SVM model to train prediction model, using all available scoring algorithm normalized scores
+	- http://annovar.openbioinformatics.org/en/latest/user-guide/filter/#-metasvm-annotation
+
+- **MetaLR **
+	- Scores ranges from 0 to 1
+	- D: Deleterious; T: Tolerated
+	- very similar to MetaSVM, with similar performance
+	- http://annovar.openbioinformatics.org/en/latest/user-guide/filter/#-metalr-annotation
+
+- **integrated fitCons**
+	- Scores ranges from 0.0 to 0.80
+	- http://compgen.cshl.edu/fitCons/
+
+- **GERP RS**
+	- Scores ranges from -12.3 to 6.17
+	- The larger the score, the more conserved the site.
+	- http://mendel.stanford.edu/SidowLab/downloads/gerp/
+
+- **phyloP7way_vertebrate**
+	- The larger the score, the more conserved.
+		- higher scores are more deleterious
+	- Phylogenetic p-values for 7 vertebrate species
+	- https://brb.nci.nih.gov/seqtools/colexpanno.html#dbnsfp
+
+- **phyloP20way_mammalian**
+	- The larger the score, the more conserved.
+		- higher scores are more deleterious
+	- Phylogenetic p-values for 20 mammalian species
+	- https://brb.nci.nih.gov/seqtools/colexpanno.html#dbnsfp
+
+- **phastCons7way**
+	- Scores ranges from 0 to 1
+	- The larger the score, the more conserved the site
+		- higher scores are more deleterious
+	- http://compgen.cshl.edu/phast/phastCons-HOWTO.html
+
+- **phastCons20way **
+	- Scores ranges from 0 to 1
+	- The larger the score, the more conserved the site
+		- higher scores are more deleterious
+	- http://compgen.cshl.edu/phast/phastCons-HOWTO.html
+
+- **SiPhy**
+	- Scores ranges from 0.0003 to 37.9718
+	- The larger the score, the more conserved the site
+		- higher scores are more deleterious
+	- http://garberlab.umassmed.edu/software.html
+                                                                             
 
 ### <i class="icon-hdd"></i> Databases
 All required databases will be downloaded in the hg19/ <i class="icon-folder-open"></i> directory. 
@@ -108,17 +206,17 @@ Several commonly used databases are integrated:
 	- for the variants reported in the Exome Aggregation Consortium (version 0.3)
 - <b>dbnsfp30a</b> 
 	- for various functional deleteriousness prediction scores from the dbNSFP database (version 2.6)
+	
 - <b>clinvar_20140929</b>
 	- for the variants reported in the ClinVar database (version 20140929).
 
 #### For functional prediction of variants in whole-genome data:
 
-- <b>GERP++</b>
+- **GERP++**
 	- functional prediction scores for 9 billion mutations based on selective constraints across human genome. You can optionally use gerp++gt2 instead since it includes only RS score greater than 2, which provides high sensitivity while still strongly enriching for truly constrained sites
-- <b>CADD</b>
+- **CADD**
 	- Combined Annotation Dependent Depletion score for 9 billion mutations. It is basically constructed by a support vector machine trained to differentiate 14.7 million high-frequency human-derived alleles from 14.7 million simulated variants, using ~70 different features.
-- <b>CADD13</b>
-	- CADD version 1.3.
+
 - **DANN**
 	- functional prediction score generated by deep learning, using the identical set of training data as cadd but with much improved performance than CADD.
 - **FATHMM**
@@ -132,6 +230,7 @@ Several commonly used databases are integrated:
 
 - **dbnsfp30a**
 	- this dataset already includes SIFT, PolyPhen2 HDIV, PolyPhen2 HVAR, LRT, MutationTaster, MutationAssessor, FATHMM, MetaSVM, MetaLR, VEST, CADD, GERP++, DANN, fitCons, PhyloP and SiPhy scores, but <b>ONLY</b> on coding variants
+	- for more information check: http://varianttools.sourceforge.net/Annotation/DbNSFP
 
 
 #### <i class="icon-file"></i> Input File
