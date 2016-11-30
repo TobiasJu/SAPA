@@ -3,7 +3,7 @@ SAPA - SNP annotation programm for AML
 
 **75%** of a **Acute myeloid leukemia** (AML) patients SNPs are unique to them and their impact is still unresolved. 
 
-SAPA is designed to add additional information to an **Illumina truseq amplicon** variants csv file. Such as Scores for nonsynonymous scoring matrices, divided into **3** different **combined Scores**, function prediction scores, conservation scores and one ensemble score. So that the viewer gets more Information whether a mutation is delirious or harmless. Due to performance and data reasons, SAPA uses annovar<sup>1</sup> and their precomputed SNP database, to quickly gather the deleterious prediction methods scores. 
+SAPA is designed to add additional information to an **Illumina truseq amplicon** variants csv file. Such as Scores for nonsynonymous scoring matrices, divided into **3** different **combined Scores**, function prediction scores, conservation scores and one ensemble score. So that the viewer gets more Information whether a mutation is deleterious or tolerated. Due to performance and data reasons, SAPA uses annovar<sup>1</sup> and their precomputed SNP database, to quickly gather the deleterious prediction methods scores. 
   
 
 First run 
@@ -182,7 +182,7 @@ No worries your input file will not be overwritten, a new file with the data fro
 		- higher scores are more deleterious
 	- http://compgen.cshl.edu/phast/phastCons-HOWTO.html
 
-- **phastCons20way **
+- **phastCons20way**
 	- Scores ranges from 0 to 1
 	- The larger the score, the more conserved the site
 		- higher scores are more deleterious
