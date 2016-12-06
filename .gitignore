@@ -6,3 +6,4 @@ data/allprots_split.xlsx
 *.pyc
 .idea
 hg19/
+hg38/
