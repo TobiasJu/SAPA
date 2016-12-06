@@ -14,7 +14,7 @@ class AnnovarParser:
     __AAChange_refGene = ""
     __cytoBand = ""
     __esp6500siv2_all = 0.0
-    __snp138 = ""
+    __avsnp147 = ""
     __SIFT_score = 0.0
     __SIFT_pred = ""
     __Polyphen2_HDIV_score = 0.0
@@ -63,7 +63,7 @@ class AnnovarParser:
 
     # constructor
     def __init__(self, Chr, Start, End, Ref, Alt, Func_refGene, Gene_refGene, GeneDetail_refGene, ExonicFunc_refGene,
-                 AAChange_refGene, cytoBand, esp6500siv2_all, snp138, SIFT_score, SIFT_pred, Polyphen2_HDIV_score,
+                 AAChange_refGene, cytoBand, esp6500siv2_all, avsnp147, SIFT_score, SIFT_pred, Polyphen2_HDIV_score,
                  Polyphen2_HDIV_pred, Polyphen2_HVAR_score, Polyphen2_HVAR_pred, LRT_score, LRT_pred,
                  MutationTaster_score, MutationTaster_pred, MutationAssessor_score, MutationAssessor_pred, FATHMM_score,
                  FATHMM_pred, PROVEAN_score, PROVEAN_pred, VEST3_score, CADD_raw, CADD_phred, DANN_score,
@@ -82,7 +82,7 @@ class AnnovarParser:
         self.__AAChange_refGene = AAChange_refGene
         self.__cytoBand = cytoBand
         self.__esp6500siv2_all = esp6500siv2_all
-        self.__snp138 = snp138
+        self.__avsnp147 = avsnp147
         self.__SIFT_score = SIFT_score
         self.__SIFT_pred = SIFT_pred
         self.__Polyphen2_HDIV_score = Polyphen2_HDIV_score
@@ -122,7 +122,7 @@ class AnnovarParser:
 
     def print_header(self):
         return "Chr\tStart\tEnd\tRef\tAlt\tFunc_refGene\tGene_refGene\tGeneDetail_refGene\tExonicFunc_refGene\t" \
-               "AAChange_refGene\tcytoBand\tesp6500siv2_all\tsnp138\tSIFT_score\tSIFT_pred\tPolyphen2_HDIV_score\t" \
+               "AAChange_refGene\tcytoBand\tesp6500siv2_all\tavsnp147\tSIFT_score\tSIFT_pred\tPolyphen2_HDIV_score\t" \
                "Polyphen2_HDIV_pred\tPolyphen2_HVAR_score\tPolyphen2_HVAR_pred\tLRT_score\tLRT_pred\t" \
                "MutationTaster_score\tMutationTaster_pred\tMutationAssessor_score\tMutationAssessor_pred\tFATHMM_score" \
                "\tFATHMM_pred\tPROVEAN_score\tPROVEAN_pred\tVEST3_score\tCADD_raw\tCADD_phred\tDANN_score\t" \
@@ -145,7 +145,7 @@ class AnnovarParser:
                          self.__AAChange_refGene,
                          self.__cytoBand,
                          self.__esp6500siv2_all,
-                         self.__snp138,
+                         self.__avsnp147,
                          self.__SIFT_score,
                          self.__SIFT_pred,
                          self.__Polyphen2_HDIV_score,

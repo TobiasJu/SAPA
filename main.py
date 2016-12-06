@@ -25,11 +25,11 @@ group.add_argument("-q", "--quiet", action="store_true", help="prevent output in
 # parser.add_argument("-l", "--log", action="store_true", help="store the output in a log file")
 # parser.add_argument("-n", "--number", type=int, help="just a Test number")
 parser.add_argument("-m", "--manual", action="store_true", help="display the manual for this program")
-parser.add_argument("-i", "--input_file", help="tab separated table with SNP's")
+parser.add_argument("-i", "--input_file", help="comma separated table with SNP's")
 parser.add_argument("-d", "--detail", action="store_true", help="write detailed output file")
 parser.add_argument("-s", "--separator", help='set the input file separator (default: ",")')
 parser.add_argument("-t", "--text_delimiter", help='set the input text delimiter (default: ")')
-# parser.add_argument("-id", "--input_directory", type=str, help="hg19 database directory (default /hg19)")
+parser.add_argument("-b", "---buildver", type=str, help="database buildversion (default: hg19)")
 parser.add_argument("-o", "--output_file", type=str, help="output file name (default output.csv)")
 parser.add_argument("-f", "--fast", action="store_true", help="run annotation just with a region based approach, "
                                                               "for faster computing and less download file demand")
@@ -96,7 +96,7 @@ Several commonly used databases are integrated: ‘cytoBand’ for the chromosom
 ‘exac03’ for the variants reported in the Exome Aggregation Consortium (version 0.3)50, ‘dbnsfp30a’ for various
 functional deleteriousness prediction scores from the dbNSFP database (version 2.6)51,
 ‘clinvar_20140929’ for the variants reported in the ClinVar database (version 20140929)52 and
-‘snp138’ for the dbSNP database (version 138).
+‘avsnp147’ for the dbSNP database (version 138).
              """
     parser.print_help()
     sys.exit(0)
@@ -113,6 +113,15 @@ if not args.input_file:
 
 if not args.quiet:
     print args
+
+if args.buildver == "hg38" or args.buildver == "GRCh38":
+    buildversion = "hg38"
+    print "buildversion is GRCh38/hg38"
+elif args.buildver == "dm3" or args.buildver == "mm9":
+    print "Please contact me via github and tell my why, if you need different build versions."
+else:
+    buildversion = "hg19"
+    print "buildversion is GRCh37/hg19"
 
 # if args.verbose:
 # print "detailed output selected"
@@ -156,8 +165,8 @@ with open(args.input_file) as csvfile:
                             variant_line[14], variant_line[15]))
         elif len(variant_line) < 16:
             success_count += 1
-            context = variant_line[5].split(",")
-            consequences = variant_line[6].split(",")
+            # context = variant_line[5].split(",")
+            # consequences = variant_line[6].split(",")
             snps.append(SNP(l_count, variant_line[0], int(variant_line[1]), variant_line[2], variant_line[3],
                             ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."))
         else:
@@ -217,81 +226,61 @@ if not args.quiet:
 # WORKS JUST UNDER UBUNTU OR THE UBUNTU BASH FOR WINDOWS #
 # get annovar databases if needed ###
 
-ad = "hg19/"  # annovar database
-
 annotate_variation = "./perl/annotate_variation.pl "
-databases = ["-buildver hg19 -downdb -webfrom annovar refGene hg19/",
-             "-buildver hg19 -downdb cytoBand hg19/",
-             "-buildver hg19 -downdb -webfrom annovar esp6500siv2_all hg19/",
-             "-buildver hg19 -downdb -webfrom annovar 1000g2014oct hg19/",
-             "-buildver hg19 -downdb -webfrom annovar snp138 hg19/",
-             "-buildver hg19 -downdb -webfrom annovar dbnsfp30a hg19/"  # lib30 update! dbnsfp30a
+databases = ["-buildver " + buildversion + " -downdb -webfrom annovar refGene " + buildversion,
+             "-buildver " + buildversion + " -downdb cytoBand " + buildversion,
+             "-buildver " + buildversion + " -downdb -webfrom annovar esp6500siv2_all " + buildversion,
+             "-buildver " + buildversion + " -downdb -webfrom annovar avsnp147 " + buildversion,  # snp138
+             "-buildver " + buildversion + " -downdb -webfrom annovar dbnsfp30a " + buildversion
              ]
 
-if args.fast:
-    if not os.path.isfile("hg19/hg19_refGene.txt"):
-        print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
-        p.communicate()
 
-    if not os.path.isfile("hg19/hg19_refGene.txt"):
-        print "download failed! Please try again or download the file directly: "
-        sys.exit(0)
+if not os.path.isfile(buildversion + "/" + buildversion + "_refGene.txt"):
+    print "downloading dependencies for " + buildversion + "..."
+    p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
+    p.communicate()
 
-    if not os.path.isfile("hg19/hg19_dbnsfp30a.txt"):
-        print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
-        p.communicate()
+if not os.path.isfile(buildversion + "/" + buildversion + "_refGene.txt"):
+    print "download failed! Please try again or download the file directly with the link above "
+    sys.exit(0)
 
-    if not os.path.isfile("hg19/hg19_dbnsfp30a.txt"):
-        print "download failed! Please try again or download the file directly: "
-        sys.exit(0)
+if not os.path.isfile(buildversion + "/" + buildversion + "_dbnsfp30a.txt"):
+    print "downloading dependencies for " + buildversion + "..."
+    p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
+    p.communicate()
 
-else:
-    if not os.path.isfile("hg19/hg19_refGene.txt"):
-        print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
-        p.communicate()
+if not os.path.isfile(buildversion + "/" + buildversion + "_dbnsfp30a.txt"):
+    print "download failed! Please try again or download the file directly with the link above "
+    sys.exit(0)
 
-    if not os.path.isfile("hg19/hg19_refGene.txt"):
-        print "download failed! Please try again or download the file directly: "
-        sys.exit(0)
-
-    if not os.path.isfile("hg19/hg19_cytoBand.txt"):
-        print "downloading dependencies..."
+if not args.fast:
+    if not os.path.isfile(buildversion + "/" + buildversion + "_cytoBand.txt"):
+        print "downloading dependencies for " + buildversion + "..."
         p = subprocess.Popen([annotate_variation + databases[1]], shell=True)
         p.communicate()
 
-    if not os.path.isfile("hg19/hg19_cytoBand.txt"):
-        print "download failed! Please try again or download the file directly: "
+    if not os.path.isfile(buildversion + "/" + buildversion + "_cytoBand.txt"):
+        print "download failed! Please try again or download the file directly with the link above "
         sys.exit(0)
 
-    if not os.path.isfile("hg19/hg19_esp6500siv2_all.txt"):
-        print "downloading dependencies..."
+    if not os.path.isfile(buildversion + "/" + buildversion + "_esp6500siv2_all.txt"):
+        print "downloading dependencies for " + buildversion + "..."
         p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
         p.communicate()
 
-    if not os.path.isfile("hg19/hg19_esp6500siv2_all.txt"):
-        print "download failed! Please try again or download the file directly: "
+    if not os.path.isfile(buildversion + "/" + buildversion + "_esp6500siv2_all.txt"):
+        print "download failed! Please try again or download the file directly with the link above "
         sys.exit(0)
 
-    if not os.path.isfile("hg19/hg19_snp138.txt"):
-        print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
+    if not os.path.isfile(buildversion + "/" + buildversion + "_avsnp147.txt"):
+        print "downloading dependencies for " + buildversion + "..."
+        p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
         p.communicate()
 
-    if not os.path.isfile("hg19/hg19_snp138.txt"):
-        print "download failed! Please try again or download the file directly: "
+    if not os.path.isfile(buildversion + "/" + buildversion + "_avsnp147.txt"):
+        print "download failed! Please try again or download the file directly with the link above "
         sys.exit(0)
 
-    if not os.path.isfile("hg19/hg19_dbnsfp30a.txt"):
-        print "downloading dependencies..."
-        p = subprocess.Popen([annotate_variation + databases[5]], shell=True)
-        p.communicate()
-
-    if not os.path.isfile("hg19/hg19_dbnsfp30a.txt"):
-        print "download failed! Please try again or download the file directly: "
-        sys.exit(0)
 
 # annotate the SNPs ###
 print "annotating the SNPs"
@@ -300,12 +289,12 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 # print dir_path
 
 if args.fast:
-    params = "amplicon_variants_tab.csv " + ad + " -buildver hg19 -out myanno -remove -protocol " \
-                                                               "refGene,dbnsfp30a -operation g,f -nastring ."  #snp138
+    params = "amplicon_variants_tab.csv " + buildversion + " -buildver " + buildversion + " -out myanno -remove -protocol " \
+                                                               "refGene,dbnsfp30a -operation g,f -nastring ."
 else:
-    params = "amplicon_variants_tab.csv " + ad + " -buildver hg19 -out myanno -remove -protocol " \
-                                                               "refGene,cytoBand,esp6500siv2_all,snp138,dbnsfp30a " \
-                                                               "-operation g,r,f,f,f -nastring . "
+    params = "amplicon_variants_tab.csv " + buildversion + " -buildver " + buildversion + " -out myanno -remove -protocol " \
+                                                               "refGene,cytoBand,esp6500siv2_all,avsnp147,dbnsfp30a " \
+                                                               "-operation g,r,f,f,f -nastring . "  #snp138
 if args.quiet:
     FNULL = open(os.devnull, 'w')
     p = subprocess.Popen([annovar_pl + params], shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
@@ -319,7 +308,9 @@ p.communicate()
 annovar = []
 l_count = 0
 failed = 1
-with open('myanno.hg19_multianno.txt', 'r') as annovar_file:
+a_file = "myanno." + buildversion + "_multianno.txt"  # 'myanno.hg19_multianno.txt'
+
+with open(a_file, 'r') as annovar_file:
     for row in annovar_file:
         # filter header
         if l_count != 0:
@@ -522,7 +513,7 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
                                       annotation._AnnovarParser__AAChange_refGene,
                                       annotation._AnnovarParser__cytoBand,
                                       annotation._AnnovarParser__esp6500siv2_all,
-                                      annotation._AnnovarParser__snp138,
+                                      annotation._AnnovarParser__avsnp147,
                                       annotation._AnnovarParser__SIFT_score,
                                       annotation._AnnovarParser__SIFT_pred,
                                       annotation._AnnovarParser__Polyphen2_HDIV_score,
