@@ -281,7 +281,14 @@ The generated outputfile `output.txt`, which contains the patients annotated SNP
 | 15 | chr20 | 31022959  | T   | C   | SNV      | Coding                                     | missense_variant                                                                                    | rs6058694            |             |                | 100  | 997      | 17877       | 39         | 17831     | -100.0      | 0                          | -4.18               | 652             | Tolerated        |
 | 16 | chr21 | 36252877  | C   | T   | SNV      | Coding                                     | missense_variant                                                                                    |                      | COSM96546   |                | 100  | 465      | 8562        | 4573       | 3978      | -100.0      | 991                        | 5.31                | 5748            | Deleterious      |
 | 17 | chrX  | 39933339  | A   | G   | SNV      | Coding                                     | synonymous_variant                                                                                  | rs5917933            |             |                | 100  | 998      | 14616       | 18         | 14592     | -100.0      | .                          | .                   | .               | .                |
-| 18 | chrX  | 123195650 | A   | T   | SNV      | Coding                                     | missense_variant                                                                                    |                      |             |                | 47   | 73       | 109         | 100        | 8         | -100.0      | 303                        | 4.77                | 4932            | Tolerated        |
+| 18 | chrX  | 123195650 | A   | T   | SNV      | Coding                                     | missense_variant                                                                                    |                      |             |                | 47   | 73      
+ | 109         | 100        | 8         | -100.0      | 303                        | 4.77                | 4932            | Tolerated        |
+
+
+Known bugs and missing features
+-------------
+Some deletions are not handled correctly and sometimes there is no score for the deletion available.
+Also there is no scoring system for non coding variants, this may change later. 
 
 References
 -------------
