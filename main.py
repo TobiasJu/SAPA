@@ -140,7 +140,7 @@ with open(args.input_file) as csvfile:
         variant_lines = csv.reader(csvfile, delimiter=',', quotechar='"')
 
     # skip header if there
-    has_header = csv.Sniffer().has_header(csvfile.read(100))
+    has_header = csv.Sniffer().has_header(csvfile.read(25)) # 100
     csvfile.seek(0)  # rewind
     incsv = csv.reader(csvfile)
     if has_header:
@@ -163,14 +163,14 @@ with open(args.input_file) as csvfile:
                             variant_line[4], context, consequences, variant_line[7], variant_line[8], variant_line[9],
                             int(variant_line[10]), variant_line[11], variant_line[12], variant_line[13],
                             variant_line[14], variant_line[15]))
-        elif len(variant_line) < 16:
+        elif 16 > len(variant_line) > 4:
             success_count += 1
             # context = variant_line[5].split(",")
             # consequences = variant_line[6].split(",")
             snps.append(SNP(l_count, variant_line[0], int(variant_line[1]), variant_line[2], variant_line[3],
-                            ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."))
+                            variant_line[4], variant_line[5], ".", ".", ".", ".", ".", ".", ".", ".", ".", "."))
         else:
-            print "INVALID DATA (length < 16) in Line {}".format(l_count)
+            print "INVALID DATA (16 >= length > 4) in Line {}".format(l_count)
             print variant_line
             fail_count += 1
         l_count += 1
@@ -230,7 +230,7 @@ annotate_variation = "./perl/annotate_variation.pl "
 databases = ["-buildver " + buildversion + " -downdb -webfrom annovar refGene " + buildversion,
              "-buildver " + buildversion + " -downdb cytoBand " + buildversion,
              "-buildver " + buildversion + " -downdb -webfrom annovar esp6500siv2_all " + buildversion,
-             "-buildver " + buildversion + " -downdb -webfrom annovar avsnp147 " + buildversion,  # snp138
+             "-buildver " + buildversion + " -downdb -webfrom annovar avsnp147 " + buildversion,  # avsnp147
              "-buildver " + buildversion + " -downdb -webfrom annovar dbnsfp30a " + buildversion
              ]
 
@@ -294,7 +294,7 @@ if args.fast:
 else:
     params = "amplicon_variants_tab.csv " + buildversion + " -buildver " + buildversion + " -out myanno -remove -protocol " \
                                                                "refGene,cytoBand,esp6500siv2_all,avsnp147,dbnsfp30a " \
-                                                               "-operation g,r,f,f,f -nastring . "  #snp138
+                                                               "-operation g,r,f,f,f -nastring . "  #avsnp147
 if args.quiet:
     FNULL = open(os.devnull, 'w')
     p = subprocess.Popen([annovar_pl + params], shell=True, stdout=FNULL, stderr=subprocess.STDOUT)

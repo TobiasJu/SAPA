@@ -149,9 +149,3 @@ class AnnovarParser:
                          self.__phyloP46way_placental,
                          self.__phyloP100way_vertebrate,
                          self.__SiPhy_29way_logOdds)
-
-#                         self.__g2014oct_all,
-#                         self.__g2014oct_afr,
-#                         self.__g2014oct_eas,
-#                         self.__g2014oct_eur,
-0Suchvorgang...
