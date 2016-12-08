@@ -566,6 +566,7 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
                                       annotation._AnnovarParser__MetaLR_score,
                                       annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_raw
                                       ))
+    # check for final prediction ###
     if annotation._AnnovarParser__MetaLR_pred == "T":
         export_string += "Tolerated"
     elif annotation._AnnovarParser__MetaLR_pred == "D":
@@ -573,14 +574,21 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
     elif annotation._AnnovarParser__MetaLR_pred == "P":
         export_string += "possibly damaging"
     elif annotation._AnnovarParser__MetaLR_pred == ".":
-        if "Intron" in snp.get_context():
-            export_string += "Tolerated (Intron)"
-        elif "Intergenic" in snp.get_context():
-            export_string += "Tolerated (Intergenic)"
-        elif "Coding" in snp.get_context() and "synonymous_variant" in snp.get_consequences():
-            export_string += "Tolerated (synonymous_variant)"
+        # no Meta Socore available
+        if annotation._AnnovarParser__fathmm_MKL_coding_pred == "D":
+            export_string += "Deleterious (FATHMM)"
+        elif not annotation._AnnovarParser__DANN_score == ".":
+            if float(annotation._AnnovarParser__DANN_score) > 0.96:
+                export_string += "Deleterious (DANN)"
         else:
-            export_string += "."
+            if "Intron" in snp.get_context():
+                export_string += "Tolerated (Intron)"
+            elif "Intergenic" in snp.get_context():
+                export_string += "Tolerated (Intergenic)"
+            elif "Coding" in snp.get_context() and "synonymous_variant" in snp.get_consequences():
+                export_string += "Tolerated (synonymous_variant)"
+            else:
+                export_string += "."
 
     # change digit format to german
     export_string = export_string.replace('.', ',')
