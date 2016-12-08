@@ -4,9 +4,9 @@ import sys
 print "converting file to SAPA format"
 
 counter = 0
-clinvar = open('converted_hg38_pathogenic.csv', 'w')
+clinvar = open('converted_hg38_benign.csv', 'w')
 clinvar.write("Chr,Pos,Ref,Alt,Clinical significance,Gene\n")
-with open("clinvar_pathogenic_snp.txt") as csvfile:
+with open("clinvar_hg38_benign.txt") as csvfile:
     variant_lines = csv.reader(csvfile, delimiter='\t', quotechar='"')
     # skip header if there
     has_header = csv.Sniffer().has_header(csvfile.read(100))
@@ -39,7 +39,7 @@ with open("clinvar_pathogenic_snp.txt") as csvfile:
                 export_string += chr+","+pos+","+ref+","+alt+","+clin_sig[0]+","+gene+"\n"
                 clinvar.write(export_string)
 
-        if counter == 100:
+        if counter == 1000:
             break
 clinvar.close()
 print "END"
