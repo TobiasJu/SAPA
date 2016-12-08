@@ -48,10 +48,10 @@ Parameter
 	> e.g. `-t "'"`
 	this will set the text delimiter to an apostrophe, if a column contains multiple entries 
 
-`-id, --input_directory` 
-: hg19 (GRCh37) database directory (default /hg19)
-	> e.g. `-id humandb/`
-	set the input directory to be named humandb 
+`-b, --buildver` 
+: buildversion e.g hg19 (GRCh37) or hg38 (GRCh38) database (default hg19)
+	> e.g. `-b hg38`
+	set the reference genome to hg38 
 
 `-o, --output_file`
 : output file name (default output.txt)
@@ -80,38 +80,43 @@ No worries your input file will not be overwritten, a new file with the data fro
 #### <i class="icon-pencil"></i> Scoring explained (dbnsfp30a)
 
 - **SIFT**
-	- Score	ranges from 0 to 1. The amino acid substitution is predicted damaging is the score is <= 0.05, and tolerated if the score is > 0.05.
+	- Score	ranges from 0 to 1. 
+	- The amino acid substitution is predicted damaging is the score is <= 0.05, and tolerated if the score is > 0.05.
 	- http://sift.jcvi.org/www/SIFT_help.html
 	
-- **Polyphen2 **
+- **Polyphen2**
 	- Scores ranges from 0 to 1
 	- D: Probably damaging (>=0.957), P: possibly damaging (0.453<=pp2_hdiv<=0.956); B: benign (pp2_hdiv<=0.452)
 	- http://genetics.bwh.harvard.edu/pph2/dokuwiki/overview
 
-- **LRT ** 
+- **LRT** 
 	- Scores ranges from 0 to 1
+	- Lower scores are more deleterious
 	- D: Deleterious; N: Neutral; U: Unknown
 	- https://www.researchgate.net/profile/Justin_Fay/publication/26671245_Identification_of_deleterious_mutations_within_three_human_genomes/links/00b49529eabbc6aa2b000000.pdf
 
-- **MutationTaster **
+- **MutationTaster**
 	- Scores ranges from 0 to 1
+	-  Deleterious threshold > 0.5
 	- 	A = "disease_causing_automatic"; D =“disease_causing”; N = “polymorphism”; P = “polymorphism_automatic”
 	- http://www.mutationtaster.org/
 
 
 - **MutationAssessor**
 	- Scores ranges from -5.545 to 5.975
+	- Deleterious threshold > 0.65
 	- H: high; M: medium; L: low; N: neutral. H/M means functional and L/N means non-functional
 	- http://mutationassessor.org/r3/
 
 
 - **FATHMM**
-	- Scores ranges from -16.13 to 10.64 
+	- Scores ranges from -16.13 to 10.64
+	- Deleterious threshold >= 0.45
 	- D: Deleterious; T: Tolerated
 	- http://fathmm.biocompute.org.uk/
 
 
-- **PROVEAN **
+- **PROVEAN**
 	- Scores ranges from -13 to 4
 	- Deleterious PROVEAN < -2,5 ; Tolerated PROVEAN > -2,5 
 	- http://provean.jcvi.org/about.php
@@ -123,13 +128,15 @@ No worries your input file will not be overwritten, a new file with the data fro
 	- http://karchinlab.org/apps/appVest.html
 
 
-- **CADD**
-	- Scores ranges from ?? to ??
+- **CADD_raw**
+	- raw CADD score
 	- The larger the score the more likely the SNP has damaging effect.
 	- http://cadd.gs.washington.edu/
 
 - **CADD_phred**
-	- This is phred-like rank score based on whole genome CADD raw scores.
+	- Scores range from 0 to 60
+	- Deleterious threshold > 15
+	- This is [phred-like rank score](https://en.wikipedia.org/wiki/Phred_quality_score) based on whole genome CADD raw scores.
 	- The larger the score the more likely the SNP has damaging effect.
 
 - **DANN**
@@ -149,7 +156,7 @@ No worries your input file will not be overwritten, a new file with the data fro
 	- Uses a radial SVM model to train prediction model, using all available scoring algorithm normalized scores
 	- http://annovar.openbioinformatics.org/en/latest/user-guide/filter/#-metasvm-annotation
 
-- **MetaLR **
+- **MetaLR**
 	- Scores ranges from 0 to 1
 	- D: Deleterious; T: Tolerated
 	- very similar to MetaSVM, with similar performance
@@ -160,6 +167,7 @@ No worries your input file will not be overwritten, a new file with the data fro
 	- http://compgen.cshl.edu/fitCons/
 
 - **GERP RS**
+	- RS = (rejected substitutions) 
 	- Scores ranges from -12.3 to 6.17
 	- The larger the score, the more conserved the site.
 	- http://mendel.stanford.edu/SidowLab/downloads/gerp/
