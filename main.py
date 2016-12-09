@@ -483,8 +483,9 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
         if args.detail:
             header = str(snp.print_header()) + str(annotation.print_header() + "final prediction\t")
         else:
-            header = str(snp.print_header()) + "Gene\tfunction prediction scores [0-1]\tconservation scores\t" \
-                                               "ensemble scores\tfinal prediction\t"
+            header = str(snp.print_header()) + "Gene\tfunction prediction scores [0-1]\tconservation scores[-12.3-" \
+                                               "6.17]\t" \
+                                               "ensemble scores[0-60]\tfinal prediction\t"
         target.write(header)
         target.write("\n")
     # write rows in table
@@ -564,7 +565,7 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
                                       snp.get_altDepth(), snp.get_strandBias(),
                                       annotation._AnnovarParser__Gene_refGene,
                                       annotation._AnnovarParser__MetaLR_score,
-                                      annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_raw
+                                      annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_phred
                                       ))
     # check for final prediction ###
     if annotation._AnnovarParser__MetaLR_pred == "T":
@@ -581,7 +582,11 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
             if float(annotation._AnnovarParser__DANN_score) > 0.96:
                 export_string += "Deleterious (DANN)"
         else:
-            if "Intron" in snp.get_context():
+            if annotation._AnnovarParser__ExonicFunc_refGene == "synonymous SNV":
+                export_string += "Tolerated (synonymous)"
+            elif "intronic" in annotation._AnnovarParser__Func_refGene:
+                export_string += "Tolerated (Intron)"
+            elif "Intron" in snp.get_context():
                 export_string += "Tolerated (Intron)"
             elif "Intergenic" in snp.get_context():
                 export_string += "Tolerated (Intergenic)"
