@@ -49,17 +49,51 @@ class AnnovarParser:
     __phastCons7way_vertebrate = 0.0
     __phastCons20way_mammalian = 0.0
     __SiPhy_29way_logOdds = 0.0
-    # hypothetical max scores
-    __SIFT_max = 10.0
-    __Polyphen2_HDIV_max = 10.0
-    __Polyphen2_HVAR_max = 10.0
-    __LRT_max = 10.0
-    __MutationTaster_max = 10.0
-    __MutationAssessor_max = 10.0
-    __FATHMM_max = 10.0
-    __RadialSVM_max = 0.0
-    __LR_max = 10.0
-    __VEST3_max = 10.0
+    # observed max scores
+    __SIFT_max = 1.0
+    __Polyphen2_HDIV_max = 1.0
+    __Polyphen2_HVAR_max = 1.0
+    __LRT_max = 1.0
+    __MutationTaster_max = 1.0
+    __MutationAssessor_max = 5.975
+    __FATHMM_max = 10.64
+    __PROVEAN_max = 4
+    __VEST3_max = 1.0
+    __CADD_max = 60
+    __DANN_max = 0.99
+    __fathmm_MKL_coding_max = 1.0
+    __MetaSVM_max = 1.0
+    __MetaLR_max = 1.0
+    __integrated_fitCons_max = 0.80
+    __GERP_max = 6.17
+    __phyloP7way_vertebrate_max = 10.0  # ??
+    __phyloP20way_mammalian_max = 10.0  # ??
+    __phastCons7way_vertebrate_max = 1.0
+    __phastCons20way_mammalian_max = 1.0
+    __SiPhy_29way_logOdds_max = 38.0
+    # minimal scores
+    __SIFT_min = 0
+    __Polyphen2_HDIV_min = 0
+    __Polyphen2_HVAR_min = 0
+    __LRT_min = 0
+    __MutationTaster_min = 0
+    __MutationAssessor_min = -5.545
+    __FATHMM_min = -16.3
+    __PROVEAN_min = -13
+    __VEST3_min = 0
+    __CADD_min = 0
+    __DANN_min = 0.01
+    __fathmm_MKL_coding_min = 0
+    __MetaSVM_min = -1
+    __MetaLR_min = 0
+    __integrated_fitCons_min = 0.
+    __GERP_min = -12.3
+    __phyloP7way_vertebrate_min = 10.0  # ??
+    __phyloP20way_mammalian_min = 10.0  # ??
+    __phastCons7way_vertebrate_min = 0
+    __phastCons20way_mammalian_min = 0
+    __SiPhy_29way_logOdds_min = 0
+
 
     # constructor
     def __init__(self, Chr, Start, End, Ref, Alt, Func_refGene, Gene_refGene, GeneDetail_refGene, ExonicFunc_refGene,
@@ -132,7 +166,7 @@ class AnnovarParser:
 
     def export_tab(self):
         return "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
-               "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
+               "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t" \
                "".format(self.__Chr,
                          self.__Start,
                          self.__End,
@@ -160,19 +194,13 @@ class AnnovarParser:
                          self.__MutationAssessor_pred,
                          self.__FATHMM_score,
                          self.__FATHMM_pred,
-                         self.__RadialSVM_score,
-                         self.__RadialSVM_pred,
-                         self.__LR_score,
-                         self.__LR_pred,
+                         self.__MetaSVM_score,
+                         self.__MetaSVM_pred,
+                         self.__MetaLR_score,
+                         self.__MetaLR_pred,
                          self.__VEST3_score,
                          self.__CADD_raw,
                          self.__CADD_phred,
                          self.__GERP_RS,
-                         self.__phyloP46way_placental,
-                         self.__phyloP100way_vertebrate,
-                         self.__SiPhy_29way_logOdds)
 
-#                         self.__g2014oct_all,
-#                         self.__g2014oct_afr,
-#                         self.__g2014oct_eas,
-#                         self.__g2014oct_eur,
+                         self.__SiPhy_29way_logOdds)
