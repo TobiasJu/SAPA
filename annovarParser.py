@@ -88,8 +88,8 @@ class AnnovarParser:
     __MetaLR_min = 0
     __integrated_fitCons_min = 0.
     __GERP_min = -12.3
-    __phyloP7way_vertebrate_min = 10.0  # ??
-    __phyloP20way_mammalian_min = 10.0  # ??
+    __phyloP7way_vertebrate_min = 0  # ??
+    __phyloP20way_mammalian_min = 0  # ??
     __phastCons7way_vertebrate_min = 0
     __phastCons20way_mammalian_min = 0
     __SiPhy_29way_logOdds_min = 0

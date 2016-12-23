@@ -1,11 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+import sys
+
+try:
+    import setuptools
+except ImportError, e:
+    print "PiP is not installed"
+    sys.exit(1)
+else:
+    print "PiP is installed"
+
+try:
+    import dominate
+except ImportError, e:
+    pass
+    print "Dominate is missing"
+    sys.exit(1)
+
+from dominate.tags import *
+from os.path import exists
 import re
 import csv
-import sys
 import os
 import collections
-from os.path import exists
 import subprocess
 import ensembl_rest
 import itertools
@@ -106,11 +124,6 @@ if not args.input_file:
     parser.print_help()
     sys.exit(0)
 
-# if not args.input_directory:
-#    print "ERROR, please enter a input directory"
-#    parser.print_help()
-#    sys.exit(0)
-
 if not args.quiet:
     print args
 
@@ -122,9 +135,6 @@ elif args.buildver == "dm3" or args.buildver == "mm9":
 else:
     buildversion = "hg19"
     print "buildversion is GRCh37/hg19"
-
-# if args.verbose:
-# print "detailed output selected"
 
 # load the input file into a mutation Objects from the given patient Data ###
 fail_count = 0
@@ -140,7 +150,7 @@ with open(args.input_file) as csvfile:
         variant_lines = csv.reader(csvfile, delimiter=',', quotechar='"')
 
     # skip header if there
-    has_header = csv.Sniffer().has_header(csvfile.read(25)) # 100
+    has_header = csv.Sniffer().has_header(csvfile.read(25))  # 100
     csvfile.seek(0)  # rewind
     incsv = csv.reader(csvfile)
     if has_header:
@@ -234,11 +244,10 @@ databases = ["-buildver " + buildversion + " -downdb -webfrom annovar refGene " 
              "-buildver " + buildversion + " -downdb -webfrom annovar dbnsfp30a " + buildversion
              ]
 
-
 if not os.path.isfile(buildversion + "/" + buildversion + "_refGene.txt"):
     print "downloading dependencies for " + buildversion + "..."
-    p = subprocess.Popen([annotate_variation + databases[0]], shell=True)
-    p.communicate()
+    popen = subprocess.Popen([annotate_variation + databases[0]], shell=True)
+    popen.communicate()
 
 if not os.path.isfile(buildversion + "/" + buildversion + "_refGene.txt"):
     print "download failed! Please try again or download the file directly with the link above "
@@ -246,8 +255,8 @@ if not os.path.isfile(buildversion + "/" + buildversion + "_refGene.txt"):
 
 if not os.path.isfile(buildversion + "/" + buildversion + "_dbnsfp30a.txt"):
     print "downloading dependencies for " + buildversion + "..."
-    p = subprocess.Popen([annotate_variation + databases[4]], shell=True)
-    p.communicate()
+    popen = subprocess.Popen([annotate_variation + databases[4]], shell=True)
+    popen.communicate()
 
 if not os.path.isfile(buildversion + "/" + buildversion + "_dbnsfp30a.txt"):
     print "download failed! Please try again or download the file directly with the link above "
@@ -256,8 +265,8 @@ if not os.path.isfile(buildversion + "/" + buildversion + "_dbnsfp30a.txt"):
 if not args.fast:
     if not os.path.isfile(buildversion + "/" + buildversion + "_cytoBand.txt"):
         print "downloading dependencies for " + buildversion + "..."
-        p = subprocess.Popen([annotate_variation + databases[1]], shell=True)
-        p.communicate()
+        popen = subprocess.Popen([annotate_variation + databases[1]], shell=True)
+        popen.communicate()
 
     if not os.path.isfile(buildversion + "/" + buildversion + "_cytoBand.txt"):
         print "download failed! Please try again or download the file directly with the link above "
@@ -265,8 +274,8 @@ if not args.fast:
 
     if not os.path.isfile(buildversion + "/" + buildversion + "_esp6500siv2_all.txt"):
         print "downloading dependencies for " + buildversion + "..."
-        p = subprocess.Popen([annotate_variation + databases[2]], shell=True)
-        p.communicate()
+        popen = subprocess.Popen([annotate_variation + databases[2]], shell=True)
+        popen.communicate()
 
     if not os.path.isfile(buildversion + "/" + buildversion + "_esp6500siv2_all.txt"):
         print "download failed! Please try again or download the file directly with the link above "
@@ -274,13 +283,12 @@ if not args.fast:
 
     if not os.path.isfile(buildversion + "/" + buildversion + "_avsnp147.txt"):
         print "downloading dependencies for " + buildversion + "..."
-        p = subprocess.Popen([annotate_variation + databases[3]], shell=True)
-        p.communicate()
+        popen = subprocess.Popen([annotate_variation + databases[3]], shell=True)
+        popen.communicate()
 
     if not os.path.isfile(buildversion + "/" + buildversion + "_avsnp147.txt"):
         print "download failed! Please try again or download the file directly with the link above "
         sys.exit(0)
-
 
 # annotate the SNPs ###
 print "annotating the SNPs"
@@ -290,19 +298,19 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 if args.fast:
     params = "amplicon_variants_tab.csv " + buildversion + " -buildver " + buildversion + " -out myanno -remove -protocol " \
-                                                               "refGene,dbnsfp30a -operation g,f -nastring ."
+                                                                                          "refGene,dbnsfp30a -operation g,f -nastring ."
 else:
     params = "amplicon_variants_tab.csv " + buildversion + " -buildver " + buildversion + " -out myanno -remove -protocol " \
-                                                               "refGene,cytoBand,esp6500siv2_all,avsnp147,dbnsfp30a " \
-                                                               "-operation g,r,f,f,f -nastring . "  #avsnp147
+                                                                                          "refGene,cytoBand,esp6500siv2_all,avsnp147,dbnsfp30a " \
+                                                                                          "-operation g,r,f,f,f -nastring . "  # avsnp147
 if args.quiet:
     FNULL = open(os.devnull, 'w')
-    p = subprocess.Popen([annovar_pl + params], shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+    popen = subprocess.Popen([annovar_pl + params], shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
 else:
     print annovar_pl + params
-    p = subprocess.Popen([annovar_pl + params], shell=True)
+    popen = subprocess.Popen([annovar_pl + params], shell=True)
 # wait until it's finished
-p.communicate()
+popen.communicate()
 
 # parse annovar file ###
 annovar = []
@@ -318,7 +326,8 @@ with open(a_file, 'r') as annovar_file:
             row = row.split("\t")
             if len(row) == 44:  # fast run
                 annovar.append(AnnovarParser(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
-                                             row[9], ".", ".", ",", row[10], row[11], row[12], row[13], row[14], row[15], row[16],
+                                             row[9], ".", ".", ",", row[10], row[11], row[12], row[13], row[14],
+                                             row[15], row[16],
                                              row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24],
                                              row[25], row[26], row[27], row[28], row[29], row[30], row[31], row[32],
                                              row[33], row[34], row[35], row[36], row[37], row[38], row[39], row[40],
@@ -357,12 +366,12 @@ for snp, annotation in zip(snps, annovar):
         snps_with_annotation[snp] = annotation
         counters += 1
 
-# iterate over annovar data and get final scores ###
-# for data in annovar:
+    # iterate over annovar data and get final scores ###
+    # for data in annovar:
     # score = data._AnnovarParser__SIFT_score
     # if score != ".":
-        # rel_score = float(data._AnnovarParser__SIFT_score) / data._AnnovarParser__SIFT_max
-        # print rel_score
+    # rel_score = float(data._AnnovarParser__SIFT_score) / data._AnnovarParser__SIFT_max
+    # print rel_score
 ###### some work to do here ####
 # sys.exit(0)
 
@@ -472,11 +481,16 @@ for snp in snps:
 if not args.output_file:
     target = open("output.csv", 'w')
     print "writing export in: output.csv"
+    target_html = open("output.html", 'w')
+    print "writing html table in: output.html"
 else:
     target = open(args.output_file, 'w')
     print "writing export in: " + args.output_file
+    target_html = open(args.output_file + ".html", 'w')
+    print "writing html table in: " + args.output_file + ".html"
 export_cnt = 0
 ordered_snps_with_annotation = collections.OrderedDict(sorted(snps_with_annotation.items()))
+
 for snp, annotation in ordered_snps_with_annotation.iteritems():
     # write header first:
     if export_cnt == 0:
@@ -607,5 +621,162 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
     export_cnt += 1
 target.close()
 
+# HTML page generation ###
+doc = dominate.document(title='SAPA output')
+
+with doc.head:
+    link(rel='stylesheet', href='style.css')
+    script(type='text/javascript', src='script.js')
+
+with doc.add(body()).add(div(id='content')):
+    h1('SAPA - SNP Annotation Programm for AML')
+    p('Here are all annotated SNPs listed, see GIT for details')
+    with div(id='header').add(ol()):
+        for i in ['GIT']:
+            li(a(i.title(), href='https://github.com/Twinstar2/SAPA'))
+
+    with table().add(tbody()):
+        l = tr()
+        export_cnt = 0
+        for snp, annotation in ordered_snps_with_annotation.iteritems():
+            # write header first:
+
+            if export_cnt == 0:
+                if args.detail:
+                    header = str(snp.print_header()) + str(annotation.print_header() + "final prediction\t")
+                else:
+                    header = str(snp.print_header()) + "Gene\tfunction prediction scores [0-1]\tconservation scores" \
+                                                       "[-12.3-6.17]\t" \
+                                                       "ensemble scores[0-60]\tfinal prediction\t"
+                with table().add(thead()):
+                    split_header = header.split("\t")
+                    for i in split_header:
+                        l += td(i)
+                    l += tr()
+
+            # write rows in table
+            try:
+                altFreq = snp.get_altFreq() * 100
+            except ValueError:
+                altFreq = snp.get_altFreq()
+
+            if args.detail:
+                for i in [snp.get_id(), snp.get_chr(), snp.get_pos(), snp.get_ref(), snp.get_alt(),
+                          snp.get_type(), ','.join(snp.get_context()), ','.join(snp.get_consequences()),
+                          snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(), snp.get_qual(),
+                          altFreq, snp.get_totalDepth(), snp.get_refDepth(),
+                          snp.get_altDepth(), snp.get_strandBias(),
+                          annotation._AnnovarParser__Chr,
+                          annotation._AnnovarParser__Start,
+                          annotation._AnnovarParser__End,
+                          annotation._AnnovarParser__Ref,
+                          annotation._AnnovarParser__Alt,
+                          annotation._AnnovarParser__Func_refGene,
+                          annotation._AnnovarParser__Gene_refGene,
+                          annotation._AnnovarParser__GeneDetail_refGene,
+                          annotation._AnnovarParser__ExonicFunc_refGene,
+                          annotation._AnnovarParser__AAChange_refGene,
+                          annotation._AnnovarParser__cytoBand,
+                          annotation._AnnovarParser__esp6500siv2_all,
+                          annotation._AnnovarParser__avsnp147,
+                          annotation._AnnovarParser__SIFT_score,
+                          annotation._AnnovarParser__SIFT_pred,
+                          annotation._AnnovarParser__Polyphen2_HDIV_score,
+                          annotation._AnnovarParser__Polyphen2_HDIV_pred,
+                          annotation._AnnovarParser__Polyphen2_HVAR_score,
+                          annotation._AnnovarParser__Polyphen2_HVAR_pred,
+                          annotation._AnnovarParser__LRT_score,
+                          annotation._AnnovarParser__LRT_pred,
+                          annotation._AnnovarParser__MutationTaster_score,
+                          annotation._AnnovarParser__MutationTaster_pred,
+                          annotation._AnnovarParser__MutationAssessor_score,
+                          annotation._AnnovarParser__MutationAssessor_pred,
+                          annotation._AnnovarParser__FATHMM_score,
+                          annotation._AnnovarParser__FATHMM_pred,
+                          annotation._AnnovarParser__PROVEAN_score,
+                          annotation._AnnovarParser__PROVEAN_pred,
+                          annotation._AnnovarParser__VEST3_score,
+                          annotation._AnnovarParser__CADD_raw,
+                          annotation._AnnovarParser__CADD_phred,
+                          annotation._AnnovarParser__DANN_score,
+                          annotation._AnnovarParser__fathmm_MKL_coding_score,
+                          annotation._AnnovarParser__fathmm_MKL_coding_pred,
+                          annotation._AnnovarParser__MetaSVM_score,
+                          annotation._AnnovarParser__MetaSVM_pred,
+                          annotation._AnnovarParser__MetaLR_score,
+                          annotation._AnnovarParser__MetaLR_pred,
+                          annotation._AnnovarParser__integrated_fitCons_score,
+                          annotation._AnnovarParser__integrated_confidence_value,
+                          annotation._AnnovarParser__GERP_RS,
+                          annotation._AnnovarParser__phyloP7way_vertebrate,
+                          annotation._AnnovarParser__phyloP20way_mammalian,
+                          annotation._AnnovarParser__phastCons7way_vertebrate,
+                          annotation._AnnovarParser__phastCons20way_mammalian,
+                          annotation._AnnovarParser__SiPhy_29way_logOdds
+                          ]:
+                    # snp.get_geneChromosome(),
+                    # snp.get_gene(), snp.get_geneSyn(), snp.get_geneDesc(),
+                    # snp.get_proteinClass(), snp.get_geneStart(), snp.get_geneEnd()
+                    # ))
+                    l += td(i)
+            else:
+                for i in [snp.get_id(), snp.get_chr(), snp.get_pos(),
+                          snp.get_ref(), snp.get_alt(), snp.get_type(),
+                          ','.join(snp.get_context()), ','.join(snp.get_consequences()),
+                          snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(),
+                          snp.get_qual(), snp.get_altFreq(),
+                          snp.get_totalDepth(), snp.get_refDepth(),
+                          snp.get_altDepth(), snp.get_strandBias(),
+                          annotation._AnnovarParser__Gene_refGene,
+                          annotation._AnnovarParser__MetaLR_score,
+                          annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_phred
+                          ]:
+                    l += td(i)
+            l += tr()
+            export_string = ""
+            # check for final prediction ###
+            if annotation._AnnovarParser__MetaLR_pred == "T":
+                export_string += "Tolerated"
+            elif annotation._AnnovarParser__MetaLR_pred == "D":
+                export_string += "Deleterious"
+            elif annotation._AnnovarParser__MetaLR_pred == "P":
+                export_string += "possibly damaging"
+            elif annotation._AnnovarParser__MetaLR_pred == ".":
+                # no Meta Socore available
+                if annotation._AnnovarParser__fathmm_MKL_coding_pred == "D":
+                    export_string += "Deleterious (FATHMM)"
+                elif not annotation._AnnovarParser__DANN_score == ".":
+                    if float(annotation._AnnovarParser__DANN_score) > 0.96:
+                        export_string += "Deleterious (DANN)"
+                else:
+                    if annotation._AnnovarParser__ExonicFunc_refGene == "synonymous SNV":
+                        export_string += "Tolerated (synonymous)"
+                    elif "intronic" in annotation._AnnovarParser__Func_refGene:
+                        export_string += "Tolerated (Intron)"
+                    elif "Intron" in snp.get_context():
+                        export_string += "Tolerated (Intron)"
+                    elif "Intergenic" in snp.get_context():
+                        export_string += "Tolerated (Intergenic)"
+                    elif "Coding" in snp.get_context() and "synonymous_variant" in snp.get_consequences():
+                        export_string += "Tolerated (synonymous_variant)"
+                    else:
+                        export_string += "."
+
+            # change digit format to german
+            export_string = export_string.replace('.', ',')
+            # filter deleterious only
+            if args.filter_deleterious and annotation._AnnovarParser__MetaLR_pred == "D":
+                #target.write(export_string)
+                #target.write("\n")
+                print "filtering"
+            if not args.filter_deleterious:
+                #target.write(export_string)
+                #target.write("\n")
+                print "filtering"
+            export_cnt += 1
+
+target_html.write(doc.render())
+print(doc.render())
+target_html.close()
 
 print "FINISHED"
