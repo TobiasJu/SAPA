@@ -1,4 +1,5 @@
-data/c*
+*.html
+data/c:x*
 data/P*
 data/truseq-*
 data/test*
