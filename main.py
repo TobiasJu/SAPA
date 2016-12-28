@@ -630,11 +630,14 @@ with doc.head:
     link(rel='stylesheet', href='https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css')
     script(type='text/javascript', src='https://code.jquery.com/jquery-1.12.4.js')
     script(type='text/javascript', src='https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js')
+    script(type='text/javascript', src='https://cdn.datatables.net/plug-ins/1.10.13/sorting/natural.js')
     script(type='text/javascript', src="./resources/main.js")
 
 with doc.add(div(id='content')):
     h1('SAPA - SNP Annotation Programm for AML')
-    p('Here are all annotated SNPs listed, see <a href="https://github.com/Twinstar2/SAPA">GIT</a> for details')
+    info = p('All annotated SNPs are listed below, see ')
+    info.add(a("SAPA GIT", href='https://github.com/Twinstar2/SAPA'))
+    info.add(" for details.")
 
     with table(id="resultTable", border='1'):
         # line = tr()
@@ -738,18 +741,31 @@ with doc.add(div(id='content')):
 
                 if (i == annotation._AnnovarParser__MetaLR_score and i != "."):
                     MetaLR_diff = annotation._AnnovarParser__MetaLR_max - annotation._AnnovarParser__MetaLR_min
-                    print "MetaLR diff:"
-                    print MetaLR_diff
                     MetaLR_div = float(
                         annotation._AnnovarParser__MetaLR_score) / MetaLR_diff
                     red = 255 * MetaLR_div
                     green = 255 - red
-
                     blue = 0
                     colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
                     row += td(i, style='background-color: rgb(' + colorstring + ")")
-                #elif (i == annotation._AnnovarParser__GERP_RS and i != "."):
-                #    green = 0
+                elif (i == annotation._AnnovarParser__GERP_RS and i != "."):
+                    GERP_diff = annotation._AnnovarParser__GERP_RS_max - annotation._AnnovarParser__GERP_RS_min
+                    GERP_div = float(
+                        annotation._AnnovarParser__GERP_RS) / GERP_diff
+                    red = 255 * GERP_div
+                    green = 255 - red
+                    blue = 0
+                    colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
+                    row += td(i, style='background-color: rgb(' + colorstring + ")")
+                elif (i == annotation._AnnovarParser__CADD_phred and i != "."):
+                    CADD_phred_diff = annotation._AnnovarParser__CADD_phred_max - annotation._AnnovarParser__CADD_phred_min
+                    CADD_phred_div = float(
+                        annotation._AnnovarParser__CADD_phred) / CADD_phred_diff
+                    red = 255 * CADD_phred_div
+                    green = 255 - red
+                    blue = 0
+                    colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
+                    row += td(i, style='background-color: rgb(' + colorstring + ")")
                 else:
                     row += td(i)
 
