@@ -623,157 +623,167 @@ target.close()
 
 # HTML page generation ###
 doc = dominate.document(title='SAPA output')
+export_cnt = 0
+wd = os.path.dirname(os.path.realpath(__file__))
 
 with doc.head:
-    link(rel='stylesheet', href='style.css')
-    script(type='text/javascript', src='script.js')
+    link(rel='stylesheet', href='https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css')
+    script(type='text/javascript', src='https://code.jquery.com/jquery-1.12.4.js')
+    script(type='text/javascript', src='https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js')
+    script(type='text/javascript', src="./resources/main.js")
 
-with doc.add(body()).add(div(id='content')):
+with doc.add(div(id='content')):
     h1('SAPA - SNP Annotation Programm for AML')
     p('Here are all annotated SNPs listed, see GIT for details')
     with div(id='header').add(ol()):
-        for i in ['GIT']:
-            li(a(i.title(), href='https://github.com/Twinstar2/SAPA'))
+        li(a("GIT".title(), href='https://github.com/Twinstar2/SAPA'))
 
-    with table().add(tbody()):
-        l = tr()
-        export_cnt = 0
-        for snp, annotation in ordered_snps_with_annotation.iteritems():
-            # write header first:
+    with table(id="resultTable", border='1'):
+        # line = tr()
+        thead = thead()
+        tbody = tbody()
 
-            if export_cnt == 0:
-                if args.detail:
-                    header = str(snp.print_header()) + str(annotation.print_header() + "final prediction\t")
-                else:
-                    header = str(snp.print_header()) + "Gene\tfunction prediction scores [0-1]\tconservation scores" \
-                                                       "[-12.3-6.17]\t" \
-                                                       "ensemble scores[0-60]\tfinal prediction\t"
-                with table().add(thead()):
-                    split_header = header.split("\t")
-                    for i in split_header:
-                        l += td(i)
-                    l += tr()
+    # write header first:
+    if args.detail:
+        header = str(snps_with_annotation.iterkeys().next().print_header()) +\
+                 str(snps_with_annotation.itervalues().next().print_header() + "final prediction\t")
+    else:
+        header = str(snps_with_annotation.iterkeys().next().print_header()) +\
+                 "Gene\tfunction prediction scores [0-1]\tconservation scores[-12.3-6.17]\t" \
+                 "ensemble scores[0-60]\tfinal prediction\t"
 
-            # write rows in table
-            try:
-                altFreq = snp.get_altFreq() * 100
-            except ValueError:
-                altFreq = snp.get_altFreq()
+    split_header = header.split("\t")
+    for i in split_header:
+        if i != "":
+            thead += td(i)
+    #thead += tr()
+    print "writing header"
 
-            if args.detail:
-                for i in [snp.get_id(), snp.get_chr(), snp.get_pos(), snp.get_ref(), snp.get_alt(),
-                          snp.get_type(), ','.join(snp.get_context()), ','.join(snp.get_consequences()),
-                          snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(), snp.get_qual(),
-                          altFreq, snp.get_totalDepth(), snp.get_refDepth(),
-                          snp.get_altDepth(), snp.get_strandBias(),
-                          annotation._AnnovarParser__Chr,
-                          annotation._AnnovarParser__Start,
-                          annotation._AnnovarParser__End,
-                          annotation._AnnovarParser__Ref,
-                          annotation._AnnovarParser__Alt,
-                          annotation._AnnovarParser__Func_refGene,
-                          annotation._AnnovarParser__Gene_refGene,
-                          annotation._AnnovarParser__GeneDetail_refGene,
-                          annotation._AnnovarParser__ExonicFunc_refGene,
-                          annotation._AnnovarParser__AAChange_refGene,
-                          annotation._AnnovarParser__cytoBand,
-                          annotation._AnnovarParser__esp6500siv2_all,
-                          annotation._AnnovarParser__avsnp147,
-                          annotation._AnnovarParser__SIFT_score,
-                          annotation._AnnovarParser__SIFT_pred,
-                          annotation._AnnovarParser__Polyphen2_HDIV_score,
-                          annotation._AnnovarParser__Polyphen2_HDIV_pred,
-                          annotation._AnnovarParser__Polyphen2_HVAR_score,
-                          annotation._AnnovarParser__Polyphen2_HVAR_pred,
-                          annotation._AnnovarParser__LRT_score,
-                          annotation._AnnovarParser__LRT_pred,
-                          annotation._AnnovarParser__MutationTaster_score,
-                          annotation._AnnovarParser__MutationTaster_pred,
-                          annotation._AnnovarParser__MutationAssessor_score,
-                          annotation._AnnovarParser__MutationAssessor_pred,
-                          annotation._AnnovarParser__FATHMM_score,
-                          annotation._AnnovarParser__FATHMM_pred,
-                          annotation._AnnovarParser__PROVEAN_score,
-                          annotation._AnnovarParser__PROVEAN_pred,
-                          annotation._AnnovarParser__VEST3_score,
-                          annotation._AnnovarParser__CADD_raw,
-                          annotation._AnnovarParser__CADD_phred,
-                          annotation._AnnovarParser__DANN_score,
-                          annotation._AnnovarParser__fathmm_MKL_coding_score,
-                          annotation._AnnovarParser__fathmm_MKL_coding_pred,
-                          annotation._AnnovarParser__MetaSVM_score,
-                          annotation._AnnovarParser__MetaSVM_pred,
-                          annotation._AnnovarParser__MetaLR_score,
-                          annotation._AnnovarParser__MetaLR_pred,
-                          annotation._AnnovarParser__integrated_fitCons_score,
-                          annotation._AnnovarParser__integrated_confidence_value,
-                          annotation._AnnovarParser__GERP_RS,
-                          annotation._AnnovarParser__phyloP7way_vertebrate,
-                          annotation._AnnovarParser__phyloP20way_mammalian,
-                          annotation._AnnovarParser__phastCons7way_vertebrate,
-                          annotation._AnnovarParser__phastCons20way_mammalian,
-                          annotation._AnnovarParser__SiPhy_29way_logOdds
-                          ]:
-                    # snp.get_geneChromosome(),
-                    # snp.get_gene(), snp.get_geneSyn(), snp.get_geneDesc(),
-                    # snp.get_proteinClass(), snp.get_geneStart(), snp.get_geneEnd()
-                    # ))
-                    l += td(i)
+    for snp, annotation in ordered_snps_with_annotation.iteritems():
+        row = tr()
+        # write rows in table
+        try:
+            altFreq = snp.get_altFreq() * 100
+        except ValueError:
+            altFreq = snp.get_altFreq()
+
+        if args.detail:
+            for i in [snp.get_id(), snp.get_chr(), snp.get_pos(), snp.get_ref(), snp.get_alt(),
+                      snp.get_type(), ','.join(snp.get_context()), ','.join(snp.get_consequences()),
+                      snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(), snp.get_qual(),
+                      altFreq, snp.get_totalDepth(), snp.get_refDepth(),
+                      snp.get_altDepth(), snp.get_strandBias(),
+                      annotation._AnnovarParser__Chr,
+                      annotation._AnnovarParser__Start,
+                      annotation._AnnovarParser__End,
+                      annotation._AnnovarParser__Ref,
+                      annotation._AnnovarParser__Alt,
+                      annotation._AnnovarParser__Func_refGene,
+                      annotation._AnnovarParser__Gene_refGene,
+                      annotation._AnnovarParser__GeneDetail_refGene,
+                      annotation._AnnovarParser__ExonicFunc_refGene,
+                      annotation._AnnovarParser__AAChange_refGene,
+                      annotation._AnnovarParser__cytoBand,
+                      annotation._AnnovarParser__esp6500siv2_all,
+                      annotation._AnnovarParser__avsnp147,
+                      annotation._AnnovarParser__SIFT_score,
+                      annotation._AnnovarParser__SIFT_pred,
+                      annotation._AnnovarParser__Polyphen2_HDIV_score,
+                      annotation._AnnovarParser__Polyphen2_HDIV_pred,
+                      annotation._AnnovarParser__Polyphen2_HVAR_score,
+                      annotation._AnnovarParser__Polyphen2_HVAR_pred,
+                      annotation._AnnovarParser__LRT_score,
+                      annotation._AnnovarParser__LRT_pred,
+                      annotation._AnnovarParser__MutationTaster_score,
+                      annotation._AnnovarParser__MutationTaster_pred,
+                      annotation._AnnovarParser__MutationAssessor_score,
+                      annotation._AnnovarParser__MutationAssessor_pred,
+                      annotation._AnnovarParser__FATHMM_score,
+                      annotation._AnnovarParser__FATHMM_pred,
+                      annotation._AnnovarParser__PROVEAN_score,
+                      annotation._AnnovarParser__PROVEAN_pred,
+                      annotation._AnnovarParser__VEST3_score,
+                      annotation._AnnovarParser__CADD_raw,
+                      annotation._AnnovarParser__CADD_phred,
+                      annotation._AnnovarParser__DANN_score,
+                      annotation._AnnovarParser__fathmm_MKL_coding_score,
+                      annotation._AnnovarParser__fathmm_MKL_coding_pred,
+                      annotation._AnnovarParser__MetaSVM_score,
+                      annotation._AnnovarParser__MetaSVM_pred,
+                      annotation._AnnovarParser__MetaLR_score,
+                      annotation._AnnovarParser__MetaLR_pred,
+                      annotation._AnnovarParser__integrated_fitCons_score,
+                      annotation._AnnovarParser__integrated_confidence_value,
+                      annotation._AnnovarParser__GERP_RS,
+                      annotation._AnnovarParser__phyloP7way_vertebrate,
+                      annotation._AnnovarParser__phyloP20way_mammalian,
+                      annotation._AnnovarParser__phastCons7way_vertebrate,
+                      annotation._AnnovarParser__phastCons20way_mammalian,
+                      annotation._AnnovarParser__SiPhy_29way_logOdds
+                      ]:
+                # snp.get_geneChromosome(),
+                # snp.get_gene(), snp.get_geneSyn(), snp.get_geneDesc(),
+                # snp.get_proteinClass(), snp.get_geneStart(), snp.get_geneEnd()
+                # ))
+                row += td(i)
+        else:
+            for i in [snp.get_id(), snp.get_chr(), snp.get_pos(),
+                      snp.get_ref(), snp.get_alt(), snp.get_type(),
+                      ','.join(snp.get_context()), ','.join(snp.get_consequences()),
+                      snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(),
+                      snp.get_qual(), snp.get_altFreq(),
+                      snp.get_totalDepth(), snp.get_refDepth(),
+                      snp.get_altDepth(), snp.get_strandBias(),
+                      annotation._AnnovarParser__Gene_refGene,
+                      annotation._AnnovarParser__MetaLR_score,
+                      annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_phred
+                      ]:
+                row += td(i)
+
+        export_string = ""
+        # check for final prediction ###
+        if annotation._AnnovarParser__MetaLR_pred == "T":
+            export_string += "Tolerated"
+        elif annotation._AnnovarParser__MetaLR_pred == "D":
+            export_string += "Deleterious"
+        elif annotation._AnnovarParser__MetaLR_pred == "P":
+            export_string += "possibly damaging"
+        elif annotation._AnnovarParser__MetaLR_pred == ".":
+            # no Meta Socore available
+            if annotation._AnnovarParser__fathmm_MKL_coding_pred == "D":
+                export_string += "Deleterious (FATHMM)"
+            elif not annotation._AnnovarParser__DANN_score == ".":
+                if float(annotation._AnnovarParser__DANN_score) > 0.96:
+                    export_string += "Deleterious (DANN)"
             else:
-                for i in [snp.get_id(), snp.get_chr(), snp.get_pos(),
-                          snp.get_ref(), snp.get_alt(), snp.get_type(),
-                          ','.join(snp.get_context()), ','.join(snp.get_consequences()),
-                          snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(),
-                          snp.get_qual(), snp.get_altFreq(),
-                          snp.get_totalDepth(), snp.get_refDepth(),
-                          snp.get_altDepth(), snp.get_strandBias(),
-                          annotation._AnnovarParser__Gene_refGene,
-                          annotation._AnnovarParser__MetaLR_score,
-                          annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_phred
-                          ]:
-                    l += td(i)
-            l += tr()
-            export_string = ""
-            # check for final prediction ###
-            if annotation._AnnovarParser__MetaLR_pred == "T":
-                export_string += "Tolerated"
-            elif annotation._AnnovarParser__MetaLR_pred == "D":
-                export_string += "Deleterious"
-            elif annotation._AnnovarParser__MetaLR_pred == "P":
-                export_string += "possibly damaging"
-            elif annotation._AnnovarParser__MetaLR_pred == ".":
-                # no Meta Socore available
-                if annotation._AnnovarParser__fathmm_MKL_coding_pred == "D":
-                    export_string += "Deleterious (FATHMM)"
-                elif not annotation._AnnovarParser__DANN_score == ".":
-                    if float(annotation._AnnovarParser__DANN_score) > 0.96:
-                        export_string += "Deleterious (DANN)"
+                if annotation._AnnovarParser__ExonicFunc_refGene == "synonymous SNV":
+                    export_string += "Tolerated (synonymous)"
+                elif "intronic" in annotation._AnnovarParser__Func_refGene:
+                    export_string += "Tolerated (Intron)"
+                elif "Intron" in snp.get_context():
+                    export_string += "Tolerated (Intron)"
+                elif "Intergenic" in snp.get_context():
+                    export_string += "Tolerated (Intergenic)"
+                elif "Coding" in snp.get_context() and "synonymous_variant" in snp.get_consequences():
+                    export_string += "Tolerated (synonymous_variant)"
                 else:
-                    if annotation._AnnovarParser__ExonicFunc_refGene == "synonymous SNV":
-                        export_string += "Tolerated (synonymous)"
-                    elif "intronic" in annotation._AnnovarParser__Func_refGene:
-                        export_string += "Tolerated (Intron)"
-                    elif "Intron" in snp.get_context():
-                        export_string += "Tolerated (Intron)"
-                    elif "Intergenic" in snp.get_context():
-                        export_string += "Tolerated (Intergenic)"
-                    elif "Coding" in snp.get_context() and "synonymous_variant" in snp.get_consequences():
-                        export_string += "Tolerated (synonymous_variant)"
-                    else:
-                        export_string += "."
+                    export_string += "."
 
-            # change digit format to german
-            export_string = export_string.replace('.', ',')
-            # filter deleterious only
-            if args.filter_deleterious and annotation._AnnovarParser__MetaLR_pred == "D":
-                #target.write(export_string)
-                #target.write("\n")
-                print "filtering"
-            if not args.filter_deleterious:
-                #target.write(export_string)
-                #target.write("\n")
-                print "filtering"
-            export_cnt += 1
+        row += td(export_string)
+        tbody += row
+
+        # change digit format to german
+        export_string = export_string.replace('.', ',')
+        # filter deleterious only
+        if args.filter_deleterious and annotation._AnnovarParser__MetaLR_pred == "D":
+            #target.write(export_string)
+            #target.write("\n")
+            print "filtering"
+        if not args.filter_deleterious:
+            #target.write(export_string)
+            #target.write("\n")
+            print "filtering"
+        export_cnt += 1
 
 target_html.write(doc.render())
 print(doc.render())
