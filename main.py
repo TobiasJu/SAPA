@@ -634,9 +634,7 @@ with doc.head:
 
 with doc.add(div(id='content')):
     h1('SAPA - SNP Annotation Programm for AML')
-    p('Here are all annotated SNPs listed, see GIT for details')
-    with div(id='header').add(ol()):
-        li(a("GIT".title(), href='https://github.com/Twinstar2/SAPA'))
+    p('Here are all annotated SNPs listed, see <a href="https://github.com/Twinstar2/SAPA">GIT</a> for details')
 
     with table(id="resultTable", border='1'):
         # line = tr()
@@ -721,11 +719,9 @@ with doc.add(div(id='content')):
                       annotation._AnnovarParser__phastCons20way_mammalian,
                       annotation._AnnovarParser__SiPhy_29way_logOdds
                       ]:
-                # snp.get_geneChromosome(),
-                # snp.get_gene(), snp.get_geneSyn(), snp.get_geneDesc(),
-                # snp.get_proteinClass(), snp.get_geneStart(), snp.get_geneEnd()
-                # ))
+
                 row += td(i)
+                row.add(td(style="background-color: rgb(255, 229, 192)"))
         else:
             for i in [snp.get_id(), snp.get_chr(), snp.get_pos(),
                       snp.get_ref(), snp.get_alt(), snp.get_type(),
@@ -736,9 +732,28 @@ with doc.add(div(id='content')):
                       snp.get_altDepth(), snp.get_strandBias(),
                       annotation._AnnovarParser__Gene_refGene,
                       annotation._AnnovarParser__MetaLR_score,
-                      annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_phred
+                      annotation._AnnovarParser__GERP_RS,
+                      annotation._AnnovarParser__CADD_phred
                       ]:
-                row += td(i)
+
+                if (i == annotation._AnnovarParser__MetaLR_score and i != "."):
+                    MetaLR_diff = annotation._AnnovarParser__MetaLR_max - annotation._AnnovarParser__MetaLR_min
+                    print "MetaLR diff:"
+                    print MetaLR_diff
+                    MetaLR_div = float(
+                        annotation._AnnovarParser__MetaLR_score) / MetaLR_diff
+                    red = 255 * MetaLR_div
+                    green = 255 - red
+
+                    blue = 0
+                    colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
+                    row += td(i, style='background-color: rgb(' + colorstring + ")")
+                #elif (i == annotation._AnnovarParser__GERP_RS and i != "."):
+                #    green = 0
+                else:
+                    row += td(i)
+
+        #sys.exit(0)
 
         export_string = ""
         # check for final prediction ###
@@ -779,10 +794,10 @@ with doc.add(div(id='content')):
             #target.write(export_string)
             #target.write("\n")
             print "filtering"
-        if not args.filter_deleterious:
+        #if not args.filter_deleterious:
             #target.write(export_string)
             #target.write("\n")
-            print "filtering"
+        #    print "not filtering"
         export_cnt += 1
 
 target_html.write(doc.render())
