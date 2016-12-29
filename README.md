@@ -80,24 +80,25 @@ No worries your input file will not be overwritten, a new file with the data fro
 #### <i class="icon-pencil"></i> Scoring explained (dbnsfp30a)
 
 - **SIFT**
-	- Score	ranges from 0 to 1. 
+	- Score	ranges from 1 to 0.
 	- The amino acid substitution is predicted damaging is the score is <= 0.05, and tolerated if the score is > 0.05.
 	- http://sift.jcvi.org/www/SIFT_help.html
 	
 - **Polyphen2**
 	- Scores ranges from 0 to 1
-	- D: Probably damaging (>=0.957), P: possibly damaging (0.453<=pp2_hdiv<=0.956); B: benign (pp2_hdiv<=0.452)
+	- D: Probably damaging (>=0.957), P: possibly damaging (0.453<=pp2<=0.956); B: benign (pp2<=0.452)
 	- http://genetics.bwh.harvard.edu/pph2/dokuwiki/overview
 
 - **LRT** 
-	- Scores ranges from 0 to 1
+	- Scores ranges from 1 to 0
+	- Deleterious threshold < 0.002 (observed)
 	- Lower scores are more deleterious
 	- D: Deleterious; N: Neutral; U: Unknown
 	- https://www.researchgate.net/profile/Justin_Fay/publication/26671245_Identification_of_deleterious_mutations_within_three_human_genomes/links/00b49529eabbc6aa2b000000.pdf
 
 - **MutationTaster**
 	- Scores ranges from 0 to 1
-	-  Deleterious threshold > 0.5
+	- Deleterious threshold > 0.5
 	- 	A = "disease_causing_automatic"; D =“disease_causing”; N = “polymorphism”; P = “polymorphism_automatic”
 	- http://www.mutationtaster.org/
 
@@ -111,7 +112,7 @@ No worries your input file will not be overwritten, a new file with the data fro
 
 - **FATHMM**
 	- Scores ranges from -16.13 to 10.64
-	- Deleterious threshold >= 0.45
+	- Deleterious threshold < -1 (observed)
 	- D: Deleterious; T: Tolerated
 	- http://fathmm.biocompute.org.uk/
 
@@ -123,13 +124,13 @@ No worries your input file will not be overwritten, a new file with the data fro
 
 
 - **VEST3**
-	- Scores ranges from 0 to 1. 
+	- Scores ranges from 0 to 1
 	- The larger the score the more likely the mutation may cause functional change.
 	- http://karchinlab.org/apps/appVest.html
 
 
 - **CADD_raw**
-	- raw CADD score
+	- Score ranges from -2,375 to 7,6 (observed)
 	- The larger the score the more likely the SNP has damaging effect.
 	- http://cadd.gs.washington.edu/
 
@@ -140,30 +141,36 @@ No worries your input file will not be overwritten, a new file with the data fro
 	- The larger the score the more likely the SNP has damaging effect.
 
 - **DANN**
-	- Scores ranges from 0.01 to 0.99
+	- Scores ranges from 0.01 to 0.999
+	- Deleterious threshold > 0.993 (observed)
 	- The higher the score the more likely the mutation may cause functional change.
 	- DANN uses the same feature set and training data as CADD to train a deep neural network (DNN)
 	- https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4341060/
 
 - **FATHMM_MKL_coding_score**
 	- Scores ranges from 0 - 1
+	- Deleterious threshold > 0.63 (observed)
 	- The higher the score, the greater the confidence of a functional mutation.
 	- http://fathmm.biocompute.org.uk/fathmmMKL.htm
 
 - **MetaSVM**
 	- Scores ranges from -1 to +1
+	- Deleterious threshold > 0 (observed)
 	- D: Deleterious; T: Tolerated
 	- Uses a radial SVM model to train prediction model, using all available scoring algorithm normalized scores
 	- http://annovar.openbioinformatics.org/en/latest/user-guide/filter/#-metasvm-annotation
 
 - **MetaLR**
 	- Scores ranges from 0 to 1
+	- Deleterious threshold > 0.5
 	- D: Deleterious; T: Tolerated
 	- very similar to MetaSVM, with similar performance
 	- http://annovar.openbioinformatics.org/en/latest/user-guide/filter/#-metalr-annotation
 
 - **integrated fitCons**
-	- Scores ranges from 0.0 to 0.80
+	- Scores ranges from 0.0 to 1.0
+	- higher scores indicating more potential
+	    - the fraction of genomic positions evincing a particular pattern (or "fingerprint") of functional assay results, that are under selective pressure
 	- http://compgen.cshl.edu/fitCons/
 
 - **GERP RS**
@@ -173,12 +180,14 @@ No worries your input file will not be overwritten, a new file with the data fro
 	- http://mendel.stanford.edu/SidowLab/downloads/gerp/
 
 - **phyloP7way_vertebrate**
+    - Scores ranges from -1.844 to 1.062 (observed)
 	- The larger the score, the more conserved.
 		- higher scores are more deleterious
 	- Phylogenetic p-values for 7 vertebrate species
 	- https://brb.nci.nih.gov/seqtools/colexpanno.html#dbnsfp
 
 - **phyloP20way_mammalian**
+    - Scores ranges from -3.095 to 1.186 (observed)
 	- The larger the score, the more conserved.
 		- higher scores are more deleterious
 	- Phylogenetic p-values for 20 mammalian species
