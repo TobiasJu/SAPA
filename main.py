@@ -366,12 +366,12 @@ for snp, annotation in zip(snps, annovar):
         snps_with_annotation[snp] = annotation
         counters += 1
 
-    # iterate over annovar data and get final scores ###
-    # for data in annovar:
-    # score = data._AnnovarParser__SIFT_score
-    # if score != ".":
-    # rel_score = float(data._AnnovarParser__SIFT_score) / data._AnnovarParser__SIFT_max
-    # print rel_score
+        # iterate over annovar data and get final scores ###
+        # for data in annovar:
+        # score = data._AnnovarParser__SIFT_score
+        # if score != ".":
+        # rel_score = float(data._AnnovarParser__SIFT_score) / data._AnnovarParser__SIFT_max
+        # print rel_score
 ###### some work to do here ####
 # sys.exit(0)
 
@@ -529,40 +529,40 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
                                       annotation._AnnovarParser__cytoBand,
                                       annotation._AnnovarParser__esp6500siv2_all,
                                       annotation._AnnovarParser__avsnp147,
-                                      annotation._AnnovarParser__SIFT_score,
+                                      annotation._AnnovarParser__SIFT_score[0],
                                       annotation._AnnovarParser__SIFT_pred,
-                                      annotation._AnnovarParser__Polyphen2_HDIV_score,
+                                      annotation._AnnovarParser__Polyphen2_HDIV_score[0],
                                       annotation._AnnovarParser__Polyphen2_HDIV_pred,
-                                      annotation._AnnovarParser__Polyphen2_HVAR_score,
+                                      annotation._AnnovarParser__Polyphen2_HVAR_score[0],
                                       annotation._AnnovarParser__Polyphen2_HVAR_pred,
-                                      annotation._AnnovarParser__LRT_score,
+                                      annotation._AnnovarParser__LRT_score[0],
                                       annotation._AnnovarParser__LRT_pred,
-                                      annotation._AnnovarParser__MutationTaster_score,
+                                      annotation._AnnovarParser__MutationTaster_score[0],
                                       annotation._AnnovarParser__MutationTaster_pred,
-                                      annotation._AnnovarParser__MutationAssessor_score,
+                                      annotation._AnnovarParser__MutationAssessor_score[0],
                                       annotation._AnnovarParser__MutationAssessor_pred,
-                                      annotation._AnnovarParser__FATHMM_score,
+                                      annotation._AnnovarParser__FATHMM_score[0],
                                       annotation._AnnovarParser__FATHMM_pred,
-                                      annotation._AnnovarParser__PROVEAN_score,
+                                      annotation._AnnovarParser__PROVEAN_score[0],
                                       annotation._AnnovarParser__PROVEAN_pred,
-                                      annotation._AnnovarParser__VEST3_score,
-                                      annotation._AnnovarParser__CADD_raw,
-                                      annotation._AnnovarParser__CADD_phred,
-                                      annotation._AnnovarParser__DANN_score,
-                                      annotation._AnnovarParser__fathmm_MKL_coding_score,
+                                      annotation._AnnovarParser__VEST3_score[0],
+                                      annotation._AnnovarParser__CADD_raw[0],
+                                      annotation._AnnovarParser__CADD_phred[0],
+                                      annotation._AnnovarParser__DANN_score[0],
+                                      annotation._AnnovarParser__fathmm_MKL_coding_score[0],
                                       annotation._AnnovarParser__fathmm_MKL_coding_pred,
-                                      annotation._AnnovarParser__MetaSVM_score,
+                                      annotation._AnnovarParser__MetaSVM_score[0],
                                       annotation._AnnovarParser__MetaSVM_pred,
-                                      annotation._AnnovarParser__MetaLR_score,
+                                      annotation._AnnovarParser__MetaLR_score[0],
                                       annotation._AnnovarParser__MetaLR_pred,
-                                      annotation._AnnovarParser__integrated_fitCons_score,
+                                      annotation._AnnovarParser__integrated_fitCons_score[0],
                                       annotation._AnnovarParser__integrated_confidence_value,
-                                      annotation._AnnovarParser__GERP_RS,
+                                      annotation._AnnovarParser__GERP_RS[0],
                                       annotation._AnnovarParser__phyloP7way_vertebrate,
                                       annotation._AnnovarParser__phyloP20way_mammalian,
-                                      annotation._AnnovarParser__phastCons7way_vertebrate,
-                                      annotation._AnnovarParser__phastCons20way_mammalian,
-                                      annotation._AnnovarParser__SiPhy_29way_logOdds
+                                      annotation._AnnovarParser__phastCons7way_vertebrate[0],
+                                      annotation._AnnovarParser__phastCons20way_mammalian[0],
+                                      annotation._AnnovarParser__SiPhy_29way_logOdds[0]
                                       ))
         # snp.get_geneChromosome(),
         # snp.get_gene(), snp.get_geneSyn(), snp.get_geneDesc(),
@@ -578,8 +578,9 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
                                       snp.get_totalDepth(), snp.get_refDepth(),
                                       snp.get_altDepth(), snp.get_strandBias(),
                                       annotation._AnnovarParser__Gene_refGene,
-                                      annotation._AnnovarParser__MetaLR_score,
-                                      annotation._AnnovarParser__GERP_RS, annotation._AnnovarParser__CADD_phred
+                                      annotation._AnnovarParser__MetaLR_score[0],
+                                      annotation._AnnovarParser__GERP_RS[0],
+                                      annotation._AnnovarParser__CADD_phred[0]
                                       ))
     # check for final prediction ###
     if annotation._AnnovarParser__MetaLR_pred == "T":
@@ -592,8 +593,8 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
         # no Meta Socore available
         if annotation._AnnovarParser__fathmm_MKL_coding_pred == "D":
             export_string += "Deleterious (FATHMM)"
-        elif not annotation._AnnovarParser__DANN_score == ".":
-            if float(annotation._AnnovarParser__DANN_score) > 0.96:
+        elif not annotation._AnnovarParser__DANN_score[0] == ".":
+            if float(annotation._AnnovarParser__DANN_score[0]) > 0.96:
                 export_string += "Deleterious (DANN)"
         else:
             if annotation._AnnovarParser__ExonicFunc_refGene == "synonymous SNV":
@@ -646,10 +647,10 @@ with doc.add(div(id='content')):
 
     # write header first:
     if args.detail:
-        header = str(snps_with_annotation.iterkeys().next().print_header()) +\
+        header = str(snps_with_annotation.iterkeys().next().print_header()) + \
                  str(snps_with_annotation.itervalues().next().print_header() + "final prediction\t")
     else:
-        header = str(snps_with_annotation.iterkeys().next().print_header()) +\
+        header = str(snps_with_annotation.iterkeys().next().print_header()) + \
                  "Gene\tfunction prediction scores [0-1]\tconservation scores[-12.3-6.17]\t" \
                  "ensemble scores[0-60]\tfinal prediction\t"
 
@@ -657,7 +658,7 @@ with doc.add(div(id='content')):
     for i in split_header:
         if i != "":
             thead += td(i)
-    #thead += tr()
+    # thead += tr()
     print "writing header"
 
     for snp, annotation in ordered_snps_with_annotation.iteritems():
@@ -669,107 +670,99 @@ with doc.add(div(id='content')):
             altFreq = snp.get_altFreq()
 
         if args.detail:
-            for i in [snp.get_id(), snp.get_chr(), snp.get_pos(), snp.get_ref(), snp.get_alt(),
-                      snp.get_type(), ','.join(snp.get_context()), ','.join(snp.get_consequences()),
-                      snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(), snp.get_qual(),
-                      altFreq, snp.get_totalDepth(), snp.get_refDepth(),
-                      snp.get_altDepth(), snp.get_strandBias(),
-                      annotation._AnnovarParser__Chr,
-                      annotation._AnnovarParser__Start,
-                      annotation._AnnovarParser__End,
-                      annotation._AnnovarParser__Ref,
-                      annotation._AnnovarParser__Alt,
-                      annotation._AnnovarParser__Func_refGene,
-                      annotation._AnnovarParser__Gene_refGene,
-                      annotation._AnnovarParser__GeneDetail_refGene,
-                      annotation._AnnovarParser__ExonicFunc_refGene,
-                      annotation._AnnovarParser__AAChange_refGene,
-                      annotation._AnnovarParser__cytoBand,
-                      annotation._AnnovarParser__esp6500siv2_all,
-                      annotation._AnnovarParser__avsnp147,
-                      annotation._AnnovarParser__SIFT_score,
-                      annotation._AnnovarParser__SIFT_pred,
-                      annotation._AnnovarParser__Polyphen2_HDIV_score,
-                      annotation._AnnovarParser__Polyphen2_HDIV_pred,
-                      annotation._AnnovarParser__Polyphen2_HVAR_score,
-                      annotation._AnnovarParser__Polyphen2_HVAR_pred,
-                      annotation._AnnovarParser__LRT_score,
-                      annotation._AnnovarParser__LRT_pred,
-                      annotation._AnnovarParser__MutationTaster_score,
-                      annotation._AnnovarParser__MutationTaster_pred,
-                      annotation._AnnovarParser__MutationAssessor_score,
-                      annotation._AnnovarParser__MutationAssessor_pred,
-                      annotation._AnnovarParser__FATHMM_score,
-                      annotation._AnnovarParser__FATHMM_pred,
-                      annotation._AnnovarParser__PROVEAN_score,
-                      annotation._AnnovarParser__PROVEAN_pred,
-                      annotation._AnnovarParser__VEST3_score,
-                      annotation._AnnovarParser__CADD_raw,
-                      annotation._AnnovarParser__CADD_phred,
-                      annotation._AnnovarParser__DANN_score,
-                      annotation._AnnovarParser__fathmm_MKL_coding_score,
-                      annotation._AnnovarParser__fathmm_MKL_coding_pred,
-                      annotation._AnnovarParser__MetaSVM_score,
-                      annotation._AnnovarParser__MetaSVM_pred,
-                      annotation._AnnovarParser__MetaLR_score,
-                      annotation._AnnovarParser__MetaLR_pred,
-                      annotation._AnnovarParser__integrated_fitCons_score,
-                      annotation._AnnovarParser__integrated_confidence_value,
-                      annotation._AnnovarParser__GERP_RS,
-                      annotation._AnnovarParser__phyloP7way_vertebrate,
-                      annotation._AnnovarParser__phyloP20way_mammalian,
-                      annotation._AnnovarParser__phastCons7way_vertebrate,
-                      annotation._AnnovarParser__phastCons20way_mammalian,
-                      annotation._AnnovarParser__SiPhy_29way_logOdds
-                      ]:
-
-                row += td(i)
-                row.add(td(style="background-color: rgb(255, 229, 192)"))
-        else:
-            for i in [snp.get_id(), snp.get_chr(), snp.get_pos(),
-                      snp.get_ref(), snp.get_alt(), snp.get_type(),
-                      ','.join(snp.get_context()), ','.join(snp.get_consequences()),
-                      snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(),
-                      snp.get_qual(), snp.get_altFreq(),
-                      snp.get_totalDepth(), snp.get_refDepth(),
-                      snp.get_altDepth(), snp.get_strandBias(),
-                      annotation._AnnovarParser__Gene_refGene,
-                      annotation._AnnovarParser__MetaLR_score,
-                      annotation._AnnovarParser__GERP_RS,
-                      annotation._AnnovarParser__CADD_phred
-                      ]:
-
-                if (i == annotation._AnnovarParser__MetaLR_score and i != "."):
-                    MetaLR_diff = annotation._AnnovarParser__MetaLR_max - annotation._AnnovarParser__MetaLR_min
-                    MetaLR_div = float(
-                        annotation._AnnovarParser__MetaLR_score) / MetaLR_diff
-                    red = 255 * MetaLR_div
+            for value in [snp.get_id(), snp.get_chr(), snp.get_pos(), snp.get_ref(), snp.get_alt(),
+                          snp.get_type(), ','.join(snp.get_context()), ','.join(snp.get_consequences()),
+                          snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(), snp.get_qual(),
+                          altFreq, snp.get_totalDepth(), snp.get_refDepth(),
+                          snp.get_altDepth(), snp.get_strandBias(),
+                          annotation._AnnovarParser__Chr,
+                          annotation._AnnovarParser__Start,
+                          annotation._AnnovarParser__End,
+                          annotation._AnnovarParser__Ref,
+                          annotation._AnnovarParser__Alt,
+                          annotation._AnnovarParser__Func_refGene,
+                          annotation._AnnovarParser__Gene_refGene,
+                          annotation._AnnovarParser__GeneDetail_refGene,
+                          annotation._AnnovarParser__ExonicFunc_refGene,
+                          annotation._AnnovarParser__AAChange_refGene,
+                          annotation._AnnovarParser__cytoBand,
+                          annotation._AnnovarParser__esp6500siv2_all,
+                          annotation._AnnovarParser__avsnp147,
+                          annotation._AnnovarParser__SIFT_score,
+                          annotation._AnnovarParser__SIFT_pred,
+                          annotation._AnnovarParser__Polyphen2_HDIV_score,
+                          annotation._AnnovarParser__Polyphen2_HDIV_pred,
+                          annotation._AnnovarParser__Polyphen2_HVAR_score,
+                          annotation._AnnovarParser__Polyphen2_HVAR_pred,
+                          annotation._AnnovarParser__LRT_score,
+                          annotation._AnnovarParser__LRT_pred,
+                          annotation._AnnovarParser__MutationTaster_score,
+                          annotation._AnnovarParser__MutationTaster_pred,
+                          annotation._AnnovarParser__MutationAssessor_score,
+                          annotation._AnnovarParser__MutationAssessor_pred,
+                          annotation._AnnovarParser__FATHMM_score,
+                          annotation._AnnovarParser__FATHMM_pred,
+                          annotation._AnnovarParser__PROVEAN_score,
+                          annotation._AnnovarParser__PROVEAN_pred,
+                          annotation._AnnovarParser__VEST3_score,
+                          annotation._AnnovarParser__CADD_raw,
+                          annotation._AnnovarParser__CADD_phred,
+                          annotation._AnnovarParser__DANN_score,
+                          annotation._AnnovarParser__fathmm_MKL_coding_score,
+                          annotation._AnnovarParser__fathmm_MKL_coding_pred,
+                          annotation._AnnovarParser__MetaSVM_score,
+                          annotation._AnnovarParser__MetaSVM_pred,
+                          annotation._AnnovarParser__MetaLR_score,
+                          annotation._AnnovarParser__MetaLR_pred,
+                          annotation._AnnovarParser__integrated_fitCons_score,
+                          annotation._AnnovarParser__integrated_confidence_value,
+                          annotation._AnnovarParser__GERP_RS,
+                          annotation._AnnovarParser__phyloP7way_vertebrate,
+                          annotation._AnnovarParser__phyloP20way_mammalian,
+                          annotation._AnnovarParser__phastCons7way_vertebrate,
+                          annotation._AnnovarParser__phastCons20way_mammalian,
+                          annotation._AnnovarParser__SiPhy_29way_logOdds
+                          ]:
+                if type(value) is tuple and not value[0] == ".":
+                    print value
+                    diff = float(value[2]) - float(value[1])
+                    div = float(value[0]) / diff
+                    red = 255 * div
                     green = 255 - red
                     blue = 0
                     colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
-                    row += td(i, style='background-color: rgb(' + colorstring + ")")
-                elif (i == annotation._AnnovarParser__GERP_RS and i != "."):
-                    GERP_diff = annotation._AnnovarParser__GERP_RS_max - annotation._AnnovarParser__GERP_RS_min
-                    GERP_div = float(
-                        annotation._AnnovarParser__GERP_RS) / GERP_diff
-                    red = 255 * GERP_div
-                    green = 255 - red
-                    blue = 0
-                    colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
-                    row += td(i, style='background-color: rgb(' + colorstring + ")")
-                elif (i == annotation._AnnovarParser__CADD_phred and i != "."):
-                    CADD_phred_diff = annotation._AnnovarParser__CADD_phred_max - annotation._AnnovarParser__CADD_phred_min
-                    CADD_phred_div = float(
-                        annotation._AnnovarParser__CADD_phred) / CADD_phred_diff
-                    red = 255 * CADD_phred_div
-                    green = 255 - red
-                    blue = 0
-                    colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
-                    row += td(i, style='background-color: rgb(' + colorstring + ")")
+                    row += td(value[0], style='background-color: rgb(' + colorstring + ")")
+                elif type(value) is tuple and value[0] == ".":
+                    row += td(value[0])
                 else:
-                    row += td(i)
+                    row += td(value)
 
-        #sys.exit(0)
+        else:
+            for value in [snp.get_id(), snp.get_chr(), snp.get_pos(),
+                          snp.get_ref(), snp.get_alt(), snp.get_type(),
+                          ','.join(snp.get_context()), ','.join(snp.get_consequences()),
+                          snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(),
+                          snp.get_qual(), snp.get_altFreq(),
+                          snp.get_totalDepth(), snp.get_refDepth(),
+                          snp.get_altDepth(), snp.get_strandBias(),
+                          annotation._AnnovarParser__Gene_refGene,
+                          annotation._AnnovarParser__MetaLR_score,
+                          annotation._AnnovarParser__GERP_RS,
+                          annotation._AnnovarParser__CADD_phred
+                          ]:
+
+                if type(value) is tuple and not value[0] == ".":
+                    diff = float(value[2]) - float(value[1])
+                    div = float(value[0]) / diff
+                    red = 255 * div
+                    green = 255 - red
+                    blue = 0
+                    colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
+                    row += td(value[0], style='background-color: rgb(' + colorstring + ")")
+                elif type(value) is tuple and value[0] == ".":
+                    row += td(value[0])
+                else:
+                    row += td(value)
 
         export_string = ""
         # check for final prediction ###
@@ -783,8 +776,8 @@ with doc.add(div(id='content')):
             # no Meta Socore available
             if annotation._AnnovarParser__fathmm_MKL_coding_pred == "D":
                 export_string += "Deleterious (FATHMM)"
-            elif not annotation._AnnovarParser__DANN_score == ".":
-                if float(annotation._AnnovarParser__DANN_score) > 0.96:
+            elif not annotation._AnnovarParser__DANN_score[0] == ".":
+                if float(annotation._AnnovarParser__DANN_score[0]) > 0.96:
                     export_string += "Deleterious (DANN)"
             else:
                 if annotation._AnnovarParser__ExonicFunc_refGene == "synonymous SNV":
@@ -807,12 +800,12 @@ with doc.add(div(id='content')):
         export_string = export_string.replace('.', ',')
         # filter deleterious only
         if args.filter_deleterious and annotation._AnnovarParser__MetaLR_pred == "D":
-            #target.write(export_string)
-            #target.write("\n")
+            # target.write(export_string)
+            # target.write("\n")
             print "filtering"
-        #if not args.filter_deleterious:
-            #target.write(export_string)
-            #target.write("\n")
+            # if not args.filter_deleterious:
+            # target.write(export_string)
+            # target.write("\n")
         #    print "not filtering"
         export_cnt += 1
 
