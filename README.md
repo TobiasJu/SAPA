@@ -80,8 +80,9 @@ No worries your input file will not be overwritten, a new file with the data fro
 #### <i class="icon-pencil"></i> Scoring explained (dbnsfp30a)
 
 - **SIFT**
-	- Score	ranges from 1 to 0.
-	- The amino acid substitution is predicted damaging is the score is <= 0.05, and tolerated if the score is > 0.05.
+	- Score	ranges from 1 to 0
+	- Lower scores are more deleterious
+	- The amino acid substitution is predicted damaging if the score is <= 0.05, and tolerated if the score is > 0.05.
 	- http://sift.jcvi.org/www/SIFT_help.html
 	
 - **Polyphen2**
@@ -98,7 +99,7 @@ No worries your input file will not be overwritten, a new file with the data fro
 
 - **MutationTaster**
 	- Scores ranges from 0 to 1
-	- Deleterious threshold > 0.5
+	- Deleterious threshold > 0.5 (https://wikis.utexas.edu/display/bioiteam/Annovar+Annotations)
 	- 	A = "disease_causing_automatic"; D =“disease_causing”; N = “polymorphism”; P = “polymorphism_automatic”
 	- http://www.mutationtaster.org/
 
