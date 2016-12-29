@@ -558,8 +558,8 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
                                       annotation._AnnovarParser__integrated_fitCons_score[0],
                                       annotation._AnnovarParser__integrated_confidence_value,
                                       annotation._AnnovarParser__GERP_RS[0],
-                                      annotation._AnnovarParser__phyloP7way_vertebrate,
-                                      annotation._AnnovarParser__phyloP20way_mammalian,
+                                      annotation._AnnovarParser__phyloP7way_vertebrate[0],
+                                      annotation._AnnovarParser__phyloP20way_mammalian[0],
                                       annotation._AnnovarParser__phastCons7way_vertebrate[0],
                                       annotation._AnnovarParser__phastCons20way_mammalian[0],
                                       annotation._AnnovarParser__SiPhy_29way_logOdds[0]
@@ -639,6 +639,7 @@ with doc.add(div(id='content')):
     info = p('All annotated SNPs are listed below, see ')
     info.add(a("SAPA GIT", href='https://github.com/Twinstar2/SAPA'))
     info.add(" for details.")
+    button("Invert colors".title(), id="invert_button")
 
     with table(id="resultTable", border='1'):
         # line = tr()
@@ -723,15 +724,66 @@ with doc.add(div(id='content')):
                           annotation._AnnovarParser__phastCons20way_mammalian,
                           annotation._AnnovarParser__SiPhy_29way_logOdds
                           ]:
-                if type(value) is tuple and not value[0] == ".":
-                    print value
-                    diff = float(value[2]) - float(value[1])
-                    div = float(value[0]) / diff
-                    red = 255 * div
-                    green = 255 - red
-                    blue = 0
-                    colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
-                    row += td(value[0], style='background-color: rgb(' + colorstring + ")")
+                if type(value) is tuple and not value[0] == ".":  # (value, min, max, threshold)
+                    if len(value) == 3:  # has no threshold
+                        diff = float(value[2]) - float(value[1])  # max - min
+                        div = float(value[0]) / diff
+                        red = 255 * div
+                        green = 255 - red
+                        blue = 20
+                        colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
+                        row += td(value[0], style='background-color: rgb(' + colorstring + ")")
+                    elif value == annotation._AnnovarParser__SIFT_score or \
+                         value == annotation._AnnovarParser__LRT_score or \
+                         value == annotation._AnnovarParser__FATHMM_score or \
+                         value == annotation._AnnovarParser__PROVEAN_score:
+                        # reverse score !!! ###
+                        if float(value[0]) < float(value[3]):  # below threshold
+                            # red -> yellow
+                            diff = float(value[3]) - float(value[1])
+                            div = float(value[0]) / diff
+                            red = 255
+                            green = 255 * div
+                            blue = 20
+                            colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
+                            row += td(value[0], style='background-color: rgb(' + colorstring + ")")
+                        else:  # over threshold
+                            # yellow -> red
+                            diff = float(value[2]) - float(value[3])
+                            div = float(value[0]) / diff
+                            if div > 1:
+                                div = 1
+                            red = 255 * (1-div)
+                            green = 255
+                            blue = 20
+                            colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
+                            row += td(value[0], style='background-color: rgb(' + colorstring + ")")
+                    else:  # has threshold, normal score ###
+                        # print value
+                        if float(value[0]) < float(value[3]):  # below threshold
+                            # green -> yellow
+                            diff = float(value[3]) - float(value[1])
+                            div = float(value[0]) / diff
+                            red = 255 * div
+                            green = 255
+                            blue = 20
+                            colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
+                            row += td(value[0], style='background-color: rgb(' + colorstring + ")")
+                        else:  # over threshold
+                            # yellow -> red
+                            diff = float(value[2]) - float(value[3])
+                            div = float(value[0]) / diff
+                            if value == annotation._AnnovarParser__DANN_score:
+                                print str(value[2]) +", "+ str(value[3])
+                                print value[0]
+                                print diff
+                                print div
+                            red = 255
+                            green = 255 * (1-div)
+                            blue = 20
+                            colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
+                            row += td(value[0], style='background-color: rgb(' + colorstring + ")")
+
                 elif type(value) is tuple and value[0] == ".":
                     row += td(value[0])
                 else:
@@ -756,8 +808,9 @@ with doc.add(div(id='content')):
                     div = float(value[0]) / diff
                     red = 255 * div
                     green = 255 - red
-                    blue = 0
+                    blue = 20
                     colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
+                    #yellow = "r":255, "g":255, "b":20
                     row += td(value[0], style='background-color: rgb(' + colorstring + ")")
                 elif type(value) is tuple and value[0] == ".":
                     row += td(value[0])
@@ -810,7 +863,7 @@ with doc.add(div(id='content')):
         export_cnt += 1
 
 target_html.write(doc.render())
-print(doc.render())
+# print(doc.render())
 target_html.close()
 
 print "FINISHED"
