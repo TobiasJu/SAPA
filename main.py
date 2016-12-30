@@ -8,8 +8,6 @@ try:
 except ImportError, e:
     print "PiP is not installed"
     sys.exit(1)
-else:
-    print "PiP is installed"
 
 try:
     import dominate
@@ -628,11 +626,15 @@ export_cnt = 0
 wd = os.path.dirname(os.path.realpath(__file__))
 
 with doc.head:
-    link(rel='stylesheet', href='https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css')
-    link(rel='stylesheet', src='./resources/SAPA.css')
-    script(type='text/javascript', src='https://code.jquery.com/jquery-1.12.4.js')
-    script(type='text/javascript', src='https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js')
-    script(type='text/javascript', src='https://cdn.datatables.net/plug-ins/1.10.13/sorting/natural.js')
+    # link(rel='stylesheet', href='https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css')
+    link(rel='stylesheet', href='./resources/dataTables.min.css')
+    link(rel='stylesheet', href='./resources/SAPA.css')
+    # script(type='text/javascript', src='https://code.jquery.com/jquery-1.12.4.js')
+    script(type='text/javascript', src='./resources/jquery.1.12.4.min.js')
+    # script(type='text/javascript', src='https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js')
+    script(type='text/javascript', src='./resources/dataTables.min.js')
+    # script(type='text/javascript', src='https://cdn.datatables.net/plug-ins/1.10.13/sorting/natural.js')
+    script(type='text/javascript', src='./resources/natural.js')
     script(type='text/javascript', src="./resources/main.js")
 
 with doc.add(div(id='content')):

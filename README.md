@@ -8,7 +8,12 @@ SAPA is designed to add additional information to an **Illumina truseq amplicon*
 
 First run 
 -------------
-<i class="icon-refresh"></i> To get startet simply type in:
+<i class="icon-refresh"></i> If you don't have [PiP](https://pypi.python.org/pypi/pip) and [Dominate](https://github.com/Knio/dominate) you have to install them, before you can run SAPA, so type:
+
+`sudo apt-get install python-pip`
+`sudo pip install dominate`
+
+To get started simply type in:
 
 `./main.py -i data/truseq_example_data.csv`
 
