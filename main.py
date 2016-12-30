@@ -783,11 +783,11 @@ with doc.add(div(id='content')):
                             blue = 20
                             colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
                             row += td(value[0], style='background-color: rgb(' + colorstring + ")")
-                            if value == annotation._AnnovarParser__DANN_score:
-                                print str(value[2]) +", "+ str(value[3])
-                                print value[0]
-                                print range
-                                print percentage
+                            # if value == annotation._AnnovarParser__DANN_score:
+                            #     print str(value[2]) +", "+ str(value[3])
+                            #     print value[0]
+                            #     print range
+                            #     print percentage
 
                 elif type(value) is tuple and value[0] == ".":
                     row += td(value[0])
