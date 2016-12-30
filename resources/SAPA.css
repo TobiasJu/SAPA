@@ -1,0 +1,12 @@
+/* search bar to the left */
+.pull-left{
+    float:left;
+}
+.pull-right{
+    float:right;
+}
+
+.dataTables_wrapper .dataTables_filter {
+	float: left !important;
+	/* text-align: left; */
+}

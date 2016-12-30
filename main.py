@@ -629,6 +629,7 @@ wd = os.path.dirname(os.path.realpath(__file__))
 
 with doc.head:
     link(rel='stylesheet', href='https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css')
+    link(rel='stylesheet', src='./resources/SAPA.css')
     script(type='text/javascript', src='https://code.jquery.com/jquery-1.12.4.js')
     script(type='text/javascript', src='https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js')
     script(type='text/javascript', src='https://cdn.datatables.net/plug-ins/1.10.13/sorting/natural.js')
@@ -726,9 +727,9 @@ with doc.add(div(id='content')):
                           ]:
                 if type(value) is tuple and not value[0] == ".":  # (value, min, max, threshold)
                     if len(value) == 3:  # has no threshold
-                        diff = float(value[2]) - float(value[1])  # max - min
-                        div = float(value[0]) / diff
-                        red = 255 * div
+                        range = float(value[2]) - float(value[1])  # max - min
+                        percentage = float(value[0]) / range
+                        red = 255 * percentage
                         green = 255 - red
                         blue = 20
                         colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
@@ -740,20 +741,20 @@ with doc.add(div(id='content')):
                         # reverse score !!! ###
                         if float(value[0]) < float(value[3]):  # below threshold
                             # red -> yellow
-                            diff = float(value[3]) - float(value[1])
-                            div = float(value[0]) / diff
+                            range = float(value[3]) - float(value[1])
+                            percentage = float(value[0]) / range
                             red = 255
-                            green = 255 * div
+                            green = 255 * percentage
                             blue = 20
                             colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
                             row += td(value[0], style='background-color: rgb(' + colorstring + ")")
                         else:  # over threshold
                             # yellow -> red
-                            diff = float(value[2]) - float(value[3])
-                            div = float(value[0]) / diff
-                            if div > 1:
-                                div = 1
-                            red = 255 * (1-div)
+                            range = float(value[2]) - float(value[3])
+                            percentage = float(value[0]) / range
+                            if percentage > 1:
+                                percentage = 1
+                            red = 255 * (1-percentage)
                             green = 255
                             blue = 20
                             colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
@@ -762,24 +763,26 @@ with doc.add(div(id='content')):
                         # print value
                         if float(value[0]) < float(value[3]):  # below threshold
                             # green -> yellow
-                            diff = float(value[3]) - float(value[1])
-                            div = float(value[0]) / diff
-                            red = 255 * div
+                            range = float(value[3]) - float(value[1])
+                            percentage = float(value[0]) / range
+                            red = 255 * percentage
                             green = 255
                             blue = 20
                             colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
                             row += td(value[0], style='background-color: rgb(' + colorstring + ")")
                         else:  # over threshold
                             # yellow -> red
-                            diff = float(value[2]) - float(value[3])
-                            div = float(value[0]) / diff
+                            range = float(value[2]) - float(value[3])  # max - min
+                            if range < 0:
+                                range = abs(range)
+                            percentage = float(value[0]) / range
                             if value == annotation._AnnovarParser__DANN_score:
                                 print str(value[2]) +", "+ str(value[3])
                                 print value[0]
-                                print diff
-                                print div
+                                print range
+                                print percentage
                             red = 255
-                            green = 255 * (1-div)
+                            green = 255 * (1-percentage)
                             blue = 20
                             colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
                             row += td(value[0], style='background-color: rgb(' + colorstring + ")")
@@ -804,9 +807,9 @@ with doc.add(div(id='content')):
                           ]:
 
                 if type(value) is tuple and not value[0] == ".":
-                    diff = float(value[2]) - float(value[1])
-                    div = float(value[0]) / diff
-                    red = 255 * div
+                    range = float(value[2]) - float(value[1])
+                    percentage = float(value[0]) / range
+                    red = 255 * percentage
                     green = 255 - red
                     blue = 20
                     colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
