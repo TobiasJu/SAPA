@@ -1,12 +1,29 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# this script takes a ClinVar tabular text file with SNPs and converts it to the needed SAPA format.
+
 import csv
 import sys
+import argparse
 
-print "converting file to SAPA format"
+# argparse for information
+parser = argparse.ArgumentParser()
+parser.add_argument("-i", "--input_file", help="clinvar file")
+parser.add_argument("-c", "--counter", type=int, help="select number of SNPs to convert (default all)")
+args = parser.parse_args()
+
+if not args.input_file:
+    print "ERROR, please enter an input file"
+    parser.print_help()
+    sys.exit(0)
+
+print "converting file: " + args.input_file + "  to SAPA format"
 
 counter = 0
-clinvar = open('converted_hg38_benign.csv', 'w')
-clinvar.write("Chr,Pos,Ref,Alt,Clinical significance,Gene\n")
-with open("clinvar_hg38_benign.txt") as csvfile:
+clinvar = open(args.input_file + '.csv', 'w')
+clinvar.write('"Chr","Pos","Ref","Alt","Clinical significance","Gene"\n')
+with open(args.input_file) as csvfile:
     variant_lines = csv.reader(csvfile, delimiter='\t', quotechar='"')
     # skip header if there
     has_header = csv.Sniffer().has_header(csvfile.read(100))
@@ -29,17 +46,15 @@ with open("clinvar_hg38_benign.txt") as csvfile:
 
             if buildver == "GRCh38" and chr and pos:  # and clin_sig == "Pathogenic"
                 counter += 1
-                print chr
-                print pos
-                print ref
-                print alt
-                print clin_sig[0]
-                print gene
+                print chr, pos, ref, alt, clin_sig[0], gene
+                print counter
                 # print buildver
-                export_string += chr+","+pos+","+ref+","+alt+","+clin_sig[0]+","+gene+"\n"
+                export_string += '"'+chr+'"'+","+'"'+pos+'"'+","+'"'+ref+'"'+","+'"'+alt+'"'+","+'"'+clin_sig[0]+\
+                                 '"'+","+'"'+gene+'"'+"\n"
                 clinvar.write(export_string)
 
-        if counter == 1000:
-            break
+        if args.counter:
+            if counter == args.counter:
+                break
 clinvar.close()
 print "END"

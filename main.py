@@ -17,14 +17,11 @@ except ImportError, e:
     sys.exit(1)
 
 from dominate.tags import *
-from os.path import exists
-import re
 import csv
 import os
 import collections
 import subprocess
 import ensembl_rest
-import itertools
 from snp import SNP
 from allProt import AllProt
 from probedMutation import ProbedMutation
@@ -97,9 +94,6 @@ Parameters:
 -t, --text_delimiter : set the input text delimiter (default: ")
     > e.g. -t "'" this will set the text delimiter to an apostrophe, if a column contains multiple entries
 
--id, --input_directory : hg19 (GRCh37) database directory (default /hg19)
-    > e.g. -id humandb/ set the input directory to be named humandb
-
 -o, --output_file : output file name (default output.csv)
     > e.g. -o annotated_snps_detailed.txt -d running the detailed operation mode, and saving it in the file
               annotated_snps_detailed.txt
@@ -118,7 +112,7 @@ functional deleteriousness prediction scores from the dbNSFP database (version 2
     sys.exit(0)
 
 if not args.input_file:
-    print "ERROR, please enter a input file parameter"
+    print "ERROR, please enter an input file parameter"
     parser.print_help()
     sys.exit(0)
 
@@ -595,14 +589,15 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
             if float(annotation._AnnovarParser__DANN_score[0]) > 0.96:
                 export_string += "Deleterious (DANN)"
         else:
-            if annotation._AnnovarParser__ExonicFunc_refGene == "synonymous SNV":
+            if annotation._AnnovarParser__ExonicFunc_refGene == "synonymous SNV" and not \
+                            annotation._AnnovarParser__ExonicFunc_refGene == "nonsynonymous SNV":
                 export_string += "Tolerated (synonymous)"
             elif "intronic" in annotation._AnnovarParser__Func_refGene:
-                export_string += "Tolerated (Intron)"
+                export_string += "probably Tolerated (Intron)"  # I SHOULD NOT say it is tolerated, if SNP is intronic!
             elif "Intron" in snp.get_context():
-                export_string += "Tolerated (Intron)"
+                export_string += "probably Tolerated (Intron)"  # A Intronic SNP database needs to be added!
             elif "Intergenic" in snp.get_context():
-                export_string += "Tolerated (Intergenic)"
+                export_string += "probably Tolerated (Intergenic)"
             elif "Coding" in snp.get_context() and "synonymous_variant" in snp.get_consequences():
                 export_string += "Tolerated (synonymous_variant)"
             else:
@@ -648,8 +643,7 @@ with doc.add(div(id='content')):
         # line = tr()
         thead = thead()
         tbody = tbody()
-
-    # write header first:
+    # write header first
     if args.detail:
         header = str(snps_with_annotation.iterkeys().next().print_header()) + \
                  str(snps_with_annotation.itervalues().next().print_header() + "final prediction\t")
@@ -657,14 +651,10 @@ with doc.add(div(id='content')):
         header = str(snps_with_annotation.iterkeys().next().print_header()) + \
                  "Gene\tfunction prediction scores [0-1]\tconservation scores[-12.3-6.17]\t" \
                  "ensemble scores[0-60]\tfinal prediction\t"
-
     split_header = header.split("\t")
     for i in split_header:
         if i != "":
             thead += td(i)
-    # thead += tr()
-    print "writing header"
-
     for snp, annotation in ordered_snps_with_annotation.iteritems():
         row = tr()
         # write rows in table
@@ -672,7 +662,6 @@ with doc.add(div(id='content')):
             altFreq = snp.get_altFreq() * 100
         except ValueError:
             altFreq = snp.get_altFreq()
-
         if args.detail:
             for value in [snp.get_id(), snp.get_chr(), snp.get_pos(), snp.get_ref(), snp.get_alt(),
                           snp.get_type(), ','.join(snp.get_context()), ','.join(snp.get_consequences()),
@@ -737,9 +726,9 @@ with doc.add(div(id='content')):
                         colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
                         row += td(value[0], style='background-color: rgb(' + colorstring + ")")
                     elif value == annotation._AnnovarParser__SIFT_score or \
-                         value == annotation._AnnovarParser__LRT_score or \
-                         value == annotation._AnnovarParser__FATHMM_score or \
-                         value == annotation._AnnovarParser__PROVEAN_score:
+                                    value == annotation._AnnovarParser__LRT_score or \
+                                    value == annotation._AnnovarParser__FATHMM_score or \
+                                    value == annotation._AnnovarParser__PROVEAN_score:
                         # reverse score !!! ###
                         if float(value[0]) < float(value[3]):  # below threshold
                             # red -> yellow
@@ -756,7 +745,7 @@ with doc.add(div(id='content')):
                             percentage = float(value[0]) / range
                             if percentage > 1:
                                 percentage = 1
-                            red = 255 * (1-percentage)
+                            red = 255 * (1 - percentage)
                             green = 255
                             blue = 20
                             colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
@@ -779,7 +768,7 @@ with doc.add(div(id='content')):
                                 range = abs(range)
                             percentage = float(value[0]) / range
                             red = 255
-                            green = 255 * (1-percentage)
+                            green = 255 * (1 - percentage)
                             blue = 20
                             colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
                             row += td(value[0], style='background-color: rgb(' + colorstring + ")")
@@ -815,7 +804,7 @@ with doc.add(div(id='content')):
                     green = 255 - red
                     blue = 20
                     colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
-                    #yellow = "r":255, "g":255, "b":20
+                    # yellow = "r":255, "g":255, "b":20
                     row += td(value[0], style='background-color: rgb(' + colorstring + ")")
                 elif type(value) is tuple and value[0] == ".":
                     row += td(value[0])
@@ -838,14 +827,15 @@ with doc.add(div(id='content')):
                 if float(annotation._AnnovarParser__DANN_score[0]) > 0.96:
                     export_string += "Deleterious (DANN)"
             else:
-                if annotation._AnnovarParser__ExonicFunc_refGene == "synonymous SNV":
+                if annotation._AnnovarParser__ExonicFunc_refGene == "synonymous SNV" and not \
+                                annotation._AnnovarParser__ExonicFunc_refGene == "nonsynonymous SNV":
                     export_string += "Tolerated (synonymous)"
                 elif "intronic" in annotation._AnnovarParser__Func_refGene:
-                    export_string += "Tolerated (Intron)"
+                    export_string += "probably Tolerated (Intron)"
                 elif "Intron" in snp.get_context():
-                    export_string += "Tolerated (Intron)"
+                    export_string += "probably Tolerated (Intron)"
                 elif "Intergenic" in snp.get_context():
-                    export_string += "Tolerated (Intergenic)"
+                    export_string += "probably Tolerated (Intergenic)"
                 elif "Coding" in snp.get_context() and "synonymous_variant" in snp.get_consequences():
                     export_string += "Tolerated (synonymous_variant)"
                 else:

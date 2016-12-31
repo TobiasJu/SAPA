@@ -228,7 +228,7 @@ Several commonly used databases are integrated:
 - <b>exac03</b> 
 	- for the variants reported in the Exome Aggregation Consortium (version 0.3)
 - <b>dbnsfp30a</b> 
-	- for various functional deleteriousness prediction scores from the dbNSFP database (version 2.6)
+	- for various functional deleteriousness prediction scores from the dbNSFP database
 	
 - <b>clinvar_20140929</b>
 	- for the variants reported in the ClinVar database (version 20140929).
@@ -329,9 +329,18 @@ The generated outputfile `output.html`, will be in the current working directory
 | 17 | chrX  | 39933339  | A   | G   | SNV      | Coding                                     | synonymous_variant                                                                                  | rs5917933            |             |                | 100  | 99,8         | 14616       | 18        | 14592     | -100        | chrX  | 39933339  | 39933339  | A   | G   | exonic       | BCOR         | 0                  | synonymous SNV      | BCOR:NM_001123383:exon4:c,T1260C:p,D420D,BCOR:NM_001123384:exon4:c,T1260C:p,D420D,BCOR:NM_001123385:exon4:c,T1260C:p,D420D,BCOR:NM_017745:exon4:c,T1260C:p,D420D                                                                                                                                                                                       | Xp11,4   | 0,8957          | rs5917933   | 0          | 0         | 0                    | 0                   | 0                    | 0                   | 0         | 0        | 0                    | 0                   | 0                      | 0                     | 0            | 0           | 0             | 0            | 0           | 0        | 0          | 0          | 0                       | 0                      | 0             | 0            | 0            | 0           | 0                        | 0                           | 0       | 0                     | 0                     | 0                        | 0                        | 0                   | Tolerated (synonymous) |
 | 18 | chrX  | 123195650 | A   | T   | SNV      | Coding                                     | missense_variant                                                                                    |                      |             |                | 47   | 7,3          | 109         | 100       | 8         | -100        | chrX  | 123195650 | 123195650 | A   | T   | exonic       | STAG2        | 0                  | nonsynonymous SNV   | STAG2:NM_006603:exon16:c,A1564T:p,I522F,STAG2:NM_001042749:exon17:c,A1564T:p,I522F,STAG2:NM_001042750:exon17:c,A1564T:p,I522F,STAG2:NM_001042751:exon17:c,A1564T:p,I522F,STAG2:NM_001282418:exon17:c,A1564T:p,I522F                                                                                                                                    | Xq25     | 0               | 0           | 0,001      | D         | 0,955                | P                   | 0,774                | P                   | 0         | D        | 1                    | D                   | 2,66                   | M                     | 1,51         | T           | -3,81         | D            | 0,906       | 6,183    | 28,6       | 0,989      | 0,973                   | D                      | -0,343        | T            | 0,303        | T           | 0                        | 0                           | 4,77    | 1,062                 | 1,088                 | 0,999                    | 1                        | 13,668              | Tolerated              |
 
+Validation
+-------------
+For validation i used 2023 Pathogenic SNPs from Multiple submitters out of Clinvar and 2000 benign SNPs also from Multiple submitters.
+Pathogenic file: 1419 deleterious (true positive), 564 tolerated (false negative), (40 miss)
+Benign file: 153 deleterious (false positives), 1736 tolerated (true negative), (111 miss)
+This yielded in a MCC of 0.64 (0.78)
+If you want to validate it yourself, you can use the clinvar datasets in the data/ folder or download a set yourself from clinvar and convert it to the SAPA format with the ClinVar_to_SAPA_parser.py
+
+
 Known bugs and missing features
 -------------
-Some deletions are not handled correctly and sometimes there is no score for the deletion available.
+longer deletions are not handled correctly and often there are no scores for longer indels available.
 Also there is no scoring system for non coding variants, this may change later. 
 
 References
