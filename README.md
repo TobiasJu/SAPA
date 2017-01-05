@@ -4,7 +4,12 @@ SAPA - SNP annotation programm for AML
 **75%** of a **Acute myeloid leukemia** (AML) patients SNPs are unique to them and their impact is still unresolved. 
 
 SAPA is designed to add additional information to an **Illumina truseq amplicon** variants csv file. Such as Scores for nonsynonymous scoring matrices, divided into **3** different **combined Scores**, function prediction scores, conservation scores and one ensemble score. So that the viewer gets more Information whether a mutation is deleterious or tolerated. Due to performance and data reasons, SAPA uses annovar<sup>1</sup> and their precomputed SNP database, to quickly gather the deleterious prediction methods scores. 
-  
+
+
+Update:
+-------------
+Now with HTML heatmap output!
+![HTML output](/images/SAPA output.png)
 
 First run 
 -------------
