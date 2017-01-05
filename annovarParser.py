@@ -119,7 +119,7 @@ class AnnovarParser:
         self.__cytoBand = cytoBand
         self.__esp6500siv2_all = esp6500siv2_all
         self.__avsnp147 = avsnp147
-        self.__SIFT_score = (SIFT_score, self.__SIFT_min, self.__SIFT_max, 0.05)  # (value, min, max, Deleterious threshold)
+        self.__SIFT_score = (SIFT_score, self.__SIFT_min, self.__SIFT_max, 0.05)  # (value, min, max, Deleterious_threshold)
         self.__SIFT_pred = SIFT_pred
         self.__Polyphen2_HDIV_score = (Polyphen2_HDIV_score, self.__Polyphen2_HDIV_min, self.__Polyphen2_HDIV_max, 0.452)
         self.__Polyphen2_HDIV_pred = Polyphen2_HDIV_pred

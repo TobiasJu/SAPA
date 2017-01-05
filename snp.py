@@ -135,7 +135,10 @@ class SNP(object):
         return self.__type
 
     def get_context(self):
-        return self.__context
+        if isinstance(self.__context, basestring):
+            return self.__context
+        else:
+            return ','.join(self.__context)
 
     def get_consequences(self):
         return self.__consequence

@@ -6,14 +6,14 @@ import sys
 try:
     import setuptools
 except ImportError, e:
-    print "PiP is not installed"
+    print 'PiP is not installed, please install pip by typing "sudo apt-get install python-pip"'
     sys.exit(1)
 
 try:
     import dominate
 except ImportError, e:
     pass
-    print "Dominate is missing"
+    print 'Dominate HTML is missing, please install Dominate by typing "sudo pip install dominate"'
     sys.exit(1)
 
 from dominate.tags import *
@@ -495,16 +495,19 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
         target.write(header)
         target.write("\n")
     # write rows in table
-    try:
-        altFreq = snp.get_altFreq() * 100
-    except ValueError:
-        altFreq = snp.get_altFreq()
+    if snp.get_altFreq() != ".":
+        try:
+            altFreq = snp.get_altFreq() * 100
+        except ValueError:
+            altFreq = snp.get_altFreq()
+    else:
+        altFreq = "."
     if args.detail:
         export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}"
                             "\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
                             "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
                             "".format(snp.get_id(), snp.get_chr(), snp.get_pos(), snp.get_ref(), snp.get_alt(),
-                                      snp.get_type(), ','.join(snp.get_context()), ','.join(snp.get_consequences()),
+                                      snp.get_type(), snp.get_context(), ','.join(snp.get_consequences()),
                                       snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(), snp.get_qual(),
                                       altFreq, snp.get_totalDepth(), snp.get_refDepth(),
                                       snp.get_altDepth(), snp.get_strandBias(),
@@ -658,13 +661,16 @@ with doc.add(div(id='content')):
     for snp, annotation in ordered_snps_with_annotation.iteritems():
         row = tr()
         # write rows in table
-        try:
-            altFreq = snp.get_altFreq() * 100
-        except ValueError:
-            altFreq = snp.get_altFreq()
+        if snp.get_altFreq() != ".":
+            try:
+                altFreq = snp.get_altFreq() * 100
+            except ValueError:
+                altFreq = snp.get_altFreq()
+        else:
+            altFreq = "."
         if args.detail:
             for value in [snp.get_id(), snp.get_chr(), snp.get_pos(), snp.get_ref(), snp.get_alt(),
-                          snp.get_type(), ','.join(snp.get_context()), ','.join(snp.get_consequences()),
+                          snp.get_type(), snp.get_context(), ','.join(snp.get_consequences()),
                           snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(), snp.get_qual(),
                           altFreq, snp.get_totalDepth(), snp.get_refDepth(),
                           snp.get_altDepth(), snp.get_strandBias(),
