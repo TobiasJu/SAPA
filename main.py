@@ -35,8 +35,6 @@ parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group()
 # group.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
 group.add_argument("-q", "--quiet", action="store_true", help="prevent output in command line")
-# parser.add_argument("-l", "--log", action="store_true", help="store the output in a log file")
-# parser.add_argument("-n", "--number", type=int, help="just a Test number")
 parser.add_argument("-m", "--manual", action="store_true", help="display the manual for this program")
 parser.add_argument("-i", "--input_file", help="comma separated table with SNP's")
 parser.add_argument("-d", "--detail", action="store_true", help="write detailed output file")
@@ -152,11 +150,6 @@ with open(args.input_file) as csvfile:
     l_count = 0
     snps = []
     for variant_line in variant_lines:
-        # remove /n form end of line
-        # variant_line = variant_line.strip()
-        # remove " from lines
-        # variant_line[0] = variant_line[0].translate(None, '"')
-        # variant_line[-1] = variant_line[-1].translate(None, '"')
         if len(variant_line) >= 16:
             success_count += 1
             context = variant_line[5].split(",")
@@ -180,6 +173,7 @@ if not args.quiet:
     print "created patient SNP objects with " + str(len(snps)) + " unique SNPs\n"
 csvfile.close()
 
+# sanity check ###
 if fail_count > success_count:
     print "INPUT ERROR! wrong separator selected"
     sys.exit(0)
@@ -192,20 +186,17 @@ if args.filter:
         # only clinically relevant quality
         if snp.get_qual() <= 95:
             del snps[i]
-
         # if mutation does not change the amino acid, it does not affect the cell (in most cases)
         if "synonymous_variant" in snp.get_consequences():
             del snps[i]
         i += 1
     print "past filter SNP count: " + str(len(snps))
 
-# write tab delimited file for annovar #
+# write tab delimited file for annovar ###
 tab_mutations = open('amplicon_variants_tab.csv', 'w')
 for snp in snps:
     # check if type is deletion, correction of the data for annovar
     if "Deletion" in snp.get_type():
-        # print snp.get_ref()
-        # print mutation.get_alt()
         newEnd = snp.get_pos() + (len(snp.get_ref()) - 2)
         snp.set_alt("-")
         if len(snp.get_ref()) > 2:
@@ -216,18 +207,13 @@ for snp in snps:
             except IndexError:
                 snp.set_ref(snp.get_ref()[0])
         snp.set_new_end(newEnd)
-        # print mutation.get_pos()
-        # print newEnd
-        # print mutation.get_ref()
-        # print snp.get_alt()
     tab_mutations.write(snp.export())
 tab_mutations.close()
 if not args.quiet:
     print "created tab delimited file for annovar"
 
 # WORKS JUST UNDER UBUNTU OR THE UBUNTU BASH FOR WINDOWS #
-# get annovar databases if needed ###
-
+# download databases if needed ###
 annotate_variation = "./perl/annotate_variation.pl "
 databases = ["-buildver " + buildversion + " -downdb -webfrom annovar refGene " + buildversion,
              "-buildver " + buildversion + " -downdb cytoBand " + buildversion,
@@ -286,7 +272,6 @@ if not args.fast:
 print "annotating the SNPs"
 annovar_pl = "./perl/table_annovar.pl "
 dir_path = os.path.dirname(os.path.realpath(__file__))
-# print dir_path
 
 if args.fast:
     params = "amplicon_variants_tab.csv " + buildversion + " -buildver " + buildversion + " -out myanno -remove -protocol " \
@@ -364,7 +349,7 @@ for snp, annotation in zip(snps, annovar):
         # if score != ".":
         # rel_score = float(data._AnnovarParser__SIFT_score) / data._AnnovarParser__SIFT_max
         # print rel_score
-###### some work to do here ####
+###### some work to do here some day####
 # sys.exit(0)
 
 # create Objects containing all human proteins ###
@@ -390,7 +375,6 @@ for snp_entry in lines:
         end = position[1]
         geneDesc = variant_line[3].split(",")
         chromosome = "chr" + str(variant_line[4])
-        # print chromosome
         allHumanProteins.append(AllProt(prot, geneSyn, ensembl, geneDesc, chromosome, int(start),
                                         int(end), variant_line[6], variant_line[7:-1]))
 allProtFile.close()
@@ -432,7 +416,7 @@ for snp in snps:
                                                snp.get_refDepth(), snp.get_altDepth(),
                                                snp.get_strandBias(), ".", ".", ".", ".", ".", ".", "."
                                                ))
-
+# this part is for getting the corresponding AA Seq.
 # find DNA sequence for gene in each region and translate it ###
 # mutation_with_sequence = {}
 # for c_muta in coding_mutations:
@@ -467,6 +451,7 @@ for snp in snps:
 
 # ensemble API for GRCh37 hg19 ###
 # ensembl_rest.run(species="human", symbol="DOPEY2")
+# yes not jet finished
 
 
 # write in export table ###
@@ -559,10 +544,6 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
                                       annotation._AnnovarParser__phastCons20way_mammalian[0],
                                       annotation._AnnovarParser__SiPhy_29way_logOdds[0]
                                       ))
-        # snp.get_geneChromosome(),
-        # snp.get_gene(), snp.get_geneSyn(), snp.get_geneDesc(),
-        # snp.get_proteinClass(), snp.get_geneStart(), snp.get_geneEnd()
-        # ))
     else:
         export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
                             "".format(snp.get_id(), snp.get_chr(), snp.get_pos(),
@@ -643,7 +624,6 @@ with doc.add(div(id='content')):
     button("Invert colors".title(), id="invert_button")
 
     with table(id="resultTable", border='1'):
-        # line = tr()
         thead = thead()
         tbody = tbody()
     # write header first
@@ -722,6 +702,7 @@ with doc.add(div(id='content')):
                           annotation._AnnovarParser__phastCons20way_mammalian,
                           annotation._AnnovarParser__SiPhy_29way_logOdds
                           ]:
+                # generate HTML table color gradient ###
                 if type(value) is tuple and not value[0] == ".":  # (value, min, max, threshold)
                     if len(value) == 3:  # has no threshold
                         range = float(value[2]) - float(value[1])  # max - min
@@ -778,11 +759,6 @@ with doc.add(div(id='content')):
                             blue = 20
                             colorstring = str(int(red)) + ", " + str(int(green)) + ", " + str(blue)
                             row += td(value[0], style='background-color: rgb(' + colorstring + ")")
-                            # if value == annotation._AnnovarParser__DANN_score:
-                            #     print str(value[2]) +", "+ str(value[3])
-                            #     print value[0]
-                            #     print range
-                            #     print percentage
 
                 elif type(value) is tuple and value[0] == ".":
                     row += td(value[0])
@@ -817,8 +793,8 @@ with doc.add(div(id='content')):
                 else:
                     row += td(value)
 
-        export_string = ""
         # check for final prediction ###
+        export_string = ""
         if annotation._AnnovarParser__MetaLR_pred == "T":
             export_string += "Tolerated"
         elif annotation._AnnovarParser__MetaLR_pred == "D":
@@ -864,7 +840,6 @@ with doc.add(div(id='content')):
         export_cnt += 1
 
 target_html.write(doc.render())
-# print(doc.render())
 target_html.close()
 
 print "FINISHED"
