@@ -677,6 +677,7 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
             else:
                 final_prediction += "."
     export_string += final_prediction
+    dict_json['snp' + str(snp.get_id())]['final'] = final_prediction
 
     # change digit format to german
     export_string = export_string.replace('.', ',')
@@ -938,5 +939,10 @@ with doc.add(div(id='content')):
 
 target_html.write(doc.render())
 target_html.close()
+
+# remove log data
+if os.path.exists("amplicon_variants_tab.csv") and os.path.exists("myanno.hg19_multianno.txt"):
+    os.remove("amplicon_variants_tab.csv")
+    os.remove("myanno.hg19_multianno.txt")
 
 print "FINISHED"
