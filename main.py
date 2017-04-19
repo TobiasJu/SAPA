@@ -29,6 +29,8 @@ from dna_to_aa_translator import Translator
 from geneDNA import GeneDNA
 from annovarParser import AnnovarParser
 import argparse
+import io
+import json
 
 # argparse for information
 parser = argparse.ArgumentParser()
