@@ -458,17 +458,19 @@ for snp in snps:
 
 # write in export table ###
 if not args.output_file:
-    target = open("output.csv", 'w')
-    print "writing export in: output.csv"
-    target_html = open("output.html", 'w')
-    print "writing html table in: output.html"
+    target = open("output/output.csv", 'w')
+    print "writing export in: output/output.csv"
+    target_html = open("output/output.html", 'w')
+    print "writing html table in: output/output.html"
 else:
-    target = open(args.output_file, 'w')
-    print "writing export in: " + args.output_file
-    target_html = open(args.output_file + ".html", 'w')
-    print "writing html table in: " + args.output_file + ".html"
+    target = open("output/" + args.output_file, 'w')
+
+    print "writing export in: output/" + args.output_file
+    target_html = open("output/" + args.output_file + ".html", 'w')
+    print "writing html table in: output/" + args.output_file + ".html"
 export_cnt = 0
 ordered_snps_with_annotation = collections.OrderedDict(sorted(snps_with_annotation.items()))
+dict_json = {}
 
 for snp, annotation in ordered_snps_with_annotation.iteritems():
     # write header first:
@@ -489,7 +491,46 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
             altFreq = snp.get_altFreq()
     else:
         altFreq = "."
-    if args.detail:
+
+    # write Json dictionary
+    dict_json['snp' + str(snp.get_id())] = {}
+    dict_json['snp' + str(snp.get_id())]['id'] = snp.get_id()
+    dict_json['snp' + str(snp.get_id())]['chr'] = snp.get_chr()
+    dict_json['snp' + str(snp.get_id())]['pos'] = snp.get_pos()
+    dict_json['snp' + str(snp.get_id())]['ref'] = snp.get_ref()
+    dict_json['snp' + str(snp.get_id())]['alt'] = snp.get_alt()
+    dict_json['snp' + str(snp.get_id())]['type'] = snp.get_type()
+    dict_json['snp' + str(snp.get_id())]['context'] = snp.get_context()
+    dict_json['snp' + str(snp.get_id())]['consequences'] = ','.join(snp.get_consequences())
+    dict_json['snp' + str(snp.get_id())]['dbSNP'] = snp.get_dbSNP()
+    dict_json['snp' + str(snp.get_id())]['cosmic'] = snp.get_cosmic()
+    dict_json['snp' + str(snp.get_id())]['clinvar'] = snp.get_clinVar()
+    dict_json['snp' + str(snp.get_id())]['quality'] = snp.get_qual()
+    dict_json['snp' + str(snp.get_id())]['altFreq'] = snp.get_altFreq()
+    dict_json['snp' + str(snp.get_id())]['totalDepth'] = snp.get_totalDepth()
+    dict_json['snp' + str(snp.get_id())]['refDepth'] = snp.get_refDepth()
+    dict_json['snp' + str(snp.get_id())]['altDepth'] = snp.get_altDepth()
+    dict_json['snp' + str(snp.get_id())]['bias'] = snp.get_strandBias()
+    dict_json['snp' + str(snp.get_id())]['Gene_refGene'] = annotation._AnnovarParser__Gene_refGene
+    dict_json['snp' + str(snp.get_id())]['MetaLR_score'] = annotation._AnnovarParser__MetaLR_score[0]
+    dict_json['snp' + str(snp.get_id())]['GERP_RS'] = annotation._AnnovarParser__GERP_RS[0]
+    dict_json['snp' + str(snp.get_id())]['CADD_phred'] = annotation._AnnovarParser__CADD_phred[0]
+
+    if not args.detail:
+        export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
+                            "".format(snp.get_id(), snp.get_chr(), snp.get_pos(),
+                                      snp.get_ref(), snp.get_alt(), snp.get_type(),
+                                      snp.get_context(), ','.join(snp.get_consequences()),
+                                      snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(),
+                                      snp.get_qual(), snp.get_altFreq(),
+                                      snp.get_totalDepth(), snp.get_refDepth(),
+                                      snp.get_altDepth(), snp.get_strandBias(),
+                                      annotation._AnnovarParser__Gene_refGene,
+                                      annotation._AnnovarParser__MetaLR_score[0],
+                                      annotation._AnnovarParser__GERP_RS[0],
+                                      annotation._AnnovarParser__CADD_phred[0]
+                                      ))
+    else:
         export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}"
                             "\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
                             "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
@@ -546,48 +587,96 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
                                       annotation._AnnovarParser__phastCons20way_mammalian[0],
                                       annotation._AnnovarParser__SiPhy_29way_logOdds[0]
                                       ))
-    else:
-        export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
-                            "".format(snp.get_id(), snp.get_chr(), snp.get_pos(),
-                                      snp.get_ref(), snp.get_alt(), snp.get_type(),
-                                      ','.join(snp.get_context()), ','.join(snp.get_consequences()),
-                                      snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(),
-                                      snp.get_qual(), snp.get_altFreq(),
-                                      snp.get_totalDepth(), snp.get_refDepth(),
-                                      snp.get_altDepth(), snp.get_strandBias(),
-                                      annotation._AnnovarParser__Gene_refGene,
-                                      annotation._AnnovarParser__MetaLR_score[0],
-                                      annotation._AnnovarParser__GERP_RS[0],
-                                      annotation._AnnovarParser__CADD_phred[0]
-                                      ))
+        dict_json['snp' + str(snp.get_id())]['annovar_chr'] = annotation._AnnovarParser__Chr
+        dict_json['snp' + str(snp.get_id())]['start'] = annotation._AnnovarParser__Start
+        dict_json['snp' + str(snp.get_id())]['end'] = annotation._AnnovarParser__End
+        dict_json['snp' + str(snp.get_id())]['annovar_ref'] = annotation._AnnovarParser__Ref
+        dict_json['snp' + str(snp.get_id())]['annovar_alt'] = annotation._AnnovarParser__Alt
+        dict_json['snp' + str(snp.get_id())]['func_refGene'] = annotation._AnnovarParser__Func_refGene
+        # dict_json['snp' + str(snp.get_id())]['refGene'] = annotation._AnnovarParser__Gene_refGene
+        dict_json['snp' + str(snp.get_id())]['GeneDetail'] = annotation._AnnovarParser__GeneDetail_refGene
+        dict_json['snp' + str(snp.get_id())]['ExonicFunc'] = annotation._AnnovarParser__ExonicFunc_refGene
+        dict_json['snp' + str(snp.get_id())]['AAchange'] = annotation._AnnovarParser__AAChange_refGene
+        dict_json['snp' + str(snp.get_id())]['cytoBand'] = annotation._AnnovarParser__cytoBand
+        dict_json['snp' + str(snp.get_id())]['esp6500'] = annotation._AnnovarParser__esp6500siv2_all
+        dict_json['snp' + str(snp.get_id())]['avsnp147'] = annotation._AnnovarParser__avsnp147
+        dict_json['snp' + str(snp.get_id())]['SIFT_score'] = annotation._AnnovarParser__SIFT_score[0]
+        dict_json['snp' + str(snp.get_id())]['SIFT_pred'] = annotation._AnnovarParser__SIFT_pred
+        dict_json['snp' + str(snp.get_id())]['Polyphen2_HDIV_score'] = annotation._AnnovarParser__Polyphen2_HDIV_score[
+            0]
+        dict_json['snp' + str(snp.get_id())]['Polyphen2_HDIV_pred'] = annotation._AnnovarParser__Polyphen2_HDIV_pred
+        dict_json['snp' + str(snp.get_id())]['Polyphen2_HVAR_score'] = annotation._AnnovarParser__Polyphen2_HVAR_score[
+            0]
+        dict_json['snp' + str(snp.get_id())]['Polyphen2_HVAR_pred'] = annotation._AnnovarParser__Polyphen2_HVAR_pred
+        dict_json['snp' + str(snp.get_id())]['LRT_score'] = annotation._AnnovarParser__LRT_score[0]
+        dict_json['snp' + str(snp.get_id())]['LRT_pred'] = annotation._AnnovarParser__LRT_pred
+        dict_json['snp' + str(snp.get_id())]['MutationTaster_score'] = annotation._AnnovarParser__MutationTaster_score[
+            0]
+        dict_json['snp' + str(snp.get_id())]['MutationTaster_pred'] = annotation._AnnovarParser__MutationTaster_pred
+        dict_json['snp' + str(snp.get_id())]['MutationAssessor_score'] = \
+        annotation._AnnovarParser__MutationAssessor_score[0]
+        dict_json['snp' + str(snp.get_id())]['MutationAssessor_pred'] = annotation._AnnovarParser__MutationAssessor_pred
+        dict_json['snp' + str(snp.get_id())]['FATHMM_score'] = annotation._AnnovarParser__FATHMM_score[0]
+        dict_json['snp' + str(snp.get_id())]['FATHMM_pred'] = annotation._AnnovarParser__FATHMM_pred
+        dict_json['snp' + str(snp.get_id())]['PROVEAN_score'] = annotation._AnnovarParser__PROVEAN_score[0]
+        dict_json['snp' + str(snp.get_id())]['PROVEAN_pred'] = annotation._AnnovarParser__PROVEAN_pred
+        dict_json['snp' + str(snp.get_id())]['VEST3_score'] = annotation._AnnovarParser__VEST3_score[0]
+        dict_json['snp' + str(snp.get_id())]['CADD_raw'] = annotation._AnnovarParser__CADD_raw[0]
+        # dict_json['snp' + str(snp.get_id())]['CADD_phred'] = annotation._AnnovarParser__CADD_phred[0]
+        dict_json['snp' + str(snp.get_id())]['DANN_score'] = annotation._AnnovarParser__DANN_score[0]
+        dict_json['snp' + str(snp.get_id())]['fathmm_MKL_coding_score'] = \
+        annotation._AnnovarParser__fathmm_MKL_coding_score[0]
+        dict_json['snp' + str(snp.get_id())][
+            'fathmm_MKL_coding_pred'] = annotation._AnnovarParser__fathmm_MKL_coding_pred
+        dict_json['snp' + str(snp.get_id())]['MetaSVM_score'] = annotation._AnnovarParser__MetaSVM_score[0]
+        dict_json['snp' + str(snp.get_id())]['MetaSVM_pred'] = annotation._AnnovarParser__MetaSVM_pred
+        # dict_json['snp' + str(snp.get_id())]['MetaLR_score'] = annotation._AnnovarParser__MetaLR_score[0]
+        dict_json['snp' + str(snp.get_id())]['MetaLR_pred'] = annotation._AnnovarParser__MetaLR_pred
+        dict_json['snp' + str(snp.get_id())]['integrated_fitCons_score'] = \
+        annotation._AnnovarParser__integrated_fitCons_score[0]
+        dict_json['snp' + str(snp.get_id())][
+            'integrated_confidence_value'] = annotation._AnnovarParser__integrated_confidence_value
+        # dict_json['snp' + str(snp.get_id())]['GERP_RS'] = annotation._AnnovarParser__GERP_RS[0]
+        dict_json['snp' + str(snp.get_id())]['phyloP7way_vertebrate'] = \
+        annotation._AnnovarParser__phyloP7way_vertebrate[0]
+        dict_json['snp' + str(snp.get_id())]['phyloP20way_mammalian'] = \
+        annotation._AnnovarParser__phyloP20way_mammalian[0]
+        dict_json['snp' + str(snp.get_id())]['phastCons7way_vertebrate'] = \
+        annotation._AnnovarParser__phastCons7way_vertebrate[0]
+        dict_json['snp' + str(snp.get_id())]['phastCons20way_mammalian'] = \
+        annotation._AnnovarParser__phastCons20way_mammalian[0]
+        dict_json['snp' + str(snp.get_id())]['SiPhy_29way_logOdds'] = annotation._AnnovarParser__SiPhy_29way_logOdds[0]
+
     # check for final prediction ###
+    final_prediction = ""
     if annotation._AnnovarParser__MetaLR_pred == "T":
-        export_string += "Tolerated"
+        final_prediction += "Tolerated"
     elif annotation._AnnovarParser__MetaLR_pred == "D":
-        export_string += "Deleterious"
+        final_prediction += "Deleterious"
     elif annotation._AnnovarParser__MetaLR_pred == "P":
-        export_string += "possibly damaging"
+        final_prediction += "possibly damaging"
     elif annotation._AnnovarParser__MetaLR_pred == ".":
         # no Meta Socore available
         if annotation._AnnovarParser__fathmm_MKL_coding_pred == "D":
-            export_string += "Deleterious (FATHMM)"
+            final_prediction += "Deleterious (FATHMM)"
         elif not annotation._AnnovarParser__DANN_score[0] == ".":
             if float(annotation._AnnovarParser__DANN_score[0]) > 0.96:
-                export_string += "Deleterious (DANN)"
+                final_prediction += "Deleterious (DANN)"
         else:
             if annotation._AnnovarParser__ExonicFunc_refGene == "synonymous SNV" and not \
                             annotation._AnnovarParser__ExonicFunc_refGene == "nonsynonymous SNV":
-                export_string += "Tolerated (synonymous)"
+                final_prediction += "Tolerated (synonymous)"
             elif "intronic" in annotation._AnnovarParser__Func_refGene:
-                export_string += "probably Tolerated (Intron)"  # I SHOULD NOT say it is tolerated, if SNP is intronic!
+                final_prediction += "probably Tolerated (Intron)"  # I SHOULD NOT say it is tolerated, if SNP is intronic!
             elif "Intron" in snp.get_context():
-                export_string += "probably Tolerated (Intron)"  # A Intronic SNP database needs to be added!
+                final_prediction += "probably Tolerated (Intron)"  # A Intronic SNP database needs to be added!
             elif "Intergenic" in snp.get_context():
-                export_string += "probably Tolerated (Intergenic)"
+                final_prediction += "probably Tolerated (Intergenic)"
             elif "Coding" in snp.get_context() and "synonymous_variant" in snp.get_consequences():
-                export_string += "Tolerated (synonymous_variant)"
+                final_prediction += "Tolerated (synonymous_variant)"
             else:
-                export_string += "."
+                final_prediction += "."
+    export_string += final_prediction
 
     # change digit format to german
     export_string = export_string.replace('.', ',')
@@ -600,6 +689,12 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
         target.write("\n")
     export_cnt += 1
 target.close()
+
+print "DICT:\n"
+print dict_json
+with io.open('output/output.json', 'w', encoding='utf-8') as f:
+    f.write(unicode(json.dumps(dict_json, ensure_ascii=False)))
+
 
 # HTML page generation ###
 doc = dominate.document(title='SAPA output')
@@ -770,7 +865,7 @@ with doc.add(div(id='content')):
         else:
             for value in [snp.get_id(), snp.get_chr(), snp.get_pos(),
                           snp.get_ref(), snp.get_alt(), snp.get_type(),
-                          ','.join(snp.get_context()), ','.join(snp.get_consequences()),
+                          snp.get_context(), ','.join(snp.get_consequences()),
                           snp.get_dbSNP(), snp.get_cosmic(), snp.get_clinVar(),
                           snp.get_qual(), snp.get_altFreq(),
                           snp.get_totalDepth(), snp.get_refDepth(),

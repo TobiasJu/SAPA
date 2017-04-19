@@ -8,3 +8,4 @@ data/allprots_split.xlsx
 .idea
 hg19/
 hg38/
+output/
