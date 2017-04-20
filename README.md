@@ -9,7 +9,7 @@ SAPA is designed to add additional information to an **Illumina truseq amplicon*
 Update:
 -------------
 Now with HTML heatmap output!
-![HTML output](/images/SAPA output.png)
+![HTML output](/images/SAPA%20output.png)
 
 First run 
 -------------
