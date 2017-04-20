@@ -1,5 +1,6 @@
 # annovar class for storing annotated variation data
 
+import input_check
 
 class AnnovarParser:
     __Chr = ""
@@ -96,7 +97,6 @@ class AnnovarParser:
     __phastCons20way_mammalian_max = 1.0
     __SiPhy_29way_logOdds_max = 38.0
 
-
     # constructor
     def __init__(self, Chr, Start, End, Ref, Alt, Func_refGene, Gene_refGene, GeneDetail_refGene, ExonicFunc_refGene,
                  AAChange_refGene, cytoBand, esp6500siv2_all, avsnp147, SIFT_score, SIFT_pred, Polyphen2_HDIV_score,
@@ -120,7 +120,7 @@ class AnnovarParser:
         self.__esp6500siv2_all = esp6500siv2_all
         self.__avsnp147 = avsnp147
         self.__SIFT_score = (SIFT_score, self.__SIFT_min, self.__SIFT_max, 0.05)  # (value, min, max, Deleterious_threshold)
-        self.__SIFT_pred = SIFT_pred
+        self.__SIFT_pred = input_check.check_input(SIFT_pred)
         self.__Polyphen2_HDIV_score = (Polyphen2_HDIV_score, self.__Polyphen2_HDIV_min, self.__Polyphen2_HDIV_max, 0.452)
         self.__Polyphen2_HDIV_pred = Polyphen2_HDIV_pred
         self.__Polyphen2_HVAR_score = (Polyphen2_HVAR_score, self.__Polyphen2_HVAR_min, self.__Polyphen2_HVAR_max, 0.452)
@@ -154,7 +154,7 @@ class AnnovarParser:
         self.__phastCons20way_mammalian = (phastCons20way_mammalian, self.__phastCons20way_mammalian_min, self.__phastCons20way_mammalian_max)
         self.__SiPhy_29way_logOdds = (SiPhy_29way_logOdds, self.__SiPhy_29way_logOdds_min, self.__SiPhy_29way_logOdds_max)
 
-        # class functions
+    # class functions
 
     def print_header(self):
         return "Chr\tStart\tEnd\tRef\tAlt\tFunc_refGene\tGene_refGene\tGeneDetail_refGene\tExonicFunc_refGene\t" \
