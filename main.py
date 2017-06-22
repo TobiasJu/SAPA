@@ -356,7 +356,7 @@ for snp, annotation in zip(snps, annovar):
 
 # create Objects containing all human proteins ###
 allHumanProteins = []
-allProtFile = open('data/allprots.csv', 'r')
+allProtFile = open('example_data/allprots.csv', 'r')
 lines = allProtFile.readlines()[1:]
 line_count = 0
 for snp_entry in lines:
@@ -494,6 +494,7 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
 
     # write Json dictionary
     dict_json['snp' + str(snp.get_id())] = {}
+    dict_json['snp' + str(snp.get_id())]['GenName_refGene'] = annotation._AnnovarParser__Gene_refGene
     dict_json['snp' + str(snp.get_id())]['id'] = snp.get_id()
     dict_json['snp' + str(snp.get_id())]['chr'] = snp.get_chr()
     dict_json['snp' + str(snp.get_id())]['pos'] = snp.get_pos()
@@ -510,11 +511,10 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
     dict_json['snp' + str(snp.get_id())]['totalDepth'] = snp.get_totalDepth()
     dict_json['snp' + str(snp.get_id())]['refDepth'] = snp.get_refDepth()
     dict_json['snp' + str(snp.get_id())]['altDepth'] = snp.get_altDepth()
-    dict_json['snp' + str(snp.get_id())]['bias'] = snp.get_strandBias()
-    dict_json['snp' + str(snp.get_id())]['Gene_refGene'] = annotation._AnnovarParser__Gene_refGene
-    dict_json['snp' + str(snp.get_id())]['MetaLR_score'] = annotation._AnnovarParser__MetaLR_score[0]
+    dict_json['snp' + str(snp.get_id())]['strandBias'] = snp.get_strandBias()
+    dict_json['snp' + str(snp.get_id())]['MetaLRscore'] = annotation._AnnovarParser__MetaLR_score[0]
     dict_json['snp' + str(snp.get_id())]['GERP_RS'] = annotation._AnnovarParser__GERP_RS[0]
-    dict_json['snp' + str(snp.get_id())]['CADD_phred'] = annotation._AnnovarParser__CADD_phred[0]
+    dict_json['snp' + str(snp.get_id())]['CADDphred'] = annotation._AnnovarParser__CADD_phred[0]
 
     if not args.detail:
         export_string = str("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t"
@@ -691,11 +691,17 @@ for snp, annotation in ordered_snps_with_annotation.iteritems():
     export_cnt += 1
 target.close()
 
-print "DICT:\n"
-print dict_json
-with io.open('output/output.json', 'w', encoding='utf-8') as f:
-    f.write(unicode(json.dumps(dict_json, ensure_ascii=False)))
-
+#print "DICT:\n"
+#print dict_json
+if args.output_file:
+    json_out = 'output/'+ str(args.output_file) + '.json'
+    with io.open(json_out, 'w', encoding='utf-8') as f:
+        f.write(unicode(json.dumps(dict_json, ensure_ascii=False)))
+    print "writing json file in:" + json_out
+else:
+    with io.open('output/output.json', 'w', encoding='utf-8') as f:
+        f.write(unicode(json.dumps(dict_json, ensure_ascii=False)))
+    print "writing json file in: output/output.json"
 
 # HTML page generation ###
 doc = dominate.document(title='SAPA output')
