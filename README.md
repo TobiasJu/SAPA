@@ -20,7 +20,7 @@ First run
 
 To get started simply type in:
 
-`./main.py -i data/truseq_example_data.csv`
+`./main.py -i  example_data/truseq_example_data.csv`
 
 this will run the program with the example dataset. Your output will be saved in the `output.txt` and `output.html` files.  
   
